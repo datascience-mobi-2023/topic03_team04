@@ -17,7 +17,9 @@ knitr::opts_chunk$set(echo = TRUE)
 Loading the data:
 
 ```{r}
-MS_Table <- read.table("C:/Users/tinel/OneDrive/Dokumente/RUPRECHT-KARLS-UNIVERSITÄT HEIDELBERG/MOBI/HOCHSCHULSEMESTER4/DATAANALYSIS/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+#MS_Table <- read.table("C:/Users/tinel/OneDrive/Dokumente/RUPRECHT-KARLS-UNIVERSITÄT HEIDELBERG/MOBI/HOCHSCHULSEMESTER4/DATAANALYSIS/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+
+#MS_Table <- read.table("C:/users/schad/Documents/Bioinfoprojekt/RDeeP_A549_NS.csv", header=TRUE, r+ow.names=1, sep = ";")
 
 #View(MS_Table)
 ```
