@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: "Proteome-wide Screen for RNA-dependent Proteins: non-synchronized A549 cells"
 author: "Johannes Schadt, Anastasia Möller, Sylviane Verschaeve, Tine Limberg"
@@ -20,3 +21,27 @@ MS_Table <- read.table("C:/Users/tinel/OneDrive/Dokumente/RUPRECHT-KARLS-UNIVERS
 
 #View(MS_Table)
 ```
+=======
+---
+title: "Proteome-wide Screen for RNA-dependent Proteins: non-synchronized A549 cells"
+author: "Johannes Schadt, Anastasia Möller, Sylviane Verschaeve, Tine Limberg"
+date: "2023-05-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) 
+```
+
+## Proteome-wide Screen for RNA-dependent Proteins:
+
+## *non-synchronized A549 cells*
+
+Loading the data:
+
+```{r}
+MS_Table <- read.table("C:/Users/tinel/OneDrive/Dokumente/RUPRECHT-KARLS-UNIVERSITÄT HEIDELBERG/MOBI/HOCHSCHULSEMESTER4/DATAANALYSIS/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+
+#View(MS_Table)
+```
+>>>>>>> e9c16b77e10bef107667d71d131f0b7969767e23
