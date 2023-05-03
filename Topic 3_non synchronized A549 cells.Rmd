@@ -20,4 +20,7 @@ Loading the data:
 MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.csv?dl=1', header=TRUE, row.names=1, sep = ";")
 
 #View(MS_Table)
+
+dim(MS_Table)
+
 ```
