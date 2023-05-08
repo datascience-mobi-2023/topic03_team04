@@ -13,6 +13,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Proteome-wide Screen for RNA-dependent Proteins:
 
 ## *non-synchronized A549 cells*
+Zum PDF exportieren
+```{r}
+tinytex::install_tinytex()
+```
 
 Loading the data:
 
