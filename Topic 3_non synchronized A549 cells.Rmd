@@ -23,4 +23,9 @@ MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.
 
 dim(MS_Table)
 
+class(MS_Table)
+
+#summary(MS_Table)
+
+anyNA(MS_Table)
 ```
