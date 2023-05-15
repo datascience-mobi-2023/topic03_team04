@@ -1,2 +1,6 @@
-<center>Abschlussbericht<center>
-#
+# <p align="center"> Abschlussbericht </p>
+<p align="center"> Tine Limberg, Anastasia Möller, Johannes Schadt, Sylviane Verschaeve </p>
+
+| Spalte 1 | Spalte 2 |
+| :------: | :------: |
+|   Text   |   Text   |
