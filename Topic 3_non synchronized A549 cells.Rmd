@@ -95,5 +95,55 @@ On them we apply separately the mean value methode.
 #rowMeans(MS_Table_Ctrl_rep1)
 #apply(MS_Table_Ctrl_rep1,1,sd)
 MS_Table_Ctrl_rep1_normalized <- apply(t(MS_Table_Ctrl_rep1),1, function(x)(x - mean(x)) / sd(x))
-View(MS_Table_Ctrl_rep1_normalized) PROBLEM RIGHT NO
+View(MS_Table_Ctrl_rep1_normalized)
 ```
+
+Another idea to apply the mean value method on each row of every dataframe. All values below 0 are set back to 0. 
+```{r}
+
+# MS_Table_Ctrl_rep1
+MS_Table_Ctrl_rep1_normalized <- t(apply(MS_Table_Ctrl_rep1, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+# View(MS_Table_Ctrl_rep1_normalized)
+
+# MS_Table_Ctrl_rep2
+MS_Table_Ctrl_rep2_normalized <- t(apply(MS_Table_Ctrl_rep2, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+# MS_Table_Ctrl_rep3
+MS_Table_Ctrl_rep3_normalized <- t(apply(MS_Table_Ctrl_rep3, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+# MS_Table_RNase_rep1
+MS_Table_RNase_rep1_normalized <- t(apply(MS_Table_RNase_rep1, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+# MS_Table_RNase_rep2
+MS_Table_RNase_rep2_normalized <- t(apply(MS_Table_RNase_rep2, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+# MS_Table_RNase_rep3
+MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+```
+
