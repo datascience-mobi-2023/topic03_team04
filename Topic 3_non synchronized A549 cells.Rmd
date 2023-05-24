@@ -96,6 +96,7 @@ On them we apply separately the mean value methode.
 #apply(MS_Table_Ctrl_rep1,1,sd)
 MS_Table_Ctrl_rep1_normalized <- apply(t(MS_Table_Ctrl_rep1),1, function(x)(x - mean(x)) / sd(x))
 View(MS_Table_Ctrl_rep1_normalized)
+# Der oben stehende code führt nicht die mean value methode durch. Daher siehe unten.  
 ```
 
 Another idea to apply the mean value method on each row of every dataframe. All values below 0 are set back to 0. 
@@ -147,25 +148,80 @@ MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
 
 ```
 
+Hier eine Möglichkeit direkt mit der Normalisierung auch noch die Skalierung auf 100 durchzuführen
+
+```{r}
+# MS_Table_Ctrl_rep1
+MS_Table_Ctrl_rep1_normalized <- t(apply(MS_Table_Ctrl_rep1, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# View(MS_Table_Ctrl_rep1_normalized)
+
+# MS_Table_Ctrl_rep2
+MS_Table_Ctrl_rep2_normalized <- t(apply(MS_Table_Ctrl_rep2, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# MS_Table_Ctrl_rep3
+MS_Table_Ctrl_rep3_normalized <- t(apply(MS_Table_Ctrl_rep3, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# MS_Table_RNase_rep1
+MS_Table_RNase_rep1_normalized <- t(apply(MS_Table_RNase_rep1, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# MS_Table_RNase_rep2
+MS_Table_RNase_rep2_normalized <- t(apply(MS_Table_RNase_rep2, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# MS_Table_RNase_rep3
+MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+```
 
 
 
-
-An idea to check the reproducibility 
+An idea to check the reproducibility -> das hinzufügen der Funktion as.numeric hat das Problem gelöst 
 ```{r}
 num_rows <- nrow(MS_Table_Ctrl_rep1)
 
 # create vector 
-correlations <- numeric(num_rows)
+correlations <- numeric(num_rows) 
 
 
-for (i in range[1:num_rows]) {
+for (i in 1:num_rows) {
   # select row i from MS_Table_Ctrl_rep1 and MS_Table_Ctrl_rep2 
-  row1 <- MS_Table_Ctrl_rep1[i, ]
-  row2 <- MS_Table_Ctrl_rep2[i, ]
+  row_rep1 <- as.numeric(MS_Table_Ctrl_rep1[i, ]) 
+  # Der Fehler war, dass die Rows nicht als Vector, sondern als Dataframe eingelesen wurden -> Sobald der Type richtig ist, kann er auch die Correlation ausrechnen. 
+  # Als weiterer Hinweis jedoch: Die Operation könnte etwas länger dauern, wenn ihrs für alle dfs macht. 
+  row_rep2 <- as.numeric(MS_Table_Ctrl_rep2[i, ])
   
   
-  correlation <- cor(row1, row2, method = "pearson")
+  correlation <- cor(row_rep1, row_rep2, method = "pearson")
   
   
   correlations[i] <- correlation
@@ -177,6 +233,5 @@ correlations
 #Achtung: funktioniert nicht, aber ich weiß nicht warum Fehlermeldung auftritt 
 
 ```
-
 
 
