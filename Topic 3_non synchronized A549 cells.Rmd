@@ -147,3 +147,36 @@ MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
 
 ```
 
+
+
+
+
+An idea to check the reproducibility 
+```{r}
+num_rows <- nrow(MS_Table_Ctrl_rep1)
+
+# create vector 
+correlations <- numeric(num_rows)
+
+
+for (i in range[1:num_rows]) {
+  # select row i from MS_Table_Ctrl_rep1 and MS_Table_Ctrl_rep2 
+  row1 <- MS_Table_Ctrl_rep1[i, ]
+  row2 <- MS_Table_Ctrl_rep2[i, ]
+  
+  
+  correlation <- cor(row1, row2, method = "pearson")
+  
+  
+  correlations[i] <- correlation
+}
+
+# show result 
+correlations
+
+#Achtung: funktioniert nicht, aber ich weiß nicht warum Fehlermeldung auftritt 
+
+```
+
+
+
