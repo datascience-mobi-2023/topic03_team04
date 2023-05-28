@@ -1,5 +1,5 @@
 ---
-title: "test_Topic 3_non synchronized A549"
+title: "Topic 3_non synchronized A549 mit z-Transformation"
 author: "Johannes Schadt, Anastasia Möller, Sylviane Verschaeve, Tine Limberg"
 date: "2023-05-24"
 output: html_document
@@ -16,14 +16,15 @@ knitr::opts_chunk$set(echo = TRUE)
 Zum PDF exportieren:
 
 ```{r}
-tinytex::install_tinytex()
+#tinytex::install_tinytex()
 ```
 
 Loading the data:
 
 ```{r}
-MS_Table <- read.csv('RDeep_A549_NS.csv', header=TRUE, row.names=1, sep = ",")
-View(MS_Table)
+#MS_Table <- read.csv('RDeep_A549_NS.csv', header=TRUE, row.names=1, sep = ",")
+#View(MS_Table)
+MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.csv?dl=1', header=TRUE, row.names=1, sep = ";")
 ```
 
 ## 1. Preparing data for analysis
@@ -84,9 +85,9 @@ MS_Table_RNase <-MS_Table_reordered[,76:150]
 #View(MS_Table_RNase)
 ```
 
-## 2. Scale and Reduce Dataset
+## 2. Normalize, Reduce and Scale Dataset
 
-#### 2.1 Normalization (mean value methode)
+#### 2.1 Normalization (z-Transformation)
 
 For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.
 
@@ -99,134 +100,179 @@ MS_Table_RNase_rep2 <-MS_Table_reordered[,101:125]
 MS_Table_RNase_rep3 <-MS_Table_reordered[,126:150]
 ```
 
-For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.
+Normalization with z-Transformation: We use the scale command. EXPLANATION WHY Z-TRANSFORMATION !!
 
-On them we apply separately the mean value methode.
-
-```{r}
-#rowMeans(MS_Table_Ctrl_rep1)
-#apply(MS_Table_Ctrl_rep1,1,sd)
-
-MS_Table_Ctrl_rep1_normalized <- apply(t(MS_Table_Ctrl_rep1),1, function(x)(x - mean(x)) / sd(x))
-
-View(MS_Table_Ctrl_rep1_normalized)
-```
-
-Another idea to apply the mean value method on each row of every dataframe. All values below 0 are set back to 0.
+NOTE to better understand the sweep function.
 
 ```{r}
-# MS_Table_Ctrl_rep1
+m <- matrix(1:6, nrow = 2)
+m
+# Subtract the mean of each column from the corresponding elements in the matrix
+swept_matrix <- sweep(m, 2, colMeans(m), FUN = "-")
 
-MS_Table_Ctrl_rep1_normalized <- t(apply(MS_Table_Ctrl_rep1, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
+print(swept_matrix)
 
-# View(MS_Table_Ctrl_rep1_normalized)
-# MS_Table_Ctrl_rep2
+applied_matrix <- apply(m, 2, function(x) x - mean(x))
 
-MS_Table_Ctrl_rep2_normalized <- t(apply(MS_Table_Ctrl_rep2, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
-
-# MS_Table_Ctrl_rep3
-
-MS_Table_Ctrl_rep3_normalized <- t(apply(MS_Table_Ctrl_rep3, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
-
-# MS_Table_RNase_rep1
-
-MS_Table_RNase_rep1_normalized <- t(apply(MS_Table_RNase_rep1, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
-
-# MS_Table_RNase_rep2
-
-MS_Table_RNase_rep2_normalized <- t(apply(MS_Table_RNase_rep2, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
-
-# MS_Table_RNase_rep3
-
-MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
+print(applied_matrix)
 ```
 
-\<\<\<\<\<\<\< Updated upstream
-
-An idea to check the reproducibility
+First the normalization for the Ctrl: 
 
 ```{r}
-num_rows <- nrow(MS_Table_Ctrl_rep1)
-
-# create vector
-
-correlations <- numeric(num_rows)
-for (i in range[1:num_rows]) {
-
-# select row i from MS_Table_Ctrl_rep1 and MS_Table_Ctrl_rep2
-
-row1 <- MS_Table_Ctrl_rep1[i, ] 
-row2 <- MS_Table_Ctrl_rep2[i, ]
-
-correlation <- cor(row1, row2, method = "pearson")
-correlations[i] <- correlation
-}
-
-# show result
-
-correlations
-
-#Achtung: funktioniert nicht, aber ich weiß nicht warum Fehlermeldung auftritt
+ctrl1_meanvalue = t(apply(MS_Table_Ctrl_rep1,1,function(x){x-mean(x)}))
+View(ctrl1_meanvalue)
 
 ```
-
-=======
-
-\- Hintergrundrauschen
-
-\- z-transformation benötigt alle 3 replicate, da sd ()
-
-\- Reproducibility ohne normalisierung (pearson!!)
-
-\- RBP und RNA dependent proteins!!
-
-\>\>\>\>\>\>\> Stashed changes
 
 ```{r}
 ctrl_z_transformed = t(scale(t(MS_Table_Ctrl)))
-RNase_z_transformed = t(scale(t(MS_Table_RNase)))
 
-ctrl1 = ctrl_z_transformed[,1:25]
-ctrl2 = ctrl_z_transformed[,26:50]
-ctrl3 = ctrl_z_transformed[,51:75]
+ctrl1_z_transformed = ctrl_z_transformed[,1:25]
+ctrl2_z_transformed = ctrl_z_transformed[,26:50]
+ctrl3_z_transformed = ctrl_z_transformed[,51:75]
 
-RNase1 = RNase_z_transformed[,1:25]
-RNase2 = RNase_z_transformed[,26:50]
-RNase3 = RNase_z_transformed[,51:75]
+#calculate the min value for each protein
+min_ctrl1_z_transformed = apply(ctrl1_z_transformed, 1, min)
+min_ctrl2_z_transformed = apply(ctrl2_z_transformed, 1, min)
+min_ctrl3_z_transformed = apply(ctrl3_z_transformed, 1, min)
 
-ctrl_mean = (ctrl1 + ctrl2 + ctrl3)/3
-ctrl_rowsums = rowSums(ctrl_mean)
-ctrl_mean_normalized = sweep(ctrl_mean, 1, ctrl_rowsums, "/")
-View(ctrl_mean)
-RNase_mean = (RNase1 + RNase2 + RNase3)/3
+ctrl1_pos.= sweep(ctrl1_z_transformed,1,min_ctrl1_z_transformed,FUN = '-')
+ctrl2_pos.= sweep(ctrl2_z_transformed,1,min_ctrl2_z_transformed,FUN = '-')
+ctrl3_pos.= sweep(ctrl3_z_transformed,1,min_ctrl3_z_transformed,FUN = '-')
 
-View(ctrl1)
+View(ctrl1_pos.)
+View(ctrl1_pos.)
+View(ctrl1_pos.)
+```
 
-test = RNase_mean-ctrl_mean
-a = prcomp(test)
-w = umap(a$x, search_k = 4)
+Still with the z-transformation we took for each protein the same mean over all values. Since the protein amount in each replicate is different, it is better to calculate the mean extra for each replicate. However the sd-value has not to be adapted. Because the replicates have the same variance (same procedure for every replicate in the wet lab), we don't have to calculate the standarddevidation for the replicates in each fraction extra. We can calculate the sd-value for one row /sd.
+
+*sd-values and mean values of Ctrl:*
+
+```{r}
+sd_MS_Table_Ctrl = apply(MS_Table_Ctrl, 1, sd)
+
+mean_MS_Table_Ctrl_rep1 = apply(MS_Table_Ctrl_rep1, 1, mean)
+mean_MS_Table_Ctrl_rep2 = apply(MS_Table_Ctrl_rep2, 1, mean)
+mean_MS_Table_Ctrl_rep3 = apply(MS_Table_Ctrl_rep3, 1, mean)
+```
+
+*Normalization of Ctrl:*
+
+```{r}
+ctrl1_meanvalue = sweep(MS_Table_Ctrl_rep1,1,mean_MS_Table_Ctrl_rep1,'-')
+ctrl1_normalized = sweep(ctrl1_meanvalue,1,sd_MS_Table_Ctrl,'/')
+
+ctrl2_meanvalue = sweep(MS_Table_Ctrl_rep2,1,mean_MS_Table_Ctrl_rep2,'-')
+ctrl2_normalized = sweep(ctrl2_meanvalue,1,sd_MS_Table_Ctrl,'/')
+
+ctrl3_meanvalue = sweep(MS_Table_Ctrl_rep3,1,mean_MS_Table_Ctrl_rep3,'-')
+ctrl3_normalized = sweep(ctrl3_meanvalue,1,sd_MS_Table_Ctrl,'/')
+
+#calculate again the min value for each protein
+min_ctrl1_normalized = apply(ctrl1_normalized, 1, min)
+min_ctrl2_normalized = apply(ctrl2_normalized, 1, min)
+min_ctrl3_normalized = apply(ctrl3_normalized, 1, min)
+
+#substract the min value from each position to discard the 0
+ctrl1_normalized_pos.= 
+  sweep(ctrl1_normalized,1,min_ctrl1_normalized,FUN = '-')
+ctrl2_normalized_pos.= 
+  sweep(ctrl2_normalized,1,min_ctrl2_normalized,FUN = '-')
+ctrl3_normalized_pos.= 
+  sweep(ctrl3_normalized,1,min_ctrl3_normalized,FUN = '-')
+```
+
+*sd-values and mean values of RNase:*
+
+```{r}
+sd_MS_Table_RNase = apply(MS_Table_RNase, 1, sd)
+
+mean_MS_Table_RNase_rep1 = apply(MS_Table_RNase_rep1, 1, mean)
+mean_MS_Table_RNase_rep2 = apply(MS_Table_RNase_rep2, 1, mean)
+mean_MS_Table_RNase_rep3 = apply(MS_Table_RNase_rep3, 1, mean)
+```
+
+*Normalization of Ctrl:*
+
+```{r}
+rnase1_meanvalue = sweep(MS_Table_RNase_rep1,1,mean_MS_Table_RNase_rep1,'-')
+rnase1_normalized = sweep(rnase1_meanvalue,1,sd_MS_Table_RNase,'/')
+
+rnase2_meanvalue = sweep(MS_Table_RNase_rep2,1,mean_MS_Table_RNase_rep2,'-')
+rnase2_normalized = sweep(rnase2_meanvalue,1,sd_MS_Table_RNase,'/')
+
+rnase3_meanvalue = sweep(MS_Table_RNase_rep3,1,mean_MS_Table_RNase_rep3,'-')
+rnase3_normalized = sweep(rnase3_meanvalue,1,sd_MS_Table_RNase,'/')
+
+#calculate again the min value for each protein
+min_rnase1_normalized = apply(rnase1_normalized, 1, min)
+min_rnase2_normalized = apply(rnase2_normalized, 1, min)
+min_rnase3_normalized = apply(rnase3_normalized, 1, min)
+
+#substract the min value from each position to discard the 0
+rnase1_normalized_pos.= 
+  sweep(rnase1_normalized,1,min_rnase1_normalized,FUN = '-')
+rnase2_normalized_pos.= 
+  sweep(rnase2_normalized,1,min_rnase2_normalized,FUN = '-')
+rnase3_normalized_pos.= 
+  sweep(rnase3_normalized,1,min_rnase3_normalized,FUN = '-')
+```
+
+#### 2.2 Reduce 
+
+To reduce we take the mean value between each replicate.
+
+```{r}
+ctrl_reduced = 
+  (ctrl1_normalized_pos. + ctrl2_normalized_pos. + ctrl3_normalized_pos.)/3
+rnase_reduced = 
+  (rnase1_normalized_pos. + rnase2_normalized_pos. + rnase3_normalized_pos.)/3
+```
+
+#### 2.3 Scaling to 100
+
+*Each Replicate of Ctrl:*
+
+```{r}
+ctrl1_scaled = 
+  sweep(ctrl1_normalized_pos.,1,100/rowSums(ctrl1_normalized_pos.),'*')
+# rowSums(ctrl1_scaled)
+ctrl2_scaled = 
+  sweep(ctrl2_normalized_pos.,1,100/rowSums(ctrl2_normalized_pos.),'*')
+# rowSums(ctrl2_scaled)
+ctrl3_scaled = 
+  sweep(ctrl3_normalized_pos.,1,100/rowSums(ctrl3_normalized_pos.),'*')
+# rowSums(ctrl3_scaled)
+```
+
+Reduced Ctrl:
+
+```{r}
+ctrl_scaled = 
+  sweep(ctrl_reduced,1,100/rowSums(ctrl_reduced),'*')
+# rowSums(ctrl_scaled)
+```
+
+*Each Replicate of RNase:*
+
+```{r}
+rnase1_scaled = 
+  sweep(rnase1_normalized_pos.,1,100/rowSums(rnase1_normalized_pos.),'*')
+# rowSums(rnase1_scaled)
+rnase2_scaled = 
+  sweep(rnase2_normalized_pos.,1,100/rowSums(rnase2_normalized_pos.),'*')
+# rowSums(rnase2_scaled)
+rnase3_scaled = 
+  sweep(rnase3_normalized_pos.,1,100/rowSums(rnase3_normalized_pos.),'*')
+# rowSums(rnase3_scaled)
+```
+
+*Reduced RNase*
+
+```{r}
+rnase_scaled = 
+  sweep(rnase_reduced,1,100/rowSums(rnase_reduced),'*')
+# rowSums(rnase_scaled)
 ```
