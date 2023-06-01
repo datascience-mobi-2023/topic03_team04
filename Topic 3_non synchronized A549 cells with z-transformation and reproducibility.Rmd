@@ -25,6 +25,7 @@ Loading the data:
 #MS_Table <- read.csv('RDeep_A549_NS.csv', header=TRUE, row.names=1, sep = ",")
 #View(MS_Table)
 MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.csv?dl=1', header=TRUE, row.names=1, sep = ";")
+View(MS_Table)
 ```
 
 ## 1. Preparing data for analysis
@@ -100,59 +101,85 @@ MS_Table_RNase_rep2 <-MS_Table_reordered[,101:125]
 MS_Table_RNase_rep3 <-MS_Table_reordered[,126:150]
 ```
 
-For some reason, one can only calculate the correlation, if the dataframes are in class 'matrix' and 'array'.
-
-```{r}
-ctrl_rep1 = data.matrix(MS_Table_Ctrl_rep1)
-ctrl_rep2 = data.matrix(MS_Table_Ctrl_rep2)
-ctrl_rep3 = data.matrix(MS_Table_Ctrl_rep3)
-
-rnase_rep1 = data.matrix(MS_Table_RNase_rep1)
-rnase_rep2 = data.matrix(MS_Table_RNase_rep2)
-rnase_rep3 = data.matrix(MS_Table_RNase_rep3)
-```
-
 ```{r, echo=FALSE}
 ctrl_cor = 
   cbind(ctrl_cor_1_2 = 
-          sapply(seq.int(dim(ctrl_rep1)[1]), function(x) cor(ctrl_rep1[x,], ctrl_rep2[x,])), 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep1[x,]), as.numeric(MS_Table_Ctrl_rep2[x,]))),
         ctrl_cor_2_3 = 
-          sapply(seq.int(dim(ctrl_rep1)[1]), function(x) cor(ctrl_rep2[x,], ctrl_rep3[x,])), 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep2[x,]), as.numeric(MS_Table_Ctrl_rep3[x,]))), 
         ctrl_cor_1_3 = 
-          sapply(seq.int(dim(ctrl_rep1)[1]), function(x) cor(ctrl_rep1[x,], ctrl_rep3[x,])))
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep1[x,]), as.numeric(MS_Table_Ctrl_rep3[x,]))))
 
 rnase_cor = 
   cbind(rnase_cor_1_2 = 
-          sapply(seq.int(dim(rnase_rep1)[1]), function(x) cor(rnase_rep1[x,], rnase_rep2[x,])), 
+         sapply(seq.int(dim(MS_Table_RNase_rep1)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep1[x,]), as.numeric(MS_Table_RNase_rep2[x,]))),
         rnase_cor_2_3 = 
-          sapply(seq.int(dim(rnase_rep1)[1]), function(x) cor(rnase_rep2[x,], rnase_rep3[x,])), 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep2[x,]), as.numeric(MS_Table_RNase_rep3[x,]))), 
         rnase_cor_1_3 = 
-          sapply(seq.int(dim(rnase_rep1)[1]), function(x) cor(rnase_rep1[x,], rnase_rep3[x,])))
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep1[x,]), as.numeric(MS_Table_RNase_rep3[x,]))))
 
+ctrl_rnase_cor <- cbind(ctrl_cor,rnase_cor)
 ```
 
 ```{r}
-ctrl_na_rows <- which(rowSums(is.na(ctrl_cor)) > 0)
-ctrl_na_rows
+total_na = which(rowSums(is.na(ctrl_rnase_cor)) > 0)
+length(total_na)
+MS_Table_naremoved = MS_Table_reordered[-total_na,]
 
-rnase_na_rows <- which(rowSums(is.na(rnase_cor)) > 0)
-rnase_na_rows
-length(rnase_na_rows)
+MS_Table_Ctrl_rep1_naremoved <-MS_Table_naremoved[,1:25]
+MS_Table_Ctrl_rep2_naremoved <-MS_Table_naremoved[,26:50]
+MS_Table_Ctrl_rep3_naremoved <-MS_Table_naremoved[,51:75]
+MS_Table_RNase_rep1_naremoved <-MS_Table_naremoved[,76:100]
+MS_Table_RNase_rep2_naremoved <-MS_Table_naremoved[,101:125]
+MS_Table_RNase_rep3_naremoved <-MS_Table_naremoved[,126:150]
+```
+
+```{r}
+ctrl_cor_naremoved = 
+  cbind(ctrl_cor_1_2_naremoved = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep1_naremoved[x,]), as.numeric(MS_Table_Ctrl_rep2_naremoved[x,]))),
+        ctrl_cor_2_3_naremoved = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep2_naremoved[x,]), as.numeric(MS_Table_Ctrl_rep3_naremoved[x,]))), 
+        ctrl_cor_1_3_naremoved = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep1_naremoved[x,]), as.numeric(MS_Table_Ctrl_rep3_naremoved[x,]))))
+
+rnase_cor_naremoved = 
+  cbind(rnase_cor_1_2_naremoved = 
+         sapply(seq.int(dim(MS_Table_RNase_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep1_naremoved[x,]), as.numeric(MS_Table_RNase_rep2_naremoved[x,]))),
+        rnase_cor_2_3_naremoved = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep2_naremoved[x,]), as.numeric(MS_Table_RNase_rep3_naremoved[x,]))), 
+        rnase_cor_1_3_naremoved = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep1_naremoved[x,]), as.numeric(MS_Table_RNase_rep3_naremoved[x,]))))
+
+View(ctrl_cor_naremoved)
+```
+
+```{r}
+library(ggplot2)
+rnase_cor_data_frame_naremoved = data.frame(c(rnase_cor_naremoved[,1],rnase_cor_naremoved[,2],rnase_cor_naremoved[,3]))
+colnames(rnase_cor_data_frame_naremoved) = "correlation"
+ggplot(rnase_cor_data_frame_naremoved, aes(x=correlation)) + geom_histogram()
 ```
 
 In total we look at 3\*3680 correlation. This has to be taken into account, when looking at the graphs. It is import to figure out if the 3 cor are for one protein or for 3 different ones.
 
 ```{r}
 library(ggplot2)
-rnase_cor_data_frame = data.frame(c(rnase_cor[,1],rnase_cor[,2],rnase_cor[,3]))
-colnames(rnase_cor_data_frame) = "correlation"
-ggplot(rnase_cor_data_frame, aes(x=correlation)) + geom_histogram()
+ctrl_cor_data_frame_naremoved = data.frame(c(ctrl_cor_naremoved[,1],ctrl_cor_naremoved[,2],ctrl_cor_naremoved[,3]))
+colnames(ctrl_cor_data_frame_naremoved) = "correlation"
+ggplot(ctrl_cor_data_frame_naremoved, aes(x=correlation)) + geom_histogram()
 ```
 
 ```{r}
-ctrl_cor_data_frame = data.frame(c(ctrl_cor[,1],ctrl_cor[,2],ctrl_cor[,3]))
-colnames(ctrl_cor_data_frame) = "correlation"
-ggplot(ctrl_cor_data_frame, aes(x=correlation)) + geom_histogram()
+# ctrl_cor_naremoved[,1] < 0.75
+# ctrl_cor_naremoved[,2] < 0.75
+# ctrl_cor_naremoved[,3] < 0.75
+non_reproducible_ctrl=which(rowSums(ctrl_cor_naremoved<0.60)>1)
+length(non_reproducible_ctrl)
+non_reproducible_rnase=which(rowSums(rnase_cor_naremoved<0.60)>1)
+length(non_reproducible_rnase)
+#non_reproducible = unique(which(rowSums(ctrl_cor_naremoved<0.60)>0), which(rowSums(rnase_cor_naremoved<0.60)>0))
+#length(non_reproducible)
 ```
 
 ```{r}
@@ -311,6 +338,7 @@ ctrl2_scaled =
 ctrl3_scaled = 
   sweep(ctrl3_normalized_pos.,1,100/rowSums(ctrl3_normalized_pos.),'*')
 # rowSums(ctrl3_scaled)
+View(ctrl1_scaled)
 ```
 
 Reduced Ctrl:
