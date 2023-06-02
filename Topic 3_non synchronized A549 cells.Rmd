@@ -26,20 +26,20 @@ head(colnames(MS_Table))
 
 ## 1. Preparing data for analysis
 
-### 1.1 Check for missing values
+### 1.1. Check for missing values
 
 ```{r}
 sum(apply(MS_Table, 1, anyNA)) == 0
 sum(is.na(MS_Table)) == 0
 ```
 
-### 1.2 Check data format
+### 1.2. Check data format
 
 ```{r}
 sum(apply(MS_Table, 1, is.numeric)) == nrow(MS_Table)
 ```
 
-### 1.3 Deleting rows with only zeros
+### 1.3. Deleting rows with only zeros
 
 ```{r}
 min(MS_Table)
@@ -48,9 +48,9 @@ sum(apply(MS_Table,1,sum)==0)
 
 -\> da die Summe der Zeileneinträge keines Proteins 0 entspricht, wurde ein Dataframe aus False erstellt. Einträge ausschließlich False, werden durch die sum Funktion als 0 aufaddiert.
 
-### 1.4 Rearranging of Data
+### 1.4. Rearranging of Data
 
-#### 1.4.1 Reordering columns
+#### 1.4.1. Reordering columns
 
 ```{r}
 MS_Table_reordered <- MS_Table[, c(
@@ -65,7 +65,7 @@ MS_Table_reordered <- MS_Table[, c(
 sum(apply(MS_Table_reordered, 2, is.numeric)) == ncol(MS_Table)
 ```
 
-#### 1.4.2 Separate Ctrl and RNase
+#### 1.4.2. Separate Ctrl and RNase
 
 ```{r}
 MS_Table_Ctrl <-MS_Table_reordered[,1:75]
@@ -74,7 +74,7 @@ MS_Table_RNase <-MS_Table_reordered[,76:150]
 #View(MS_Table_RNase)
 ```
 
-### 1.5. Reproducibility
+## 2. Reproducibility
 
 Here we test whether the replicates are similar to each other. This would mean, that the experiment is reproducible, thus the data is reliable. Proteins that do not satisfy this condition will be removed from the dataset and will not be analysed.
 
@@ -110,7 +110,7 @@ correlations
 
 ```
 
-## 2. Scale and Reduce Dataset
+## 3. Scaled and Reduced Dataset
 
 For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.
 
@@ -123,17 +123,9 @@ rnase.rep2 <-MS_Table_reordered[,101:125]
 rnase.rep3 <-MS_Table_reordered[,126:150]
 ```
 
-### 2.1a Normalization (mean value method)
+### 3.1. Mean Value Method
 
-On them we apply separately the mean value method.
-
-```{r}
-#rowMeans(MS_Table_Ctrl_rep1)
-#apply(MS_Table_Ctrl_rep1,1,sd)
-MS_Table_Ctrl_rep1_normalized <- apply(t(MS_Table_Ctrl_rep1),1, function(x)(x - mean(x)) / sd(x))
-View(MS_Table_Ctrl_rep1_normalized)
-# Der oben stehende code führt nicht die mean value methode durch. Daher siehe unten.  
-```
+#### 3.1.1. Normalization
 
 We perform the mean-value-method (mvm) on each replicate, both control and RNase:
 
@@ -190,7 +182,205 @@ rnase.rep3.mvm.norm <- t(apply(rnase.rep3, 1, function(x) {
 
 ```
 
-### 2.1b Normalization (Min-Max-Scaling)
+#### 3.1.2. Reduction
+
+To reduce we take the mean value between each replicate.
+
+```{r}
+ctrl.mvm.reduced = 
+  (ctrl.rep1.mvm.norm + ctrl.rep2.mvm.norm + ctrl.rep3.mvm.norm)/3
+
+rnase.mvm.reduced = 
+  (rnase.rep1.mvm.norm + rnase.rep2.mvm.norm + rnase.rep3.mvm.norm)/3
+
+```
+
+#### 3.1.3. Scaling
+
+To test whether we have "lost" our scaling during the merge, and find out whether scaling back to 100 is necessary, we scale the control to 100 and compare it with the original control.
+
+```{r}
+ctrl.mvm.scaled = 
+  sweep(ctrl.mvm.reduced,1,100/rowSums(ctrl.mvm.reduced),'*')
+
+# Check if the two data frames are identical
+is_identical <- identical(ctrl.mvm.reduced, ctrl.mvm)
+
+# Print the result
+if (is_identical) {
+  print("The data frames are identical.")
+ } else {
+  print("The data frames are not identical.")
+ }
+```
+
+-\> scaling back to 100 is necessary
+
+Because scaling back to 100 is necessary, we do it for the RNase too:
+
+```{r}
+rnase.mvm.scaled = 
+  sweep(rnase.mvm.reduced,1,100/rowSums(rnase.mvm.reduced),'*')
+
+```
+
+Now we have normalized our data using the mean-value-method, and scaled it to 100. The two variables that will be used later on either contain the normalized (mvm) and scaled data of the control: **ctrl.mvm** or the normalized (mvm) and scaled data of the rnase: **rnase.mvm**
+
+```{r}
+ctrl.mvm <- ctrl.mvm.scaled
+rnase.mvm <- rnase.mvm.scaled
+```
+
+### 3.2. Z - TRansformation
+
+#### 3.2.1. Normalization
+
+Normalization with z-Transformation: We use the scale command. EXPLANATION WHY Z-TRANSFORMATION !!
+
+NOTE to better understand the sweep function.
+
+```{r}
+m <- matrix(1:6, nrow = 2)
+m
+# Subtract the mean of each column from the corresponding elements in the matrix
+swept_matrix <- sweep(m, 2, colMeans(m), FUN = "-")
+
+print(swept_matrix)
+
+applied_matrix <- apply(m, 2, function(x) x - mean(x))
+
+print(applied_matrix)
+```
+
+First the normalization for the Ctrl: 
+
+Since the protein amount in each replicate is different, it is better to calculate the mean for each replicate separately. However the sd-value does not have to be adapted. Because the replicates have the same variance (same procedure for every replicate in the wet lab), we don't have to calculate the standard devidation for the replicates in each fraction extra. We can calculate the sd-value for one row /sd.
+
+*sd-values and mean values of Ctrl:*
+
+```{r}
+sd.ctrl <- apply(ctrl.rep1, 1, sd)
+
+mean.ctrl.rep1 <- apply(ctrl.rep1, 1, mean)
+mean.ctrl.rep2 <- apply(ctrl.rep2, 1, mean)
+mean.ctrl.rep3 <- apply(ctrl.rep3, 1, mean)
+```
+
+*Normalization of Ctrl:*
+
+```{r}
+ctrl.rep1.meanvalue <- sweep(ctrl.rep1,1,mean.ctrl.rep1,'-')
+ctrl.rep1.zt.norm <- sweep(ctrl.rep1.meanvalue,1,sd.ctrl,'/')
+
+ctrl.rep2.meanvalue <- sweep(ctrl.rep2,1,mean.ctrl.rep2,'-')
+ctrl.rep2.zt.norm <- sweep(ctrl.rep2.meanvalue,1,sd.ctrl,'/')
+
+ctrl.rep3.meanvalue <- sweep(ctrl.rep3,1,mean.ctrl.rep3,'-')
+ctrl.rep3.zt.norm <- sweep(ctrl.rep3.meanvalue,1,sd.ctrl,'/')
+
+#calculate again the min value for each protein
+min.ctrl.rep1.zt.norm <- apply(ctrl.rep1.zt.norm, 1, min)
+min.ctrl.rep2.zt.norm <- apply(ctrl.rep2.zt.norm, 1, min)
+min.ctrl.rep3.zt.norm <- apply(ctrl.rep3.zt.norm, 1, min)
+
+#substract the min value from each position to discard the 0
+ctrl.rep1.zt.norm.pos <- sweep(ctrl.rep1.zt.norm,1,min.ctrl.rep1.zt.norm,FUN = '-')
+ctrl.rep2.zt.norm.pos <- sweep(ctrl.rep2.zt.norm,1,min.ctrl.rep2.zt.norm,FUN = '-')
+ctrl.rep3.zt.norm.pos <- sweep(ctrl.rep3.zt.norm,1,min.ctrl.rep3.zt.norm,FUN = '-')
+```
+
+*sd-values and mean values of RNase:*
+
+```{r}
+sd.rnase = apply(rnase.rep1, 1, sd)
+
+mean.rnase.rep1 <- apply(rnase.rep1, 1, mean)
+mean.rnase.rep2 <- apply(rnase.rep2, 1, mean)
+mean.rnase.rep3 <- apply(rnase.rep3, 1, mean)
+```
+
+*Normalization of RNase:*
+
+```{r}
+rnase.rep1.meanvalue <- sweep(rnase.rep1,1,mean.rnase.rep1,'-')
+rnase.rep1.zt.norm <- sweep(rnase.rep1.meanvalue,1,sd.rnase,'/')
+
+rnase.rep2.meanvalue <- sweep(rnase.rep2,1,mean.rnase.rep2,'-')
+rnase.rep2.zt.norm <- sweep(rnase.rep2.meanvalue,1,sd.rnase,'/')
+
+rnase.rep3.meanvalue <- sweep(rnase.rep3,1,mean.rnase.rep3,'-')
+rnase.rep3.zt.norm <- sweep(rnase.rep3.meanvalue,1,sd.rnase,'/')
+
+#calculate again the min value for each protein
+min.rnase.rep1.zt.norm <- apply(rnase.rep1.zt.norm, 1, min)
+min.rnase.rep2.zt.norm <- apply(rnase.rep2.zt.norm, 1, min)
+min.rnase.rep3.zt.norm <- apply(rnase.rep3.zt.norm, 1, min)
+
+#substract the min value from each position to discard the 0
+rnase.rep1.zt.norm.pos <- sweep(rnase.rep1.zt.norm,1,min.rnase.rep1.zt.norm,FUN = '-')
+rnase.rep2.zt.norm.pos <- sweep(rnase.rep2.zt.norm,1,min.rnase.rep2.zt.norm,FUN = '-')
+rnase.rep3.zt.norm.pos <- sweep(rnase.rep3.zt.norm,1,min.rnase.rep3.zt.norm,FUN = '-')
+```
+
+#### 3.2.2. Reduction
+
+To reduce we take the mean value between each replicate.
+
+```{r}
+ctrl.zt.reduced <- (ctrl.rep1.zt.norm.pos + ctrl.rep2.zt.norm.pos + ctrl.rep3.zt.norm.pos)/3
+
+rnase.zt.reduced <- (rnase.rep1.zt.norm.pos + rnase.rep2.zt.norm.pos + rnase.rep3.zt.norm.pos)/3
+```
+
+#### 3.2.3. Scaling
+
+*Each Replicate of Ctrl:*
+
+```{r}
+ctrl.rep1.zt.scaled = 
+  sweep(ctrl.rep1.zt.norm.pos,1,100/rowSums(ctrl.rep1.zt.norm.pos),'*')
+# rowSums(ctrl.rep1.zt.scaled)
+ctrl.rep2.zt.scaled = 
+  sweep(ctrl.rep2.zt.norm.pos,1,100/rowSums(ctrl.rep2.zt.norm.pos),'*')
+# rowSums(ctrl.rep2.zt.scaled)
+ctrl.rep3.zt.scaled = 
+  sweep(ctrl.rep3.zt.norm.pos,1,100/rowSums(ctrl.rep3.zt.norm.pos),'*')
+# rowSums(ctrl.rep3.zt.scaled)
+```
+
+Reduced Ctrl:
+
+```{r}
+ctrl.zt.scaled = 
+  sweep(ctrl.zt.reduced,1,100/rowSums(ctrl.zt.reduced),'*')
+# rowSums(ctrl.zt.scaled)
+```
+
+*Each Replicate of RNase:*
+
+```{r}
+rnase.rep1.zt.scaled = 
+  sweep(rnase.rep1.zt.norm.pos,1,100/rowSums(rnase.rep1.zt.norm.pos),'*')
+# rowSums(rnase.rep1.zt.scaled)
+rnase.rep2.zt.scaled = 
+  sweep(rnase.rep2.zt.norm.pos,1,100/rowSums(rnase.rep2.zt.norm.pos),'*')
+# rowSums(rnase.rep2.zt.scaled)
+rnase.rep3.zt.scaled = 
+  sweep(rnase.rep3.zt.norm.pos,1,100/rowSums(rnase.rep3.zt.norm.pos),'*')
+# rowSums(rnase.rep3.zt.scaled)
+```
+
+*Reduced RNase*
+
+```{r}
+rnase.zt.scaled = 
+  sweep(rnase.zt.reduced,1,100/rowSums(rnase.zt.reduced),'*')
+# rowSums(rnase.zt.scaled)
+```
+
+### 3.3. Min-Max-Scaling
+
+#### 3.3.1. Normalization
 
 We perform min-max-scaling (mms) on each replicate, both control and RNase:
 
@@ -227,7 +417,7 @@ rnase.rep3.mms.norm <- t(apply(rnase.rep3, 1, function(x) {
 }))
 ```
 
-To prove that the algorithm works we use is on a test matrix: (byrow = TRUE, dass die Zahen Zeilenweise die Matrix füllen, nicht spaltenweise)
+To prove that the algorithm works we use is on a test matrix:
 
 ```{r}
 test_matrix <- matrix(c(1,45,3,8,27,4,79,30,0,100,99,50,0,76,1,4,6,3,8,7,3), byrow = TRUE, nrow = 3)
@@ -240,39 +430,50 @@ test_normalized <- t(apply(test_matrix, 1, function(x){
 #test_normalized
 ```
 
-Now we merge the three replicates:
+#### 3.3.2. Reduction
+
+To reduce we take the mean value between each replicate.
 
 ```{r}
-ctrl.mms.merged <- ((ctrl.rep1.mms.norm + ctrl.rep2.mms.norm + ctrl.rep3.mms.norm)/3)
+ctrl.mms.reduced <- ((ctrl.rep1.mms.norm + ctrl.rep2.mms.norm + ctrl.rep3.mms.norm)/3)
 
-rnase.mms.merged <- ((rnase.rep1.mms.norm + rnase.rep2.mms.norm + rnase.rep3.mms.norm)/3)
+rnase.mms.reduced <- ((rnase.rep1.mms.norm + rnase.rep2.mms.norm + rnase.rep3.mms.norm)/3)
 ```
+
+#### 3.3.3. Scaling
 
 Those have to be scaled again:
 
 ```{r}
-ctrl.mms <- t(apply(ctrl.mms.merged, 1, function(x) {
+ctrl.mms.scaled <- t(apply(ctrl.mms.reduced, 1, function(x) {
   normalized <- (x-min(x))/(max(x)-min(x))
 }))
 
-rnase.mms <- t(apply(rnase.mms.merged, 1, function(x){
+rnase.mms.scaled <- t(apply(rnase.mms.reduced, 1, function(x){
   normalized <- (x-min(x))/(max(x)-min(x))
 }))
 ```
 
-Now we can plot graphs that show the result of the merge and second scaling. This is only an example (control sample of the first protein), the plotting of all proteins will be done later on:
+Now we can plot graphs that show the result of the merge and second scaling. This is only an example (RNase sample of the first protein), the plotting of all proteins will be done later on:
 
 ```{r}
 ##plots of the scaled replicates
 
-#plot(rnase.rep1.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
-#plot(rnase.rep2.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
-#plot(rnase.rep3.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
+plot(rnase.rep1.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
+plot(rnase.rep2.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
+plot(rnase.rep3.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
 
 ##plot of the merged ctrl
 
-#plot(rnase.mms.merged[1,], xlab="fraction", ylab="protein amount", col="red", pch=20)
+plot(rnase.mms.reduced[1,], xlab="fraction", ylab="protein amount", col="red", pch=20)
 
 ##plot of the merged and scaled ctrl
-#plot(rnase.mms[1,], xlab="fraction", ylab="protein amount", col="blue", pch=20)
+plot(rnase.mms.scaled[1,], xlab="fraction", ylab="protein amount", col="blue", pch=20)
+```
+
+Now we have normalized/scaled our data using min-max-scaling. The two variables that will be used later on either contain the normalized/scaled (mms) of the control: **ctrl.mms** or the normalized/scaled (mms) and scaled data of the rnase: **rnase.mms**
+
+```{r}
+ctrl.mms <- ctrl.mms.scaled
+rnase.mms <- rnase.mms.scaled
 ```
