@@ -99,7 +99,8 @@ View(MS_Table_Ctrl_rep1_normalized)
 # Der oben stehende code führt nicht die mean value methode durch. Daher siehe unten.  
 ```
 
-Another idea to apply the mean value method on each row of every dataframe. All values below 0 are set back to 0. 
+Another idea to apply the mean value method on each row of every dataframe. All values below 0 are set back to 0.
+
 ```{r}
 
 # MS_Table_Ctrl_rep1
@@ -203,7 +204,8 @@ MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
 
 ```
 
-Unite the replicates and scale back to 100 - Control 
+Unite the replicates and scale back to 100 - Control
+
 ```{r}
 MS_Table_Ctrl_reduced = 
   (MS_Table_Ctrl_rep1_normalized + MS_Table_Ctrl_rep2_normalized + MS_Table_Ctrl_rep3_normalized)/3
@@ -220,9 +222,11 @@ if (is_identical) {
   print("The data frames are not identical.")
 }
 ```
--> scaling back to 100 is necessary
+
+-\> scaling back to 100 is necessary
 
 Unite the replicates and scale back to 100 - RNase
+
 ```{r}
 
 MS_Table_RNase_reduced = 
@@ -232,7 +236,8 @@ MS_Table_RNase_scaled =
 
 ```
 
-creating line graphs 
+creating line graphs
+
 ```{r}
 # Anzahl der Zeilen im Dataframe
 num_rows <- nrow(MS_Table_RNase_scaled)
@@ -269,10 +274,8 @@ for (i in 1:num_rows) {
 
 ```
 
+An idea to check the reproducibility -\> das hinzufügen der Funktion as.numeric hat das Problem gelöst \## Correlation Control rep 1&2
 
-
-An idea to check the reproducibility -> das hinzufügen der Funktion as.numeric hat das Problem gelöst
-## Correlation Control rep 1&2
 ```{r}
  
 num_rows <- nrow(MS_Table_Ctrl_rep1)
@@ -302,7 +305,8 @@ correlations
 
 ```
 
-shorter version to check reproducibility 
+shorter version to check reproducibility
+
 ```{r}
 ctrl_cor = 
   cbind(ctrl_cor_1_2 = 
@@ -353,4 +357,3 @@ MS_Table_RNase_clean = MS_Table_RNase[-non_reproducible,]
 
 'View(MS_Table_Ctrl_clean)
 ```
-

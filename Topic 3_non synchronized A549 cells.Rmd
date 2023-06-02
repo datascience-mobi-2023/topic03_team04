@@ -18,9 +18,7 @@ Loading the data:
 MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.csv?dl=1', header=TRUE, row.names=1, sep = ";")
 ```
 
-## 1. Preparing data for analysis
-
-#### 0.1 Data description
+## 0. Data description
 
 ```{r}
 dim(MS_Table)
@@ -28,20 +26,22 @@ head(rownames(MS_Table))
 head(colnames(MS_Table))
 ```
 
-#### 1.1 Check for missing values
+## 1. Preparing data for analysis
+
+### 1.1 Check for missing values
 
 ```{r}
 sum(apply(MS_Table, 1, anyNA)) == 0
 sum(is.na(MS_Table)) == 0
 ```
 
-#### 1.2 Check data format
+### 1.2 Check data format
 
 ```{r}
 sum(apply(MS_Table, 1, is.numeric)) == nrow(MS_Table)
 ```
 
-#### 1.3 Deleting rows with only zeros
+### 1.3 Deleting rows with only zeros
 
 ```{r}
 min(MS_Table)
@@ -49,6 +49,8 @@ sum(apply(MS_Table,1,sum)==0)
 ```
 
 -\> da die Summe der Zeileneinträge keines Proteins 0 entspricht, wurde ein Dataframe aus False erstellt. Einträge ausschließlich False, werden durch die sum Funktion als 0 aufaddiert.
+
+### 1.4 Rearranging of Data
 
 #### 1.4.1 Reordering columns
 
@@ -76,7 +78,7 @@ MS_Table_RNase <-MS_Table_reordered[,76:150]
 
 ## 2. Scale and Reduce Dataset
 
-#### 2.1 Normalization (mean value methode)
+### 2.1a Normalization (mean value methode)
 
 For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.
 
@@ -99,7 +101,8 @@ View(MS_Table_Ctrl_rep1_normalized)
 # Der oben stehende code führt nicht die mean value methode durch. Daher siehe unten.  
 ```
 
-Another idea to apply the mean value method on each row of every dataframe. All values below 0 are set back to 0. 
+Another idea to apply the mean value method on each row of every dataframe. All values below 0 are set back to 0.
+
 ```{r}
 
 # MS_Table_Ctrl_rep1
@@ -147,7 +150,6 @@ MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
 }))
 
 ```
-
 
 Hier eine Möglichkeit direkt mit der Normalisierung auch noch die Skalierung auf 100 durchzuführen
 
@@ -204,9 +206,8 @@ MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
 
 ```
 
+An idea to check the reproducibility -\> das hinzufügen der Funktion as.numeric hat das Problem gelöst
 
-
-An idea to check the reproducibility -> das hinzufügen der Funktion as.numeric hat das Problem gelöst 
 ```{r}
 num_rows <- nrow(MS_Table_Ctrl_rep1)
 
@@ -233,6 +234,8 @@ correlations
 
 #Achtung: funktioniert nicht, aber ich weiß nicht warum Fehlermeldung auftritt
 
+```
+
 ### 2.1b Normalization (Min-Max-Scaling)
 
 For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.(This step resembles to 2.1, but this way we can avoid any confusion)
@@ -247,6 +250,7 @@ rnase.rep3.MMS <-MS_Table_reordered[,126:150]
 ```
 
 On them we apply Min-Max-Scaling:
+
 ```{r}
 
 # ctrl.rep1.MMS
@@ -294,6 +298,7 @@ test_normalized <- t(apply(test_matrix, 1, function(x){
 ```
 
 Now we merge the three replicates:
+
 ```{r}
 ctrl.MMS.merged <- ((ctrl.rep1.MMS.norm + ctrl.rep2.MMS.norm + ctrl.rep3.MMS.norm)/3)
 
@@ -301,6 +306,7 @@ rnase.MMS.merged <- ((rnase.rep1.MMS.norm + rnase.rep2.MMS.norm + rnase.rep3.MMS
 ```
 
 Those have to be scaled again:
+
 ```{r}
 ctrl.MMS <- t(apply(ctrl.MMS.merged, 1, function(x) {
   normalized <- (x-min(x))/(max(x)-min(x))
@@ -312,6 +318,7 @@ rnase.MMS <- t(apply(rnase.MMS.merged, 1, function(x){
 ```
 
 Now we can plot graphs that show the result of the merge and second scaling. This is only an example (control sample of the first protein), the plotting of all proteins will be done later on:
+
 ```{r}
 #plots of the scaled replicates
 plot(rnase.rep1.MMS.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
@@ -324,8 +331,3 @@ plot(rnase.MMS.merged[1,], xlab="fraction", ylab="protein amount", col="red", pc
 #plot of the merged and scaled ctrl
 plot(rnase.MMS[1,], xlab="fraction", ylab="protein amount", col="blue", pch=20)
 ```
-
-
-
-
-
