@@ -1,0 +1,356 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) 
+```
+
+## Proteome-wide Screen for RNA-dependent Proteins:
+
+## *non-synchronized A549 cells*
+
+Zum PDF exportieren
+
+```{r}
+# tinytex::install_tinytex()
+```
+
+Loading the data:
+
+```{r}
+MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.csv?dl=1', header=TRUE, row.names=1, sep = ";")
+```
+
+## 1. Preparing data for analysis
+
+#### 0.1 Data description
+
+```{r}
+dim(MS_Table)
+head(rownames(MS_Table))
+head(colnames(MS_Table))
+```
+
+#### 1.1 Check for missing values
+
+```{r}
+sum(apply(MS_Table, 1, anyNA)) == 0
+sum(is.na(MS_Table)) == 0
+```
+
+#### 1.2 Check data format
+
+```{r}
+sum(apply(MS_Table, 1, is.numeric)) == nrow(MS_Table)
+```
+
+#### 1.3 Deleting rows with only zeros
+
+```{r}
+min(MS_Table)
+sum(apply(MS_Table,1,sum)==0)
+```
+
+-\> da die Summe der Zeileneinträge keines Proteins 0 entspricht, wurde ein Dataframe aus False erstellt. Einträge ausschließlich False, werden durch die sum Funktion als 0 aufaddiert.
+
+#### 1.4.1 Reordering columns
+
+```{r}
+MS_Table_reordered <- MS_Table[, c(
+  paste0("Fraction", 1:25, "_Ctrl_Rep1"),
+  paste0("Fraction", 1:25, "_Ctrl_Rep2"),
+  paste0("Fraction", 1:25, "_Ctrl_Rep3"),
+  paste0("Fraction", 1:25, "_RNase_Rep1"),
+  paste0("Fraction", 1:25, "_RNase_Rep2"),
+  paste0("Fraction", 1:25, "_RNase_Rep3")
+)]
+# View(MS_Table_reordered)
+sum(apply(MS_Table_reordered, 2, is.numeric)) == ncol(MS_Table)
+```
+
+#### 1.4.2 Separate Ctrl and RNase
+
+```{r}
+MS_Table_Ctrl <-MS_Table_reordered[,1:75]
+#View(MS_Table_Ctrl)
+MS_Table_RNase <-MS_Table_reordered[,76:150]
+#View(MS_Table_RNase)
+```
+
+## 2. Scale and Reduce Dataset
+
+#### 2.1 Normalization (mean value methode)
+
+For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.
+
+```{r}
+MS_Table_Ctrl_rep1 <-MS_Table_reordered[,1:25]
+MS_Table_Ctrl_rep2 <-MS_Table_reordered[,26:50]
+MS_Table_Ctrl_rep3 <-MS_Table_reordered[,51:75]
+MS_Table_RNase_rep1 <-MS_Table_reordered[,76:100]
+MS_Table_RNase_rep2 <-MS_Table_reordered[,101:125]
+MS_Table_RNase_rep3 <-MS_Table_reordered[,126:150]
+```
+
+On them we apply separately the mean value methode.
+
+```{r}
+#rowMeans(MS_Table_Ctrl_rep1)
+#apply(MS_Table_Ctrl_rep1,1,sd)
+MS_Table_Ctrl_rep1_normalized <- apply(t(MS_Table_Ctrl_rep1),1, function(x)(x - mean(x)) / sd(x))
+View(MS_Table_Ctrl_rep1_normalized)
+# Der oben stehende code führt nicht die mean value methode durch. Daher siehe unten.  
+```
+
+Another idea to apply the mean value method on each row of every dataframe. All values below 0 are set back to 0. 
+```{r}
+
+# MS_Table_Ctrl_rep1
+MS_Table_Ctrl_rep1_normalized <- t(apply(MS_Table_Ctrl_rep1, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+# View(MS_Table_Ctrl_rep1_normalized)
+
+# MS_Table_Ctrl_rep2
+MS_Table_Ctrl_rep2_normalized <- t(apply(MS_Table_Ctrl_rep2, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+# MS_Table_Ctrl_rep3
+MS_Table_Ctrl_rep3_normalized <- t(apply(MS_Table_Ctrl_rep3, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+# MS_Table_RNase_rep1
+MS_Table_RNase_rep1_normalized <- t(apply(MS_Table_RNase_rep1, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+# MS_Table_RNase_rep2
+MS_Table_RNase_rep2_normalized <- t(apply(MS_Table_RNase_rep2, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+# MS_Table_RNase_rep3
+MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  return(normalized)
+}))
+
+```
+
+Normalization with the mean value method and scaling to 100
+
+```{r}
+# MS_Table_Ctrl_rep1
+MS_Table_Ctrl_rep1_normalized <- t(apply(MS_Table_Ctrl_rep1, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# View(MS_Table_Ctrl_rep1_normalized)
+
+# MS_Table_Ctrl_rep2
+MS_Table_Ctrl_rep2_normalized <- t(apply(MS_Table_Ctrl_rep2, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# MS_Table_Ctrl_rep3
+MS_Table_Ctrl_rep3_normalized <- t(apply(MS_Table_Ctrl_rep3, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# MS_Table_RNase_rep1
+MS_Table_RNase_rep1_normalized <- t(apply(MS_Table_RNase_rep1, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# MS_Table_RNase_rep2
+MS_Table_RNase_rep2_normalized <- t(apply(MS_Table_RNase_rep2, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# MS_Table_RNase_rep3
+MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+```
+
+Unite the replicates and scale back to 100 - Control 
+```{r}
+MS_Table_Ctrl_reduced = 
+  (MS_Table_Ctrl_rep1_normalized + MS_Table_Ctrl_rep2_normalized + MS_Table_Ctrl_rep3_normalized)/3
+MS_Table_Ctrl_scaled = 
+  sweep(MS_Table_Ctrl_reduced,1,100/rowSums(MS_Table_Ctrl_reduced),'*')
+
+# Check if the two data frames are identical
+is_identical <- identical(MS_Table_Ctrl_reduced, MS_Table_Ctrl_scaled)
+
+# Print the result
+if (is_identical) {
+  print("The data frames are identical.")
+} else {
+  print("The data frames are not identical.")
+}
+```
+-> scaling back to 100 is necessary
+
+Unite the replicates and scale back to 100 - RNase
+```{r}
+
+MS_Table_RNase_reduced = 
+  (MS_Table_RNase_rep1_normalized + MS_Table_RNase_rep2_normalized + MS_Table_RNase_rep3_normalized)/3
+MS_Table_RNase_scaled = 
+  sweep(MS_Table_RNase_reduced,1,100/rowSums(MS_Table_RNase_reduced),'*')
+
+```
+
+creating line graphs 
+```{r}
+# Anzahl der Zeilen im Dataframe
+num_rows <- nrow(MS_Table_RNase_scaled)
+
+# Erstelle einen leeren Plot für jeden Graphen
+plots <- list()
+
+# Iteriere über jede Zeile und erstelle den stetigen Graphen
+for (i in 1:num_rows) {
+  row_data <- MS_Table_RNase_scaled[i, ]
+  
+  # Überprüfe, ob genügend nicht-NA-Werte vorhanden sind
+  if (sum(!is.na(row_data)) >= 2) {
+    x <- 1:length(row_data)
+    y <- as.numeric(row_data)
+    interp_data <- approx(x, y, method = "linear", n = 1000)
+    plot(interp_data, type = "l", xlab = "X-Achse", ylab = "Y-Achse")
+    
+    # Speichere den Plot im List-Objekt
+    plots[[i]] <- recordPlot()
+    
+    # Schließe das aktuelle Grafikgerät
+    dev.off()
+  } else {
+    # Falls nicht genügend nicht-NA-Werte vorhanden sind, füge einen leeren Plot hinzu
+    plots[[i]] <- NULL
+  }
+}
+
+# Zugriff auf die einzelnen Plots
+# Zum Beispiel: plots[[1]] für den ersten Plot, plots[[2]] für den zweiten Plot, usw.
+
+
+
+```
+
+
+
+An idea to check the reproducibility -> das hinzufügen der Funktion as.numeric hat das Problem gelöst
+## Correlation Control rep 1&2
+```{r}
+ 
+num_rows <- nrow(MS_Table_Ctrl_rep1)
+
+# create vector 
+correlations <- numeric(num_rows) 
+
+
+for (i in 1:num_rows) {
+  # select row i from MS_Table_Ctrl_rep1 and MS_Table_Ctrl_rep2 
+  row_rep1 <- as.numeric(MS_Table_Ctrl_rep1[i, ]) 
+  # Der Fehler war, dass die Rows nicht als Vector, sondern als Dataframe eingelesen wurden -> Sobald der Type richtig ist, kann er auch die Correlation ausrechnen. 
+  # Als weiterer Hinweis jedoch: Die Operation könnte etwas länger dauern, wenn ihrs für alle dfs macht. 
+  row_rep2 <- as.numeric(MS_Table_Ctrl_rep2[i, ])
+  
+  
+  correlation <- cor(row_rep1, row_rep2, method = "pearson")
+  
+  
+  correlations[i] <- correlation
+}
+
+# show result 
+correlations
+
+
+
+```
+
+shorter version to check reproducibility 
+```{r}
+ctrl_cor = 
+  cbind(ctrl_cor_1_2 = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep1[x,]), as.numeric(MS_Table_Ctrl_rep2[x,]))),
+        ctrl_cor_2_3 = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep2[x,]), as.numeric(MS_Table_Ctrl_rep3[x,]))), 
+        ctrl_cor_1_3 = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep1[x,]), as.numeric(MS_Table_Ctrl_rep3[x,]))))
+
+rnase_cor = 
+  cbind(rnase_cor_1_2 = 
+         sapply(seq.int(dim(MS_Table_RNase_rep1)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep1[x,]), as.numeric(MS_Table_RNase_rep2[x,]))),
+        ctrl_cor_2_3 = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep2[x,]), as.numeric(MS_Table_RNase_rep3[x,]))), 
+        ctrl_cor_1_3 = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep1[x,]), as.numeric(MS_Table_RNase_rep3[x,]))))
+```
+
+```{r}
+ctrl_na_rows <- which(rowSums(is.na(ctrl_cor)) > 0)
+ctrl_na_rows
+
+rnase_na_rows <- which(rowSums(is.na(rnase_cor)) > 0)
+rnase_na_rows
+length(rnase_na_rows)
+```
+
+In total we look at 3\*3680 correlation. This has to be taken into account, when looking at the graphs. It is import to figure out if the 3 cor are for one protein or for 3 different ones.
+
+```{r}
+library(ggplot2)
+rnase_cor_data_frame = data.frame(c(rnase_cor[,1],rnase_cor[,2],rnase_cor[,3]))
+colnames(rnase_cor_data_frame) = "correlation"
+ggplot(rnase_cor_data_frame, aes(x=correlation)) + geom_histogram()
+```
+
+```{r}
+ctrl_cor_data_frame = data.frame(c(ctrl_cor[,1],ctrl_cor[,2],ctrl_cor[,3]))
+colnames(ctrl_cor_data_frame) = "correlation"
+ggplot(ctrl_cor_data_frame, aes(x=correlation)) + geom_histogram()
+```
+
+```{r}
+non_reproducible = unique(which(rowSums(ctrl_cor<0.95)>0), which(rowSums(rnase_cor<0.95)>0))
+
+MS_Table_Ctrl_clean = MS_Table_Ctrl[-non_reproducible,]
+MS_Table_RNase_clean = MS_Table_RNase[-non_reproducible,]
+
+'View(MS_Table_Ctrl_clean)
+```
+
