@@ -2,9 +2,7 @@
 knitr::opts_chunk$set(echo = TRUE) 
 ```
 
-## Proteome-wide Screen for RNA-dependent Proteins:
-
-## *non-synchronized A549 cells*
+# Proteome-wide Screen for RNA-dependent Proteins: *non-synchronized A549 cells*
 
 Zum PDF exportieren
 
@@ -76,135 +74,11 @@ MS_Table_RNase <-MS_Table_reordered[,76:150]
 #View(MS_Table_RNase)
 ```
 
-## 2. Scale and Reduce Dataset
+### 1.5. Reproducibility
 
-### 2.1a Normalization (mean value methode)
+Here we test whether the replicates are similar to each other. This would mean, that the experiment is reproducible, thus the data is reliable. Proteins that do not satisfy this condition will be removed from the dataset and will not be analysed.
 
-For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.
-
-```{r}
-MS_Table_Ctrl_rep1 <-MS_Table_reordered[,1:25]
-MS_Table_Ctrl_rep2 <-MS_Table_reordered[,26:50]
-MS_Table_Ctrl_rep3 <-MS_Table_reordered[,51:75]
-MS_Table_RNase_rep1 <-MS_Table_reordered[,76:100]
-MS_Table_RNase_rep2 <-MS_Table_reordered[,101:125]
-MS_Table_RNase_rep3 <-MS_Table_reordered[,126:150]
-```
-
-On them we apply separately the mean value methode.
-
-```{r}
-#rowMeans(MS_Table_Ctrl_rep1)
-#apply(MS_Table_Ctrl_rep1,1,sd)
-MS_Table_Ctrl_rep1_normalized <- apply(t(MS_Table_Ctrl_rep1),1, function(x)(x - mean(x)) / sd(x))
-View(MS_Table_Ctrl_rep1_normalized)
-# Der oben stehende code führt nicht die mean value methode durch. Daher siehe unten.  
-```
-
-Another idea to apply the mean value method on each row of every dataframe. All values below 0 are set back to 0.
-
-```{r}
-
-# MS_Table_Ctrl_rep1
-MS_Table_Ctrl_rep1_normalized <- t(apply(MS_Table_Ctrl_rep1, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
-
-# View(MS_Table_Ctrl_rep1_normalized)
-
-# MS_Table_Ctrl_rep2
-MS_Table_Ctrl_rep2_normalized <- t(apply(MS_Table_Ctrl_rep2, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
-
-# MS_Table_Ctrl_rep3
-MS_Table_Ctrl_rep3_normalized <- t(apply(MS_Table_Ctrl_rep3, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
-
-# MS_Table_RNase_rep1
-MS_Table_RNase_rep1_normalized <- t(apply(MS_Table_RNase_rep1, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
-
-# MS_Table_RNase_rep2
-MS_Table_RNase_rep2_normalized <- t(apply(MS_Table_RNase_rep2, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
-
-# MS_Table_RNase_rep3
-MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  return(normalized)
-}))
-
-```
-
-Hier eine Möglichkeit direkt mit der Normalisierung auch noch die Skalierung auf 100 durchzuführen
-
-```{r}
-# MS_Table_Ctrl_rep1
-MS_Table_Ctrl_rep1_normalized <- t(apply(MS_Table_Ctrl_rep1, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  scaled <- normalized * (100 / sum(normalized))
-  return(scaled)
-}))
-
-# View(MS_Table_Ctrl_rep1_normalized)
-
-# MS_Table_Ctrl_rep2
-MS_Table_Ctrl_rep2_normalized <- t(apply(MS_Table_Ctrl_rep2, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  scaled <- normalized * (100 / sum(normalized))
-  return(scaled)
-}))
-
-# MS_Table_Ctrl_rep3
-MS_Table_Ctrl_rep3_normalized <- t(apply(MS_Table_Ctrl_rep3, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  scaled <- normalized * (100 / sum(normalized))
-  return(scaled)
-}))
-
-# MS_Table_RNase_rep1
-MS_Table_RNase_rep1_normalized <- t(apply(MS_Table_RNase_rep1, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  scaled <- normalized * (100 / sum(normalized))
-  return(scaled)
-}))
-
-# MS_Table_RNase_rep2
-MS_Table_RNase_rep2_normalized <- t(apply(MS_Table_RNase_rep2, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  scaled <- normalized * (100 / sum(normalized))
-  return(scaled)
-}))
-
-# MS_Table_RNase_rep3
-MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
-  normalized <- x - mean(x)
-  normalized[normalized < 0] <- 0
-  scaled <- normalized * (100 / sum(normalized))
-  return(scaled)
-}))
-
-```
+#### Fabio's Idea:
 
 An idea to check the reproducibility -\> das hinzufügen der Funktion as.numeric hat das Problem gelöst
 
@@ -236,50 +110,119 @@ correlations
 
 ```
 
-### 2.1b Normalization (Min-Max-Scaling)
+## 2. Scale and Reduce Dataset
 
-For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.(This step resembles to 2.1, but this way we can avoid any confusion)
+For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.
 
 ```{r}
-ctrl.rep1.MMS <-MS_Table_reordered[,1:25]
-ctrl.rep2.MMS <-MS_Table_reordered[,26:50]
-ctrl.rep3.MMS <-MS_Table_reordered[,51:75]
-rnase.rep1.MMS <-MS_Table_reordered[,76:100]
-rnase.rep2.MMS <-MS_Table_reordered[,101:125]
-rnase.rep3.MMS <-MS_Table_reordered[,126:150]
+ctrl.rep1 <-MS_Table_reordered[,1:25]
+ctrl.rep2 <-MS_Table_reordered[,26:50]
+ctrl.rep3 <-MS_Table_reordered[,51:75]
+rnase.rep1 <-MS_Table_reordered[,76:100]
+rnase.rep2 <-MS_Table_reordered[,101:125]
+rnase.rep3 <-MS_Table_reordered[,126:150]
 ```
 
-On them we apply Min-Max-Scaling:
+### 2.1a Normalization (mean value method)
+
+On them we apply separately the mean value method.
+
+```{r}
+#rowMeans(MS_Table_Ctrl_rep1)
+#apply(MS_Table_Ctrl_rep1,1,sd)
+MS_Table_Ctrl_rep1_normalized <- apply(t(MS_Table_Ctrl_rep1),1, function(x)(x - mean(x)) / sd(x))
+View(MS_Table_Ctrl_rep1_normalized)
+# Der oben stehende code führt nicht die mean value methode durch. Daher siehe unten.  
+```
+
+We perform the mean-value-method (mvm) on each replicate, both control and RNase:
+
+```{r}
+# Control Replicate 1 MVM
+ctrl.rep1.mvm.norm <- t(apply(ctrl.rep1, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# View(ctrl.rep1.mvm.norm)
+
+# Control Replicate 2 MVM
+ctrl.rep2.mvm.norm <- t(apply(ctrl.rep2, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# Control Replicate 3 MVM
+ctrl.rep3.mvm.norm <- t(apply(ctrl.rep3, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# RNase Replicate 1 MVM
+rnase.rep1.mvm.norm <- t(apply(rnase.rep1, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# RNase Replicate 2 MVM
+rnase.rep2.mvm.norm <- t(apply(rnase.rep2, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+# RNase Replicate 3 MVM
+rnase.rep3.mvm.norm <- t(apply(rnase.rep3, 1, function(x) {
+  normalized <- x - mean(x)
+  normalized[normalized < 0] <- 0
+  scaled <- normalized * (100 / sum(normalized))
+  return(scaled)
+}))
+
+```
+
+### 2.1b Normalization (Min-Max-Scaling)
+
+We perform min-max-scaling (mms) on each replicate, both control and RNase:
 
 ```{r}
 
-# ctrl.rep1.MMS
-ctrl.rep1.MMS.norm <- t(apply(ctrl.rep1.MMS, 1, function(x) {
+# Control Replicate 1 MMS
+ctrl.rep1.mms.norm <- t(apply(ctrl.rep1, 1, function(x) {
   normalized <- (x-min(x))/(max(x)-min(x))
 }))
 
-# ctrl.rep2.MMS
-ctrl.rep2.MMS.norm <- t(apply(ctrl.rep2.MMS, 1, function(x) {
+# Control Replicate 2 MMS
+ctrl.rep2.mms.norm <- t(apply(ctrl.rep2, 1, function(x) {
   normalized <- (x-min(x))/(max(x)-min(x))
 }))
 
-# ctrl.rep3.MMS
-ctrl.rep3.MMS.norm <- t(apply(ctrl.rep3.MMS, 1, function(x) {
+# Control Replicate 3 MMS
+ctrl.rep3.mms.norm <- t(apply(ctrl.rep3, 1, function(x) {
   normalized <- (x-min(x))/(max(x)-min(x))
 }))
 
-# rnase.rep1.MMS
-rnase.rep1.MMS.norm <- t(apply(rnase.rep1.MMS, 1, function(x) {
+# RNase Replicate 1 MMS
+rnase.rep1.mms.norm <- t(apply(rnase.rep1, 1, function(x) {
   normalized <- (x-min(x))/(max(x)-min(x))
 }))
 
-# rnase.rep2.MMS
-rnase.rep2.MMS.norm <- t(apply(rnase.rep2.MMS, 1, function(x) {
+# RNase Replicate 2 MMS
+rnase.rep2.mms.norm <- t(apply(rnase.rep2, 1, function(x) {
   normalized <- (x-min(x))/(max(x)-min(x))
 }))
 
-# rnase.rep3.MMS
-rnase.rep3.MMS.norm <- t(apply(rnase.rep3.MMS, 1, function(x) {
+# RNase Replicate 2 MMS
+rnase.rep3.mms.norm <- t(apply(rnase.rep3, 1, function(x) {
   normalized <- (x-min(x))/(max(x)-min(x))
 }))
 ```
@@ -300,19 +243,19 @@ test_normalized <- t(apply(test_matrix, 1, function(x){
 Now we merge the three replicates:
 
 ```{r}
-ctrl.MMS.merged <- ((ctrl.rep1.MMS.norm + ctrl.rep2.MMS.norm + ctrl.rep3.MMS.norm)/3)
+ctrl.mms.merged <- ((ctrl.rep1.mms.norm + ctrl.rep2.mms.norm + ctrl.rep3.mms.norm)/3)
 
-rnase.MMS.merged <- ((rnase.rep1.MMS.norm + rnase.rep2.MMS.norm + rnase.rep3.MMS.norm)/3)
+rnase.mms.merged <- ((rnase.rep1.mms.norm + rnase.rep2.mms.norm + rnase.rep3.mms.norm)/3)
 ```
 
 Those have to be scaled again:
 
 ```{r}
-ctrl.MMS <- t(apply(ctrl.MMS.merged, 1, function(x) {
+ctrl.mms <- t(apply(ctrl.mms.merged, 1, function(x) {
   normalized <- (x-min(x))/(max(x)-min(x))
 }))
 
-rnase.MMS <- t(apply(rnase.MMS.merged, 1, function(x){
+rnase.mms <- t(apply(rnase.mms.merged, 1, function(x){
   normalized <- (x-min(x))/(max(x)-min(x))
 }))
 ```
@@ -320,14 +263,16 @@ rnase.MMS <- t(apply(rnase.MMS.merged, 1, function(x){
 Now we can plot graphs that show the result of the merge and second scaling. This is only an example (control sample of the first protein), the plotting of all proteins will be done later on:
 
 ```{r}
-#plots of the scaled replicates
-plot(rnase.rep1.MMS.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
-plot(rnase.rep2.MMS.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
-plot(rnase.rep3.MMS.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
+##plots of the scaled replicates
 
-#plot of the merged ctrl
-plot(rnase.MMS.merged[1,], xlab="fraction", ylab="protein amount", col="red", pch=20)
+#plot(rnase.rep1.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
+#plot(rnase.rep2.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
+#plot(rnase.rep3.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
 
-#plot of the merged and scaled ctrl
-plot(rnase.MMS[1,], xlab="fraction", ylab="protein amount", col="blue", pch=20)
+##plot of the merged ctrl
+
+#plot(rnase.mms.merged[1,], xlab="fraction", ylab="protein amount", col="red", pch=20)
+
+##plot of the merged and scaled ctrl
+#plot(rnase.mms[1,], xlab="fraction", ylab="protein amount", col="blue", pch=20)
 ```
