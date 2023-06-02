@@ -1,0 +1,372 @@
+---
+title: "Topic 3_non synchronized A549 with z-Transformation and reproducibility"
+author: "Johannes Schadt, Anastasia Möller, Sylviane Verschaeve, Tine Limberg"
+date: "2023-05-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Proteome-wide Screen for RNA-dependent Proteins:
+
+## *non-synchronized A549 cells*
+
+Zum PDF exportieren:
+
+```{r}
+#tinytex::install_tinytex()
+```
+
+Loading the data:
+
+```{r}
+#MS_Table <- read.csv('RDeep_A549_NS.csv', header=TRUE, row.names=1, sep = ",")
+#View(MS_Table)
+MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.csv?dl=1', header=TRUE, row.names=1, sep = ";")
+View(MS_Table)
+```
+
+## 1. Preparing data for analysis
+
+#### 0.1 Data description
+
+```{r}
+dim(MS_Table)
+head(rownames(MS_Table))
+head(colnames(MS_Table))
+```
+
+#### 1.1 Check for missing values
+
+```{r}
+sum(apply(MS_Table, 1, anyNA)) == 0
+sum(is.na(MS_Table)) == 0
+```
+
+#### 1.2 Check data format
+
+```{r}
+MS_Table = apply(MS_Table,2,as.numeric)
+sum(apply(MS_Table, 1, is.numeric)) == nrow(MS_Table)
+```
+
+#### 1.3 Deleting rows with only zeros
+
+```{r}
+min(MS_Table)
+sum(apply(MS_Table,1,sum)==0)
+```
+
+-\> da die Summe der Zeileneinträge keines Proteins 0 entspricht, wurde ein Dataframe aus False erstellt. Einträge ausschließlich False, werden durch die sum Funktion als 0 aufaddiert.
+
+#### 1.4.1 Reordering columns
+
+```{r}
+MS_Table_reordered <- MS_Table[, c(
+  paste0("Fraction", 1:25, "_Ctrl_Rep1"),
+  paste0("Fraction", 1:25, "_Ctrl_Rep2"),
+  paste0("Fraction", 1:25, "_Ctrl_Rep3"),
+  paste0("Fraction", 1:25, "_RNase_Rep1"),
+  paste0("Fraction", 1:25, "_RNase_Rep2"),
+  paste0("Fraction", 1:25, "_RNase_Rep3")
+)]
+
+#View(MS_Table_reordered)
+sum(apply(MS_Table_reordered, 2, is.numeric)) == ncol(MS_Table)
+```
+
+#### 1.4.2 Separate Ctrl and RNase
+
+```{r}
+MS_Table_Ctrl <-MS_Table_reordered[,1:75]
+#View(MS_Table_Ctrl)
+MS_Table_RNase <-MS_Table_reordered[,76:150]
+#View(MS_Table_RNase)
+```
+
+## 2. Reproducibility
+
+#### 2.1 Pearson Correlation
+
+To faciliate the calculation of the correlation between each replicate, we design 6 separate data frames, one for each replicate
+
+```{r}
+MS_Table_Ctrl_rep1 <-MS_Table_reordered[,1:25]
+MS_Table_Ctrl_rep2 <-MS_Table_reordered[,26:50]
+MS_Table_Ctrl_rep3 <-MS_Table_reordered[,51:75]
+MS_Table_RNase_rep1 <-MS_Table_reordered[,76:100]
+MS_Table_RNase_rep2 <-MS_Table_reordered[,101:125]
+MS_Table_RNase_rep3 <-MS_Table_reordered[,126:150]
+```
+
+```{r, echo=FALSE}
+ctrl_cor = 
+  cbind(ctrl_cor_1_2 = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep1[x,]), as.numeric(MS_Table_Ctrl_rep2[x,]))),
+        ctrl_cor_2_3 = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep2[x,]), as.numeric(MS_Table_Ctrl_rep3[x,]))), 
+        ctrl_cor_1_3 = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep1[x,]), as.numeric(MS_Table_Ctrl_rep3[x,]))))
+
+rnase_cor = 
+  cbind(rnase_cor_1_2 = 
+         sapply(seq.int(dim(MS_Table_RNase_rep1)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep1[x,]), as.numeric(MS_Table_RNase_rep2[x,]))),
+        rnase_cor_2_3 = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep2[x,]), as.numeric(MS_Table_RNase_rep3[x,]))), 
+        rnase_cor_1_3 = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep1[x,]), as.numeric(MS_Table_RNase_rep3[x,]))))
+
+ctrl_rnase_cor <- cbind(ctrl_cor,rnase_cor)
+```
+
+```{r}
+total_na = which(rowSums(is.na(ctrl_rnase_cor)) > 0)
+length(total_na)
+MS_Table_naremoved = MS_Table_reordered[-total_na,]
+
+MS_Table_Ctrl_rep1_naremoved <-MS_Table_naremoved[,1:25]
+MS_Table_Ctrl_rep2_naremoved <-MS_Table_naremoved[,26:50]
+MS_Table_Ctrl_rep3_naremoved <-MS_Table_naremoved[,51:75]
+MS_Table_RNase_rep1_naremoved <-MS_Table_naremoved[,76:100]
+MS_Table_RNase_rep2_naremoved <-MS_Table_naremoved[,101:125]
+MS_Table_RNase_rep3_naremoved <-MS_Table_naremoved[,126:150]
+```
+
+```{r}
+ctrl_cor_naremoved = 
+  cbind(ctrl_cor_1_2_naremoved = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep1_naremoved[x,]), as.numeric(MS_Table_Ctrl_rep2_naremoved[x,]))),
+        ctrl_cor_2_3_naremoved = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep2_naremoved[x,]), as.numeric(MS_Table_Ctrl_rep3_naremoved[x,]))), 
+        ctrl_cor_1_3_naremoved = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_Ctrl_rep1_naremoved[x,]), as.numeric(MS_Table_Ctrl_rep3_naremoved[x,]))))
+
+rnase_cor_naremoved = 
+  cbind(rnase_cor_1_2_naremoved = 
+         sapply(seq.int(dim(MS_Table_RNase_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep1_naremoved[x,]), as.numeric(MS_Table_RNase_rep2_naremoved[x,]))),
+        rnase_cor_2_3_naremoved = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep2_naremoved[x,]), as.numeric(MS_Table_RNase_rep3_naremoved[x,]))), 
+        rnase_cor_1_3_naremoved = 
+          sapply(seq.int(dim(MS_Table_Ctrl_rep1_naremoved)[1]), function(x) cor(as.numeric(MS_Table_RNase_rep1_naremoved[x,]), as.numeric(MS_Table_RNase_rep3_naremoved[x,]))))
+
+View(ctrl_cor_naremoved)
+```
+
+```{r}
+library(ggplot2)
+rnase_cor_data_frame_naremoved = data.frame(c(rnase_cor_naremoved[,1],rnase_cor_naremoved[,2],rnase_cor_naremoved[,3]))
+colnames(rnase_cor_data_frame_naremoved) = "correlation"
+ggplot(rnase_cor_data_frame_naremoved, aes(x=correlation)) + geom_histogram()
+```
+
+In total we look at 3\*3680 correlation. This has to be taken into account, when looking at the graphs. It is import to figure out if the 3 cor are for one protein or for 3 different ones.
+
+```{r}
+library(ggplot2)
+ctrl_cor_data_frame_naremoved = data.frame(c(ctrl_cor_naremoved[,1],ctrl_cor_naremoved[,2],ctrl_cor_naremoved[,3]))
+colnames(ctrl_cor_data_frame_naremoved) = "correlation"
+ggplot(ctrl_cor_data_frame_naremoved, aes(x=correlation)) + geom_histogram()
+```
+
+```{r}
+# ctrl_cor_naremoved[,1] < 0.75
+# ctrl_cor_naremoved[,2] < 0.75
+# ctrl_cor_naremoved[,3] < 0.75
+non_reproducible_ctrl=which(rowSums(ctrl_cor_naremoved<0.60)>1)
+length(non_reproducible_ctrl)
+non_reproducible_rnase=which(rowSums(rnase_cor_naremoved<0.60)>1)
+length(non_reproducible_rnase)
+#non_reproducible = unique(which(rowSums(ctrl_cor_naremoved<0.60)>0), which(rowSums(rnase_cor_naremoved<0.60)>0))
+#length(non_reproducible)
+```
+
+```{r}
+non_reproducible = unique(which(rowSums(ctrl_cor<0.95)>0), which(rowSums(rnase_cor<0.95)>0))
+
+MS_Table_Ctrl_clean = MS_Table_Ctrl[-non_reproducible,]
+MS_Table_RNase_clean = MS_Table_RNase[-non_reproducible,]
+```
+
+## 3. Normalize, Reduce and Scale Dataset
+
+#### 3.1 Normalization (z-Transformation)
+
+Normalization with z-Transformation: We use the scale command. EXPLANATION WHY Z-TRANSFORMATION !!
+
+NOTE to better understand the sweep function.
+
+```{r}
+m <- matrix(1:6, nrow = 2)
+m
+# Subtract the mean of each column from the corresponding elements in the matrix
+swept_matrix <- sweep(m, 2, colMeans(m), FUN = "-")
+
+print(swept_matrix)
+
+applied_matrix <- apply(m, 2, function(x) x - mean(x))
+
+print(applied_matrix)
+```
+
+First the normalization for the Ctrl: 
+
+```{r}
+ctrl1_meanvalue = t(apply(MS_Table_Ctrl_rep1,1,function(x){x-mean(x)}))
+View(ctrl1_meanvalue)
+
+```
+
+```{r}
+ctrl_z_transformed = t(scale(t(MS_Table_Ctrl)))
+
+ctrl1_z_transformed = ctrl_z_transformed[,1:25]
+ctrl2_z_transformed = ctrl_z_transformed[,26:50]
+ctrl3_z_transformed = ctrl_z_transformed[,51:75]
+
+#calculate the min value for each protein
+min_ctrl1_z_transformed = apply(ctrl1_z_transformed, 1, min)
+min_ctrl2_z_transformed = apply(ctrl2_z_transformed, 1, min)
+min_ctrl3_z_transformed = apply(ctrl3_z_transformed, 1, min)
+
+ctrl1_pos.= sweep(ctrl1_z_transformed,1,min_ctrl1_z_transformed,FUN = '-')
+ctrl2_pos.= sweep(ctrl2_z_transformed,1,min_ctrl2_z_transformed,FUN = '-')
+ctrl3_pos.= sweep(ctrl3_z_transformed,1,min_ctrl3_z_transformed,FUN = '-')
+
+View(ctrl1_pos.)
+View(ctrl1_pos.)
+View(ctrl1_pos.)
+```
+
+Still with the z-transformation we took for each protein the same mean over all values. Since the protein amount in each replicate is different, it is better to calculate the mean extra for each replicate. However the sd-value has not to be adapted. Because the replicates have the same variance (same procedure for every replicate in the wet lab), we don't have to calculate the standarddevidation for the replicates in each fraction extra. We can calculate the sd-value for one row /sd.
+
+*sd-values and mean values of Ctrl:*
+
+```{r}
+sd_MS_Table_Ctrl = apply(MS_Table_Ctrl, 1, sd)
+
+mean_MS_Table_Ctrl_rep1 = apply(MS_Table_Ctrl_rep1, 1, mean)
+mean_MS_Table_Ctrl_rep2 = apply(MS_Table_Ctrl_rep2, 1, mean)
+mean_MS_Table_Ctrl_rep3 = apply(MS_Table_Ctrl_rep3, 1, mean)
+```
+
+*Normalization of Ctrl:*
+
+```{r}
+ctrl1_meanvalue = sweep(MS_Table_Ctrl_rep1,1,mean_MS_Table_Ctrl_rep1,'-')
+ctrl1_normalized = sweep(ctrl1_meanvalue,1,sd_MS_Table_Ctrl,'/')
+
+ctrl2_meanvalue = sweep(MS_Table_Ctrl_rep2,1,mean_MS_Table_Ctrl_rep2,'-')
+ctrl2_normalized = sweep(ctrl2_meanvalue,1,sd_MS_Table_Ctrl,'/')
+
+ctrl3_meanvalue = sweep(MS_Table_Ctrl_rep3,1,mean_MS_Table_Ctrl_rep3,'-')
+ctrl3_normalized = sweep(ctrl3_meanvalue,1,sd_MS_Table_Ctrl,'/')
+
+#calculate again the min value for each protein
+min_ctrl1_normalized = apply(ctrl1_normalized, 1, min)
+min_ctrl2_normalized = apply(ctrl2_normalized, 1, min)
+min_ctrl3_normalized = apply(ctrl3_normalized, 1, min)
+
+#substract the min value from each position to discard the 0
+ctrl1_normalized_pos.= 
+  sweep(ctrl1_normalized,1,min_ctrl1_normalized,FUN = '-')
+ctrl2_normalized_pos.= 
+  sweep(ctrl2_normalized,1,min_ctrl2_normalized,FUN = '-')
+ctrl3_normalized_pos.= 
+  sweep(ctrl3_normalized,1,min_ctrl3_normalized,FUN = '-')
+```
+
+*sd-values and mean values of RNase:*
+
+```{r}
+sd_MS_Table_RNase = apply(MS_Table_RNase, 1, sd)
+
+mean_MS_Table_RNase_rep1 = apply(MS_Table_RNase_rep1, 1, mean)
+mean_MS_Table_RNase_rep2 = apply(MS_Table_RNase_rep2, 1, mean)
+mean_MS_Table_RNase_rep3 = apply(MS_Table_RNase_rep3, 1, mean)
+```
+
+*Normalization of Ctrl:*
+
+```{r}
+rnase1_meanvalue = sweep(MS_Table_RNase_rep1,1,mean_MS_Table_RNase_rep1,'-')
+rnase1_normalized = sweep(rnase1_meanvalue,1,sd_MS_Table_RNase,'/')
+
+rnase2_meanvalue = sweep(MS_Table_RNase_rep2,1,mean_MS_Table_RNase_rep2,'-')
+rnase2_normalized = sweep(rnase2_meanvalue,1,sd_MS_Table_RNase,'/')
+
+rnase3_meanvalue = sweep(MS_Table_RNase_rep3,1,mean_MS_Table_RNase_rep3,'-')
+rnase3_normalized = sweep(rnase3_meanvalue,1,sd_MS_Table_RNase,'/')
+
+#calculate again the min value for each protein
+min_rnase1_normalized = apply(rnase1_normalized, 1, min)
+min_rnase2_normalized = apply(rnase2_normalized, 1, min)
+min_rnase3_normalized = apply(rnase3_normalized, 1, min)
+
+#substract the min value from each position to discard the 0
+rnase1_normalized_pos.= 
+  sweep(rnase1_normalized,1,min_rnase1_normalized,FUN = '-')
+rnase2_normalized_pos.= 
+  sweep(rnase2_normalized,1,min_rnase2_normalized,FUN = '-')
+rnase3_normalized_pos.= 
+  sweep(rnase3_normalized,1,min_rnase3_normalized,FUN = '-')
+```
+
+#### 3.2 Reduce
+
+To reduce we take the mean value between each replicate.
+
+```{r}
+ctrl_reduced = 
+  (ctrl1_normalized_pos. + ctrl2_normalized_pos. + ctrl3_normalized_pos.)/3
+rnase_reduced = 
+  (rnase1_normalized_pos. + rnase2_normalized_pos. + rnase3_normalized_pos.)/3
+```
+
+#### 3.3 Scaling to 100
+
+*Each Replicate of Ctrl:*
+
+```{r}
+ctrl1_scaled = 
+  sweep(ctrl1_normalized_pos.,1,100/rowSums(ctrl1_normalized_pos.),'*')
+# rowSums(ctrl1_scaled)
+ctrl2_scaled = 
+  sweep(ctrl2_normalized_pos.,1,100/rowSums(ctrl2_normalized_pos.),'*')
+# rowSums(ctrl2_scaled)
+ctrl3_scaled = 
+  sweep(ctrl3_normalized_pos.,1,100/rowSums(ctrl3_normalized_pos.),'*')
+# rowSums(ctrl3_scaled)
+View(ctrl1_scaled)
+```
+
+Reduced Ctrl:
+
+```{r}
+ctrl_scaled = 
+  sweep(ctrl_reduced,1,100/rowSums(ctrl_reduced),'*')
+# rowSums(ctrl_scaled)
+```
+
+*Each Replicate of RNase:*
+
+```{r}
+rnase1_scaled = 
+  sweep(rnase1_normalized_pos.,1,100/rowSums(rnase1_normalized_pos.),'*')
+# rowSums(rnase1_scaled)
+rnase2_scaled = 
+  sweep(rnase2_normalized_pos.,1,100/rowSums(rnase2_normalized_pos.),'*')
+# rowSums(rnase2_scaled)
+rnase3_scaled = 
+  sweep(rnase3_normalized_pos.,1,100/rowSums(rnase3_normalized_pos.),'*')
+# rowSums(rnase3_scaled)
+```
+
+*Reduced RNase*
+
+```{r}
+rnase_scaled = 
+  sweep(rnase_reduced,1,100/rowSums(rnase_reduced),'*')
+# rowSums(rnase_scaled)
+```
