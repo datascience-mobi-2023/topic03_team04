@@ -148,6 +148,7 @@ MS_Table_RNase_rep3_normalized <- t(apply(MS_Table_RNase_rep3, 1, function(x) {
 
 ```
 
+
 Hier eine Möglichkeit direkt mit der Normalisierung auch noch die Skalierung auf 100 durchzuführen
 
 ```{r}
@@ -230,8 +231,101 @@ for (i in 1:num_rows) {
 # show result 
 correlations
 
-#Achtung: funktioniert nicht, aber ich weiß nicht warum Fehlermeldung auftritt 
+#Achtung: funktioniert nicht, aber ich weiß nicht warum Fehlermeldung auftritt
 
+### 2.1b Normalization (Min-Max-Scaling)
+
+For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.(This step resembles to 2.1, but this way we can avoid any confusion)
+
+```{r}
+ctrl.rep1.MMS <-MS_Table_reordered[,1:25]
+ctrl.rep2.MMS <-MS_Table_reordered[,26:50]
+ctrl.rep3.MMS <-MS_Table_reordered[,51:75]
+rnase.rep1.MMS <-MS_Table_reordered[,76:100]
+rnase.rep2.MMS <-MS_Table_reordered[,101:125]
+rnase.rep3.MMS <-MS_Table_reordered[,126:150]
 ```
+
+On them we apply Min-Max-Scaling:
+```{r}
+
+# ctrl.rep1.MMS
+ctrl.rep1.MMS.norm <- t(apply(ctrl.rep1.MMS, 1, function(x) {
+  normalized <- (x-min(x))/(max(x)-min(x))
+}))
+
+# ctrl.rep2.MMS
+ctrl.rep2.MMS.norm <- t(apply(ctrl.rep2.MMS, 1, function(x) {
+  normalized <- (x-min(x))/(max(x)-min(x))
+}))
+
+# ctrl.rep3.MMS
+ctrl.rep3.MMS.norm <- t(apply(ctrl.rep3.MMS, 1, function(x) {
+  normalized <- (x-min(x))/(max(x)-min(x))
+}))
+
+# rnase.rep1.MMS
+rnase.rep1.MMS.norm <- t(apply(rnase.rep1.MMS, 1, function(x) {
+  normalized <- (x-min(x))/(max(x)-min(x))
+}))
+
+# rnase.rep2.MMS
+rnase.rep2.MMS.norm <- t(apply(rnase.rep2.MMS, 1, function(x) {
+  normalized <- (x-min(x))/(max(x)-min(x))
+}))
+
+# rnase.rep3.MMS
+rnase.rep3.MMS.norm <- t(apply(rnase.rep3.MMS, 1, function(x) {
+  normalized <- (x-min(x))/(max(x)-min(x))
+}))
+```
+
+To prove that the algorithm works we use is on a test matrix: (byrow = TRUE, dass die Zahen Zeilenweise die Matrix füllen, nicht spaltenweise)
+
+```{r}
+test_matrix <- matrix(c(1,45,3,8,27,4,79,30,0,100,99,50,0,76,1,4,6,3,8,7,3), byrow = TRUE, nrow = 3)
+
+test_normalized <- t(apply(test_matrix, 1, function(x){
+  normalized <- (x-min(x))/(max(x)-min(x))
+}))
+
+#test_matrix
+#test_normalized
+```
+
+Now we merge the three replicates:
+```{r}
+ctrl.MMS.merged <- ((ctrl.rep1.MMS.norm + ctrl.rep2.MMS.norm + ctrl.rep3.MMS.norm)/3)
+
+rnase.MMS.merged <- ((rnase.rep1.MMS.norm + rnase.rep2.MMS.norm + rnase.rep3.MMS.norm)/3)
+```
+
+Those have to be scaled again:
+```{r}
+ctrl.MMS <- t(apply(ctrl.MMS.merged, 1, function(x) {
+  normalized <- (x-min(x))/(max(x)-min(x))
+}))
+
+rnase.MMS <- t(apply(rnase.MMS.merged, 1, function(x){
+  normalized <- (x-min(x))/(max(x)-min(x))
+}))
+```
+
+Now we can plot graphs that show the result of the merge and second scaling. This is only an example (control sample of the first protein), the plotting of all proteins will be done later on:
+```{r}
+#plots of the scaled replicates
+plot(rnase.rep1.MMS.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
+plot(rnase.rep2.MMS.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
+plot(rnase.rep3.MMS.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
+
+#plot of the merged ctrl
+plot(rnase.MMS.merged[1,], xlab="fraction", ylab="protein amount", col="red", pch=20)
+
+#plot of the merged and scaled ctrl
+plot(rnase.MMS[1,], xlab="fraction", ylab="protein amount", col="blue", pch=20)
+```
+
+
+
 
 
