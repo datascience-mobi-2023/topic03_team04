@@ -96,6 +96,7 @@ On them we apply separately the mean value methode.
 #apply(MS_Table_Ctrl_rep1,1,sd)
 MS_Table_Ctrl_rep1_normalized <- apply(t(MS_Table_Ctrl_rep1),1, function(x)(x - mean(x)) / sd(x))
 View(MS_Table_Ctrl_rep1_normalized)
+# Der oben stehende code führt nicht die mean value methode durch. Daher siehe unten.  
 ```
 
 Another idea to apply the mean value method on each row of every dataframe. All values below 0 are set back to 0. 
