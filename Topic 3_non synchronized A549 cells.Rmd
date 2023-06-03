@@ -80,7 +80,7 @@ Here we test whether the replicates are similar to each other. This would mean, 
 
 #### 2.1 Pearson Correlation
 
-To faciliate the calculation of the correlation between each replicate, we design 6 separate data frames, one for each replicate
+To facilitate the calculation of the correlation between each replicate, we design 6 separate data frames, one for each replicate
 
 ```{r}
 ctrl.rep1.reprod <- MS_Table_reordered[,1:25]
@@ -127,7 +127,8 @@ rnase.rep1.naremoved <- MS.Table.naremoved[,76:100]
 rnase.rep2.naremoved <- MS.Table.naremoved[,101:125]
 rnase.rep3.naremoved <- MS.Table.naremoved[,126:150]
 ```
-Now we calculate the correlation of the replicates. This time the proteins that containes replicates with only 0 are eliminated, so there should be no NAs anymore. 
+
+Now we calculate the correlation of the replicates. This time the proteins that containes replicates with only 0 are eliminated, so there should be no NAs anymore.
 
 ```{r}
 ctrl.cor.naremoved <- 
@@ -169,7 +170,7 @@ colnames(rnase.cor.data.frame.naremoved) = "correlation"
 ggplot(rnase.cor.data.frame.naremoved, aes(x=correlation)) + geom_histogram()
 ```
 
-Now we select the proteins which have correlations beneath 0.6. Those are not reproducible, thus the data is not safe enough to be used further. 
+Now we select the proteins which have correlations beneath 0.6. Those are not reproducible, thus the data is not safe enough to be used further.
 
 ```{r}
 # ctrl.cor.naremoved[,1] < 0.75
@@ -185,7 +186,8 @@ length(non.reproducible.rnase)
 non.reproducible <- unique(which(rowSums(ctrl.cor.naremoved<0.60)>0), which(rowSums(rnase.cor.naremoved<0.60)>0))
 length(non.reproducible)
 ```
-Now we eliminate the proteins that have non reproducible Data. 
+
+Now we eliminate the proteins that have non reproducible Data.
 
 ```{r}
 
@@ -193,7 +195,8 @@ ctrl.clean <- MS_Table_Ctrl[-non.reproducible,]
 rnase.clean <- MS_Table_RNase[-non.reproducible,]
 
 ```
-We now have clean data, with proteins that have reproducible data we can use for further analysis. 
+
+We now have clean data, with proteins that have reproducible data we can use for further analysis.
 
 ## 3. Scaled and Reduced Dataset
 
@@ -463,6 +466,15 @@ rnase.zt.scaled =
 # rowSums(rnase.zt.scaled)
 ```
 
+Now we have normalized/scaled our data using z-transformation. The two variables that will be used later on either contain the normalized and scaled (zt) data of the control: **ctrl.zt** or the normalized and scaled (zt) data of the rnase: **rnase.mms**
+
+```{r}
+ctrl.zt <- ctrl.zt.scaled
+rnase.zt <- rnase.zt.scaled
+
+```
+
+
 ### 3.3. Min-Max-Scaling
 
 #### 3.3.1. Normalization
@@ -562,3 +574,9 @@ Now we have normalized/scaled our data using min-max-scaling. The two variables 
 ctrl.mms <- ctrl.mms.scaled
 rnase.mms <- rnase.mms.scaled
 ```
+
+The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames:
+**ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
+
+
+
