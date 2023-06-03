@@ -1,5 +1,5 @@
 ---
-title: "Topic 3_non synchronized A549 mit z-Transformation"
+title: "Topic 3_non synchronized A549 mit peak finder"
 author: "Johannes Schadt, Anastasia Möller, Sylviane Verschaeve, Tine Limberg"
 date: "2023-05-24"
 output: html_document
