@@ -78,49 +78,134 @@ MS_Table_RNase <-MS_Table_reordered[,76:150]
 
 Here we test whether the replicates are similar to each other. This would mean, that the experiment is reproducible, thus the data is reliable. Proteins that do not satisfy this condition will be removed from the dataset and will not be analysed.
 
-#### Fabio's Idea:
+#### 2.1 Pearson Correlation
 
-An idea to check the reproducibility -\> das hinzufügen der Funktion as.numeric hat das Problem gelöst
+To faciliate the calculation of the correlation between each replicate, we design 6 separate data frames, one for each replicate
 
 ```{r}
-num_rows <- nrow(MS_Table_Ctrl_rep1)
+ctrl.rep1.reprod <- MS_Table_reordered[,1:25]
+ctrl.rep2.reprod <- MS_Table_reordered[,26:50]
+ctrl.rep3.reprod <- MS_Table_reordered[,51:75]
+rnase.rep1.reprod <- MS_Table_reordered[,76:100]
+rnase.rep2.reprod <- MS_Table_reordered[,101:125]
+rnase.rep3.reprod <- MS_Table_reordered[,126:150]
+```
 
-# create vector 
-correlations <- numeric(num_rows) 
+Here we calculate the correlation between the replicates and put them together in one data frame (ctrl.cor and rnase.cor) (?)
 
+```{r, echo=FALSE}
+ctrl.cor <- 
+  cbind(ctrl.cor.rep1.rep2 <- 
+          sapply(seq.int(dim(ctrl.rep1.reprod)[1]), function(x) cor(as.numeric(ctrl.rep1.reprod[x,]), as.numeric(ctrl.rep2.reprod[x,]))),
+        ctrl.cor.rep2.rep3 <- 
+          sapply(seq.int(dim(ctrl.rep1.reprod)[1]), function(x) cor(as.numeric(ctrl.rep2.reprod[x,]), as.numeric(ctrl.rep3.reprod[x,]))), 
+        ctrl.cor.rep1.rep3 <- 
+          sapply(seq.int(dim(ctrl.rep1.reprod)[1]), function(x) cor(as.numeric(ctrl.rep1.reprod[x,]), as.numeric(ctrl.rep3.reprod[x,]))))
 
-for (i in 1:num_rows) {
-  # select row i from MS_Table_Ctrl_rep1 and MS_Table_Ctrl_rep2 
-  row_rep1 <- as.numeric(MS_Table_Ctrl_rep1[i, ]) 
-  # Der Fehler war, dass die Rows nicht als Vector, sondern als Dataframe eingelesen wurden -> Sobald der Type richtig ist, kann er auch die Correlation ausrechnen. 
-  # Als weiterer Hinweis jedoch: Die Operation könnte etwas länger dauern, wenn ihrs für alle dfs macht. 
-  row_rep2 <- as.numeric(MS_Table_Ctrl_rep2[i, ])
-  
-  
-  correlation <- cor(row_rep1, row_rep2, method = "pearson")
-  
-  
-  correlations[i] <- correlation
-}
+rnase.cor <- 
+  cbind(rnase.cor.rep1.rep2 <- 
+         sapply(seq.int(dim(rnase.rep1.reprod)[1]), function(x) cor(as.numeric(rnase.rep1.reprod[x,]), as.numeric(rnase.rep2.reprod[x,]))),
+        rnase.cor.rep2.rep3 <- 
+          sapply(seq.int(dim(rnase.rep1.reprod)[1]), function(x) cor(as.numeric(rnase.rep2.reprod[x,]), as.numeric(rnase.rep3.reprod[x,]))), 
+        rnase.cor.rep1.rep3 <- 
+          sapply(seq.int(dim(rnase.rep1.reprod)[1]), function(x) cor(as.numeric(rnase.rep1.reprod[x,]), as.numeric(rnase.rep3.reprod[x,]))))
 
-# show result 
-correlations
+ctrl.rnase.cor <- cbind(ctrl.cor,rnase.cor)
+```
 
-#Achtung: funktioniert nicht, aber ich weiß nicht warum Fehlermeldung auftritt
+Now we eliminate proteins which have NA-correlations (this happens when they contain replicates with only 0s). We then create new separate data frames for each replicate.
+
+```{r}
+total.na <- which(rowSums(is.na(ctrl.rnase.cor)) > 0)
+length(total.na)
+MS.Table.naremoved <- MS_Table_reordered[-total.na,]
+
+ctrl.rep1.naremoved <- MS.Table.naremoved[,1:25]
+ctrl.rep2.naremoved <- MS.Table.naremoved[,26:50]
+ctrl.rep3.naremoved <- MS.Table.naremoved[,51:75]
+rnase.rep1.naremoved <- MS.Table.naremoved[,76:100]
+rnase.rep2.naremoved <- MS.Table.naremoved[,101:125]
+rnase.rep3.naremoved <- MS.Table.naremoved[,126:150]
+```
+Now we calculate the correlation of the replicates. This time the proteins that containes replicates with only 0 are eliminated, so there should be no NAs anymore. 
+
+```{r}
+ctrl.cor.naremoved <- 
+  cbind(ctrl.cor.rep1.rep2.naremoved <- 
+          sapply(seq.int(dim(ctrl.rep1.naremoved)[1]), function(x) cor(as.numeric(ctrl.rep1.naremoved[x,]), as.numeric(ctrl.rep2.naremoved[x,]))),
+        ctrl.cor.rep2.rep3.naremoved <- 
+          sapply(seq.int(dim(ctrl.rep1.naremoved)[1]), function(x) cor(as.numeric(ctrl.rep2.naremoved[x,]), as.numeric(ctrl.rep3.naremoved[x,]))), 
+        ctrl.cor.rep1.rep3.naremoved <- 
+          sapply(seq.int(dim(ctrl.rep1.naremoved)[1]), function(x) cor(as.numeric(ctrl.rep1.naremoved[x,]), as.numeric(ctrl.rep3.naremoved[x,]))))
+
+rnase.cor.naremoved <- 
+  cbind(rnase.cor.rep1.rep2.naremoved <- 
+         sapply(seq.int(dim(rnase.rep1.naremoved)[1]), function(x) cor(as.numeric(rnase.rep1.naremoved[x,]), as.numeric(rnase.rep2.naremoved[x,]))),
+        rnase.cor.rep2.rep3.naremoved <- 
+          sapply(seq.int(dim(rnase.rep1.naremoved)[1]), function(x) cor(as.numeric(rnase.rep2.naremoved[x,]), as.numeric(rnase.rep3.naremoved[x,]))), 
+        rnase.cor.rep1.rep3.naremoved <- 
+          sapply(seq.int(dim(rnase.rep1.naremoved)[1]), function(x) cor(as.numeric(rnase.rep1.naremoved[x,]), as.numeric(rnase.rep3.naremoved[x,]))))
+
+View(ctrl.cor.naremoved)
+```
+
+The following plot shows us the general distribution of correlation.
+
+In total we look at 3\*(3680-83) correlations This has to be taken into account, when looking at the graphs. It is import to figure out if the 3 cor are for one protein or for 3 different ones.
+
+```{r}
+library(ggplot2)
+ctrl.cor.data.frame.naremoved <- data.frame(c(ctrl.cor.naremoved[,1],ctrl.cor.naremoved[,2],ctrl.cor.naremoved[,3]))
+colnames(ctrl.cor.data.frame.naremoved) <- "correlation"
+ggplot(ctrl.cor.data.frame.naremoved, aes(x=correlation)) + geom_histogram()
+```
+
+We do the same for the RNase group:
+
+```{r}
+library(ggplot2)
+rnase.cor.data.frame.naremoved <- data.frame(c(rnase.cor.naremoved[,1],rnase.cor.naremoved[,2],rnase.cor.naremoved[,3]))
+colnames(rnase.cor.data.frame.naremoved) = "correlation"
+ggplot(rnase.cor.data.frame.naremoved, aes(x=correlation)) + geom_histogram()
+```
+
+Now we select the proteins which have correlations beneath 0.6. Those are not reproducible, thus the data is not safe enough to be used further. 
+
+```{r}
+# ctrl.cor.naremoved[,1] < 0.75
+# ctrl.cor.naremoved[,2] < 0.75
+# ctrl.cor.naremoved[,3] < 0.75
+
+non.reproducible.ctrl <- which(rowSums(ctrl.cor.naremoved<0.60)>1)
+length(non.reproducible.ctrl)
+
+non.reproducible.rnase <- which(rowSums(rnase.cor.naremoved<0.60)>1)
+length(non.reproducible.rnase)
+
+non.reproducible <- unique(which(rowSums(ctrl.cor.naremoved<0.60)>0), which(rowSums(rnase.cor.naremoved<0.60)>0))
+length(non.reproducible)
+```
+Now we eliminate the proteins that have non reproducible Data. 
+
+```{r}
+
+ctrl.clean <- MS_Table_Ctrl[-non.reproducible,]
+rnase.clean <- MS_Table_RNase[-non.reproducible,]
 
 ```
+We now have clean data, with proteins that have reproducible data we can use for further analysis. 
 
 ## 3. Scaled and Reduced Dataset
 
 For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.
 
 ```{r}
-ctrl.rep1 <-MS_Table_reordered[,1:25]
-ctrl.rep2 <-MS_Table_reordered[,26:50]
-ctrl.rep3 <-MS_Table_reordered[,51:75]
-rnase.rep1 <-MS_Table_reordered[,76:100]
-rnase.rep2 <-MS_Table_reordered[,101:125]
-rnase.rep3 <-MS_Table_reordered[,126:150]
+ctrl.rep1 <- ctrl.clean[,1:25]
+ctrl.rep2 <- ctrl.clean[,26:50]
+ctrl.rep3 <- ctrl.clean[,51:75]
+rnase.rep1 <- rnase.clean[,1:25]
+rnase.rep2 <- rnase.clean[,26:50]
+rnase.rep3 <- rnase.clean[,51:75]
 ```
 
 ### 3.1. Mean Value Method
@@ -231,7 +316,7 @@ ctrl.mvm <- ctrl.mvm.scaled
 rnase.mvm <- rnase.mvm.scaled
 ```
 
-### 3.2. Z - TRansformation
+### 3.2. z - Transformation
 
 #### 3.2.1. Normalization
 
