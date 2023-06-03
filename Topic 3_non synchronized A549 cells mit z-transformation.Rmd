@@ -276,3 +276,50 @@ rnase_scaled =
   sweep(rnase_reduced,1,100/rowSums(rnase_reduced),'*')
 # rowSums(rnase_scaled)
 ```
+
+```{r}
+colnames(rnase3_scaled) <- paste0("Rep_3_RnaseFraction", seq_along(colnames(rnase3_scaled)) -1 )
+#find peak or region with high values 
+peaks <- apply(rnase3_scaled, 1,
+               function(x) {
+                 peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
+                 peak_sd <- sapply(peak_indices,
+                                    function(i) sd(x[(i-1):(i+1)]))
+                 peak_indices[peak_sd > 1] #wenn standardabweichung kleiner als 1 wird Wert nicht als Maximum angesehen
+                   large_values <- which(x > 20) #hiermit werden auch werte die größer als 20 sind ausgegeben könnte die neighbor variente ersetzen
+      
+                 c(peak_indices[peak_sd > 2], large_values)
+
+               })
+
+#Randwerte überprüfen 
+boundariy <- apply(rnase3_scaled, 1, function(x) x[1] > 20 & x[ncol(data)] > 20)
+
+
+highvalues<- c(peaks,boundariy)
+highvalues
+
+
+
+#neighbors <- apply(rnase3_normalized, 1,
+                   #function(x) {
+                    # peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
+                     #peak_sd <- sapply(peak_indices,
+                                        #function(i) #sd(x[(i-1):(i+1)]))
+                    # peak_indices <- peak_indices[peak_sd > 2]
+                     #sapply(peak_indices,
+                            #function(i) x[(i-1):(i+1)])
+                     
+                      
+                #   })
+
+#Probleme Bennung der Spalten um eins verschoben (keine Ahnung warum???)
+#Zeile 786 erkennt kein Maxima, da Spalte 25 größer als 24 muss noch behoben werden
+#
+
+```
+
+
+
+
+
