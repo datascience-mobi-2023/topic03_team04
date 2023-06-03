@@ -276,6 +276,7 @@ rnase_scaled =
   sweep(rnase_reduced,1,100/rowSums(rnase_reduced),'*')
 # rowSums(rnase_scaled)
 ```
+##3. Peakfinder 
 
 ```{r}
 colnames(rnase3_scaled) <- paste0("Rep_3_RnaseFraction", seq_along(colnames(rnase3_scaled)) -1 )
