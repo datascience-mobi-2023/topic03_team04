@@ -266,6 +266,7 @@ They are stored in new variables:
 ctrl.clean <- ctrl.rep
 rnase.clean <- rnase.rep
 
+View(rnase.clean)
 ```
 
 
@@ -282,6 +283,8 @@ ctrl.rep3 <- ctrl.clean[,51:75]
 rnase.rep1 <- rnase.clean[,1:25]
 rnase.rep2 <- rnase.clean[,26:50]
 rnase.rep3 <- rnase.clean[,51:75]
+
+View(rnase.rep3)
 ```
 
 ### 3.1. Mean Value Method
@@ -359,25 +362,23 @@ View(ctrl.mvm.reduced)
 ```
 
 ```{r}
-r1c <- ctrl.rep1.mvm.norm
-r2c <- ctrl.rep2.mvm.norm
-r3c <- ctrl.rep3.mvm.norm
+r1r <- rnase.rep1.mvm.norm
+r2r <- rnase.rep2.mvm.norm
+r3r <- rnase.rep3.mvm.norm
 
-r1c[is.na(r1c)] <- 0
-r2c[is.na(r2c)] <- 0
-r3c[is.na(r3c)] <- 0
+r1r0 <- rnase.rep1.mvm.norm
+r2r0 <- rnase.rep2.mvm.norm
+r3r0 <- rnase.rep3.mvm.norm
 
-l <- (r1c + r2c + r3c)
-View(l)
-dim(l)
+r1r0[is.na(r1r)] <- 0
+r2r0[is.na(r2r)] <- 0
+r3r0[is.na(r3r)] <- 0
 
-ctrl.mvm.reduced = apply(r1c, 1, function(x){
+rnase.mvm.reduced <- t(apply(r1r, 1, function(x) {
+  (r1r0 + r2r0 + r3r0)/(3 - (sum(as.numeric(is.na(r1r[x,])) + as.numeric(is.na(r2r[x,])) + as.numeric(is.na(r3r[x,]))/25)))
+                         }))
 
-  ((r1c + r2c + r3c))/(sum(is.na(r1c[x,]) + is.na(r2c[x,]) + is.na(r3c[x,]))/25)
-  
-})
-
-View(ctrl.mvm.reduced)
+View(rnase.mvm.reduced)
 ```
 
 
