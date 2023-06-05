@@ -187,33 +187,48 @@ ctrl.rep <- MS.Table.naremoved
 if (ctrl.cor.naremoved[4,2] < 0.9){
   ctrl.rep[4,1:25] <- NA
   }
-
+rnase.rep2 <- t(apply(rnase.rep, 1, function(t) {
+  rnase.rep[1,t] <- NA
+}))
 
 View(rnase.cor.naremoved)
 x = 17
-rnase.rep <- MS.Table.naremoved[76:150]
+rnase.rep <- MS.Table.naremoved[,76:150]
 
-rnase.rep2 <- apply(rnase.rep, 2, function(x) {
-  if (rnase.cor.naremoved[x,1] < 0.9) {
-    if (rnase.cor.naremoved[x,3] < 0.9){
-      rnase.rep[x,1:25] <- NA 
+
+for (x in 1:dim(rnase.cor.naremoved)[1]){
+  if (rnase.cor.naremoved[x, 1] < 0.9) {
+    if (rnase.cor.naremoved[x, 3] < 0.9){
+      rnase.rep[x, 1:25] <- NA 
     }
-    if (rnase.cor.naremoved[x,2] < 0.9){
-     rnase.rep[x,26:50] <- NA
-    }
-  if (rnase.cor.naremoved[x,3] < 0.9) {
-    if (rnase.cor.naremoved[x,2] < 0.9){
-     rnase.rep[x,51:75] <- NA
+    if (rnase.cor.naremoved[x, 2] < 0.9){
+     rnase.rep[x, 26:50] <- NA
+    }}}
+  
+for (x in 1:dim(rnase.cor.naremoved)[1]){
+  if (rnase.cor.naremoved[x, 3] < 0.9) {
+    if (rnase.cor.naremoved[x, 2] < 0.9){
+     rnase.rep[x, 51:75] <- NA
     }
   }
-    }})
+     }
 
-rnase.rep2 <- apply(rnase.rep, 1, function(x) {
-  rnase.rep[x,1] <- NA
-})
 
-View(rnase.rep2)
-dim(rnase.rep)
+Nr <- c(1:dim(rnase.cor.naremoved)[1])
+gesamt <- cbind(Nr, rnase.rep[,1:25], Nr, rnase.rep[,26:50], Nr, rnase.rep[,51:75])
+View(gesamt)
+
+```
+
+```{r}
+rnase.rep <- MS.Table.naremoved
+for (x in 1:dim(rnase.cor.naremoved)[1]){
+  if (rnase.cor.naremoved[x, 1] < 0.9) {
+    if (rnase.cor.naremoved[x, 3] < 0.9){
+      rnase.rep[x, 1:25] <- NA 
+    }}
+  }
+View(rownames_to_column(rnase.rep))
 ```
 
 
