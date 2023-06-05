@@ -177,14 +177,16 @@ Now we select the proteins which have correlations beneath 0.6. Those are not re
 # ctrl.cor.naremoved[,2] < 0.75
 # ctrl.cor.naremoved[,3] < 0.75
 
-non.reproducible.ctrl <- which(rowSums(ctrl.cor.naremoved<0.60)>1)
+non.reproducible.ctrl <- which(rowSums(ctrl.cor.naremoved<0.9)>2)
 length(non.reproducible.ctrl)
 
-non.reproducible.rnase <- which(rowSums(rnase.cor.naremoved<0.60)>1)
+non.reproducible.rnase <- which(rowSums(rnase.cor.naremoved<0.9)>2)
 length(non.reproducible.rnase)
 
-non.reproducible <- unique(which(rowSums(ctrl.cor.naremoved<0.60)>0), which(rowSums(rnase.cor.naremoved<0.60)>0))
+non.reproducible <- unique(which(rowSums(ctrl.cor.naremoved<0.9)>2), which(rowSums(rnase.cor.naremoved<0.9)>2))
 length(non.reproducible)
+
+#View(rnase.cor.naremoved)
 ```
 
 Now we eliminate the proteins that have non reproducible Data.
@@ -292,7 +294,7 @@ ctrl.mvm.scaled =
   sweep(ctrl.mvm.reduced,1,100/rowSums(ctrl.mvm.reduced),'*')
 
 # Check if the two data frames are identical
-is_identical <- identical(ctrl.mvm.reduced, ctrl.mvm)
+is_identical <- identical(ctrl.mvm.reduced, ctrl.mvm.scaled)
 
 # Print the result
 if (is_identical) {
@@ -474,7 +476,6 @@ rnase.zt <- rnase.zt.scaled
 
 ```
 
-
 ### 3.3. Min-Max-Scaling
 
 #### 3.3.1. Normalization
@@ -575,8 +576,4 @@ ctrl.mms <- ctrl.mms.scaled
 rnase.mms <- rnase.mms.scaled
 ```
 
-The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames:
-**ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
-
-
-
+The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames: **ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
