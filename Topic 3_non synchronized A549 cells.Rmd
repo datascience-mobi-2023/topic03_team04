@@ -130,6 +130,7 @@ rnase.rep3.naremoved <- MS.Table.naremoved[,126:150]
 
 Now we calculate the correlation of the replicates. This time the proteins that containes replicates with only 0 are eliminated, so there should be no NAs anymore.
 
+
 ```{r}
 ctrl.cor.naremoved <- 
   cbind(ctrl.cor.rep1.rep2.naremoved <- 
@@ -171,6 +172,50 @@ ggplot(rnase.cor.data.frame.naremoved, aes(x=correlation)) + geom_histogram()
 ```
 
 Now we select the proteins which have correlations beneath 0.6. Those are not reproducible, thus the data is not safe enough to be used further.
+
+Was jetzt getan werden muss: 
+Proteine bei denen eine Korrelation gut aber die anderen zwei schlecht sind leiden unter einem abweichenden Replikat. Dieses muss entfernt werden (wenn cor 1/2 und 2/3 schlecht sind ist Replikat 3 schlecht)
+Alle Werte dieser schlechten Replikate werden auf NA gesetzt. 
+Beim späteren Zusammenfügen werden die NAs ignoriert und nicht durch 3 sonder durch (3 - (anzahl der NA-Replikate)) geteilt
+
+Das ganze wird erstmal getestet:
+```{r}
+
+View(ctrl.cor.naremoved)
+
+ctrl.rep <- MS.Table.naremoved
+if (ctrl.cor.naremoved[4,2] < 0.9){
+  ctrl.rep[4,1:25] <- NA
+  }
+
+
+View(rnase.cor.naremoved)
+x = 17
+rnase.rep <- MS.Table.naremoved[76:150]
+
+rnase.rep2 <- apply(rnase.rep, 2, function(x) {
+  if (rnase.cor.naremoved[x,1] < 0.9) {
+    if (rnase.cor.naremoved[x,3] < 0.9){
+      rnase.rep[x,1:25] <- NA 
+    }
+    if (rnase.cor.naremoved[x,2] < 0.9){
+     rnase.rep[x,26:50] <- NA
+    }
+  if (rnase.cor.naremoved[x,3] < 0.9) {
+    if (rnase.cor.naremoved[x,2] < 0.9){
+     rnase.rep[x,51:75] <- NA
+    }
+  }
+    }})
+
+rnase.rep2 <- apply(rnase.rep, 1, function(x) {
+  rnase.rep[x,1] <- NA
+})
+
+View(rnase.rep2)
+dim(rnase.rep)
+```
+
 
 ```{r}
 # ctrl.cor.naremoved[,1] < 0.75
