@@ -189,12 +189,15 @@ non.reproducible.ctrl <- which(rowSums(ctrl.cor.naremoved<0.9)>2)
 non.reproducible.rnase <- which(rowSums(rnase.cor.naremoved<0.9)>2)
 #length(non.reproducible.rnase)
 
-non.reproducible <- unique(which(rowSums(ctrl.cor.naremoved<0.9)>2), which(rowSums(rnase.cor.naremoved<0.9)>2))
+non.reproducible <- unique(c(which(rowSums(ctrl.cor.naremoved<0.9)>2), which(rowSums(rnase.cor.naremoved<0.9)>2)))
 #length(non.reproducible)
 
 #View(rnase.cor.naremoved)
+#length(non.reproducible)
+length(non.reproducible.rnase)
+length(non.reproducible.ctrl)
 length(non.reproducible)
-View(non.reproducible)
+#View(non.reproducible)
 ```
 
 Now we eliminate the proteins that only have correlations under 0.9.
@@ -206,7 +209,10 @@ rnase.rep <- MS.Table.naremoved[-non.reproducible,76:150]
 
 ctrl.cor.removed <- ctrl.cor.naremoved [-non.reproducible,]
 rnase.cor.removed <- rnase.cor.naremoved [-non.reproducible,]
-
+#View(rnase.rep)
+dim(rnase.rep)
+dim(ctrl.rep)
+dim(ctrl.cor.removed)
 ```
 
 ```{r}
@@ -242,16 +248,17 @@ for (x in 1:dim(rnase.rep)[1]){
       rnase.rep[x, 51:75] <- NA
     }
   }
-     }
+}
 
-#Nr <- c(1:dim(rnase.rep)[1])
-#rnase.with.proteinnumbers <- cbind(Nr, rnase.rep[,1:25], Nr, rnase.rep[,26:50], Nr, rnase.rep[,51:75])
+Nr <- c(1:dim(rnase.rep)[1])
+rnase.with.proteinnumbers <- cbind(Nr, rnase.rep[,1:25], Nr, rnase.rep[,26:50], Nr, rnase.rep[,51:75])
 View(rnase.with.proteinnumbers)
-#dim(rnase.rep)
+dim(rnase.rep)
+View(rnase.cor.removed)
 
 ```
 
-We now have 3343 Proteins left. 
+We now have 3074 Proteins left. 
 They are stored in new variables:
 
 ```{r}
