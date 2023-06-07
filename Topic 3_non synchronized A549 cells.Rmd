@@ -250,8 +250,7 @@ rnase.with.proteinnumbers <- cbind(Nr, rnase.rep[,1:25], Nr, rnase.rep[,26:50], 
 #View(rnase.cor.removed)
 
 ctrl.with.proteinnumbers <- cbind(Nr, ctrl.rep[,1:25], Nr, ctrl.rep[,26:50], Nr, ctrl.rep[,51:75])
-View(ctrl.rep)
-
+#View(ctrl.with.proteinnumbers)
 
 ```
 
@@ -358,7 +357,8 @@ r2c0[is.na(r2c)] <- 0
 r3c0[is.na(r3c)] <- 0
 
 
-ctrl.mvm.reduced <-  (r1c0 + r2c0 + r3c0)/(3-((sum(as.numeric(is.na(r1c[x,])) + as.numeric(is.na(r2c[x,])) + as.numeric(is.na(r3c[x,]))))/25))
+ctrl.mvm.reduced <-  (r1c0 + r2c0 + r3c0)/(3-((sum(is.na(r1c[x,]) + is.na(r2c[x,]) + is.na(r3c[x,])))/25))
+
 ```
 
 ```{r}
@@ -375,10 +375,10 @@ r1r0[is.na(r1r)] <- 0
 r2r0[is.na(r2r)] <- 0
 r3r0[is.na(r3r)] <- 0
 
-rnase.mvm.reduced <-  (r1r0 + r2r0 + r3r0)/(3 - ((sum(as.numeric(is.na(r1r[x,])) + as.numeric(is.na(r2r[x,])) + as.numeric(is.na(r3r[x,]))))/25))
+rnase.mvm.reduced <-  (r1r0 + r2r0 + r3r0)/(3 - ((sum(is.na(r1r[x,]) + is.na(r2r[x,]) + is.na(r3r[x,])))/25))
                         
 
-View(rnase.mvm.reduced)
+#View(rnase.mvm.reduced)
 ```
 
 #### 3.1.3. Scaling
@@ -424,16 +424,23 @@ View(rnase.mvm)
 
 #### 3.2.1. Normalization
 
+The z-Transformation does not work with df that have NA-values. This means we cannot use the ctrl.clean and rnase.clean df. We have to use the old ctrl.rep or the MS.Table.naremoved[-non.reproducible,1:75] dfs. On these we first perform z-Transformation and then we use the same algorithms as before to reduce the dataset in regards to reproducibility. (boah mein Elglisch)
+
 ```{r}
-ctrl.rep1z <- ctrl.rep1.naremoved 
-ctrl.rep2z <- ctrl.rep2.naremoved 
-ctrl.rep3z <- ctrl.rep3.naremoved 
+ctrl.rep.zt <- MS.Table.naremoved[-non.reproducible,1:75]
+rnase.rep.zt <- MS.Table.naremoved[-non.reproducible,76:150]
+
+ctrl.rep1z <- ctrl.rep.zt[,1:25]
+ctrl.rep2z <- ctrl.rep.zt[,26:50]
+ctrl.rep3z <- ctrl.rep.zt[,51:75]
 ctrl.repz <- cbind(ctrl.rep1z,ctrl.rep2z,ctrl.rep3z)
 
-rnase.rep1z <- rnase.rep1.naremoved
-rnase.rep2z <- rnase.rep2.naremoved 
-rnase.rep3z <- rnase.rep3.naremoved 
+
+rnase.rep1z <- rnase.rep.zt[,1:25]
+rnase.rep2z <- rnase.rep.zt[,26:50]
+rnase.rep3z <- rnase.rep.zt[,51:75]
 rnase.repz <- cbind(rnase.rep1z,rnase.rep2z,rnase.rep3z )
+
 ```
 
 First the normalization for the Ctrl: 
@@ -504,6 +511,7 @@ min.rnase.rep3.zt.norm <- apply(rnase.rep3.zt.norm, 1, min)
 rnase.rep1.zt.norm.pos <- sweep(rnase.rep1.zt.norm,1,min.rnase.rep1.zt.norm,FUN = '-')
 rnase.rep2.zt.norm.pos <- sweep(rnase.rep2.zt.norm,1,min.rnase.rep2.zt.norm,FUN = '-')
 rnase.rep3.zt.norm.pos <- sweep(rnase.rep3.zt.norm,1,min.rnase.rep3.zt.norm,FUN = '-')
+
 ```
 
 #### 3.2.2. Scaling
@@ -538,6 +546,8 @@ rnase.rep3.zt.scaled =
 # rowSums(rnase.rep3.zt.scaled)
 
 rnase.rep.zt.scaled = cbind(rnase.rep1.zt.scaled,rnase.rep2.zt.scaled,rnase.rep3.zt.scaled)
+
+View(rnase.rep.zt.scaled)
 ```
 
 #### 3.2.3. Reduction
@@ -545,7 +555,6 @@ rnase.rep.zt.scaled = cbind(rnase.rep1.zt.scaled,rnase.rep2.zt.scaled,rnase.rep3
 Now we can set the replicates with poor correlation to NA.
 
 ```{r}
-
 
 for (x in 1:dim(ctrl.rep.zt.scaled)[1]){
   if (ctrl.cor.removed[x, 1] < 0.9) {
@@ -579,14 +588,14 @@ for (x in 1:dim(rnase.rep.zt.scaled)[1]){
   }
 }
 
+View(rnase.rep.zt.scaled)
+
 Nr <- c(1:dim(rnase.rep.zt.scaled)[1])
-rnase.with.proteinnumbers <- cbind(Nr, rnase.rep.zt.scaled[x, 1:25], Nr, rnase.rep.zt.scaled[x, 26:50], Nr, rnase.rep.zt.scaled[x, 51:75])
-View(rnase.with.proteinnumbers)
+rnase.with.proteinnumbers <- cbind(Nr, rnase.rep.zt.scaled[, 1:25], Nr, rnase.rep.zt.scaled[, 26:50], Nr, rnase.rep.zt.scaled[, 51:75])
+#View(rnase.with.proteinnumbers)
 
 ctrl.with.proteinnumbers <- cbind(Nr, ctrl.rep[,1:25], Nr, ctrl.rep[,26:50], Nr, ctrl.rep[,51:75])
-#View(ctrl.rep)
-
-
+#View(ctrl.with.proteinnumbers)
 
 ```
 
@@ -594,23 +603,22 @@ To reduce we take the mean value between each replicate. Here we must consider t
 
 ```{r}
 
-r1c.zt <- ctrl.regithp1.zt.scaled
-r2c.zt <- ctrl.rep2.zt.scaled
-r3c.zt <- ctrl.rep3.zt.scaled
+r1c <- ctrl.rep1.zt.scaled
+r2c <- ctrl.rep2.zt.scaled
+r3c <- ctrl.rep3.zt.scaled
 
-r1c0.zt <- ctrl.rep1.zt.scaled
-r2c0.zt <- ctrl.rep2.zt.scaled
-r3c0.zt <- ctrl.rep3.zt.scaled
+r1c0 <- ctrl.rep1.zt.scaled
+r2c0 <- ctrl.rep2.zt.scaled
+r3c0 <- ctrl.rep3.zt.scaled
 
-r1c0.zt[is.na(r1c)] <- 0
-r2c0.zt[is.na(r2c)] <- 0
-r3c0.zt[is.na(r3c)] <- 0
+r1c0[is.na(r1c)] <- 0
+r2c0[is.na(r2c)] <- 0
+r3c0[is.na(r3c)] <- 0
 
-rc0.zt = r1c0.zt + r2c0.zt + r3c0.zt
 
-#ctrl.zt.reduced <- rc0.zt/(3-((sum(apply(r1c.zt,1,sum)) +  as.numeric(is.na(r2c.zt[x,])) + as.numeric(is.na(r3c.zt[x,]))))/25))
+ctrl.zt.reduced <-  (r1c0 + r2c0 + r3c0)/(3-((sum(is.na(r1c[x,]) + is.na(r2c[x,]) + is.na(r3c[x,])))/25))
 
-(apply(is.na(r1c.zt), 1, sum)+apply(is.na(r2c.zt), 1, sum)+apply(is.na(r3c.zt), 1, sum))
+
 ```
 
 ```{r}
@@ -627,7 +635,7 @@ r1r0[is.na(r1r)] <- 0
 r2r0[is.na(r2r)] <- 0
 r3r0[is.na(r3r)] <- 0
 
-rnase.zt.reduced <-  (r1r0 + r2r0 + r3r0)/(3 - ((sum(as.numeric(is.na(r1r[x,])) + as.numeric(is.na(r2r[x,])) + as.numeric(is.na(r3r[x,]))))/25))
+rnase.zt.reduced <-  (r1c0 + r2c0 + r3c0)/(3-((sum(is.na(r1c[x,]) + is.na(r2c[x,]) + is.na(r3c[x,])))/25))
                         
 
 ```
@@ -805,7 +813,7 @@ Now we can plot graphs that show the result of the merge and second scaling. Thi
 
 plot(rnase.rep1.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
 plot(rnase.rep2.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
-plot(rnase.rep3.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
+#plot(rnase.rep3.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
 
 ##plot of the merged ctrl
 
