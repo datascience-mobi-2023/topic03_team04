@@ -71,7 +71,7 @@ sum(apply(MS_Table_reordered, 2, is.numeric)) == ncol(MS_Table)
 MS_Table_Ctrl <-MS_Table_reordered[,1:75]
 #View(MS_Table_Ctrl)
 MS_Table_RNase <-MS_Table_reordered[,76:150]
-#View(MS_Table_RNase)
+View(MS_Table_RNase)
 ```
 
 ## 2. Reproducibility
@@ -413,11 +413,18 @@ rnase.mvm.scaled =
 Now we have normalized our data using the mean-value-method, and scaled it to 100. The two variables that will be used later on either contain the normalized (mvm) and scaled data of the control: **ctrl.mvm** or the normalized (mvm) and scaled data of the rnase: **rnase.mvm**
 
 ```{r}
-ctrl.mvm <- ctrl.mvm.scaled
-rnase.mvm <- rnase.mvm.scaled
+new.colnames.ctrl <- c("Fraction_1_Ctrl","Fraction_2_Ctrl","Fraction_3_Ctrl","Fraction_4_Ctrl","Fraction_5_Ctrl","Fraction_6_Ctrl","Fraction_7_Ctrl","Fraction_8_Ctrl","Fraction_9_Ctrl","Fraction_10_Ctrl","Fraction_11_Ctrl","Fraction_12_Ctrl","Fraction_13_Ctrl","Fraction_14_Ctrl","Fraction_15_Ctrl","Fraction_16_Ctrl","Fraction_17_Ctrl","Fraction_18_Ctrl","Fraction_19_Ctrl","Fraction_20_Ctrl","Fraction_21_Ctrl","Fraction_22_Ctrl","Fraction_23_Ctrl","Fraction_24_Ctrl","Fraction_25_Ctrl")
 
-View(ctrl.mvm)
-View(rnase.mvm)
+new.colnames.RNase <- c("Fraction_1_RNase","Fraction_2_RNase","Fraction_3_RNase","Fraction_4_RNase","Fraction_5_RNase","Fraction_6_RNase","Fraction_7_RNase","Fraction_8_RNase","Fraction_9_RNase","Fraction_10_RNase","Fraction_11_RNase","Fraction_12_RNase","Fraction_13_RNase","Fraction_14_RNase","Fraction_15_RNase","Fraction_16_RNase","Fraction_17_RNase","Fraction_18_RNase","Fraction_19_RNase","Fraction_20_RNase","Fraction_21_RNase","Fraction_22_RNase","Fraction_23_RNase","Fraction_24_RNase","Fraction_25_RNase")
+
+ctrl.mvm <- ctrl.mvm.scaled
+colnames(ctrl.mvm) <- new.colnames.ctrl
+
+rnase.mvm <- rnase.mvm.scaled
+colnames(rnase.mvm) <- new.colnames.ctrl
+
+# View(ctrl.mvm)
+# View(rnase.mvm)
 ```
 
 ### 3.2. z - Transformation
@@ -439,8 +446,7 @@ ctrl.repz <- cbind(ctrl.rep1z,ctrl.rep2z,ctrl.rep3z)
 rnase.rep1z <- rnase.rep.zt[,1:25]
 rnase.rep2z <- rnase.rep.zt[,26:50]
 rnase.rep3z <- rnase.rep.zt[,51:75]
-rnase.repz <- cbind(rnase.rep1z,rnase.rep2z,rnase.rep3z )
-
+rnase.repz <- cbind(rnase.rep1z,rnase.rep2z,rnase.rep3z)
 ```
 
 First the normalization for the Ctrl: 
@@ -546,8 +552,6 @@ rnase.rep3.zt.scaled =
 # rowSums(rnase.rep3.zt.scaled)
 
 rnase.rep.zt.scaled = cbind(rnase.rep1.zt.scaled,rnase.rep2.zt.scaled,rnase.rep3.zt.scaled)
-
-View(rnase.rep.zt.scaled)
 ```
 
 #### 3.2.3. Reduction
@@ -588,15 +592,13 @@ for (x in 1:dim(rnase.rep.zt.scaled)[1]){
   }
 }
 
-View(rnase.rep.zt.scaled)
 
 Nr <- c(1:dim(rnase.rep.zt.scaled)[1])
 rnase.with.proteinnumbers <- cbind(Nr, rnase.rep.zt.scaled[, 1:25], Nr, rnase.rep.zt.scaled[, 26:50], Nr, rnase.rep.zt.scaled[, 51:75])
-#View(rnase.with.proteinnumbers)
+View(rnase.with.proteinnumbers)
 
 ctrl.with.proteinnumbers <- cbind(Nr, ctrl.rep[,1:25], Nr, ctrl.rep[,26:50], Nr, ctrl.rep[,51:75])
-#View(ctrl.with.proteinnumbers)
-
+View(ctrl.with.proteinnumbers)
 ```
 
 To reduce we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates.
@@ -616,84 +618,49 @@ r2c0[is.na(r2c)] <- 0
 r3c0[is.na(r3c)] <- 0
 
 
-ctrl.zt.reduced <-  (r1c0 + r2c0 + r3c0)/(3-((sum(is.na(r1c[x,]) + is.na(r2c[x,]) + is.na(r3c[x,])))/25))
-
-
+ctrl.zt.reduced.ns <-  (r1c0 + r2c0 + r3c0)/(3-((sum(is.na(r1c[x,]) + is.na(r2c[x,]) + is.na(r3c[x,])))/25))
 ```
 
 ```{r}
 
-r1r <- rnase.rep1.zt.norm.pos
-r2r <- rnase.rep2.zt.norm.pos
-r3r <- rnase.rep3.zt.norm.pos
+r1r <- rnase.rep1.zt.scaled
+r2r <- rnase.rep2.zt.scaled
+r3r <- rnase.rep3.zt.scaled
 
-r1r0 <- rnase.rep1.zt.norm.pos
-r2r0 <- rnase.rep2.zt.norm.pos
-r3r0 <- rnase.rep3.zt.norm.pos
+r1r0 <- rnase.rep1.zt.scaled
+r2r0 <- rnase.rep2.zt.scaled
+r3r0 <- rnase.rep3.zt.scaled
 
 r1r0[is.na(r1r)] <- 0
 r2r0[is.na(r2r)] <- 0
 r3r0[is.na(r3r)] <- 0
 
-rnase.zt.reduced <-  (r1c0 + r2c0 + r3c0)/(3-((sum(is.na(r1c[x,]) + is.na(r2c[x,]) + is.na(r3c[x,])))/25))
-                        
-
+rnase.zt.reduced.ns <-  (r1r0 + r2r0 + r3r0)/(3-((sum(is.na(r1r[x,]) + is.na(r2r[x,]) + is.na(r3r[x,])))/25))
 ```
 
-#### 3.2.3. Scaling
-
-*Each Replicate of Ctrl:*
-
-```{r}
-ctrl.rep1.zt.scaled = 
-  sweep(ctrl.rep1.zt.norm.pos,1,100/rowSums(ctrl.rep1.zt.norm.pos),'*')
-# rowSums(ctrl.rep1.zt.scaled)
-ctrl.rep2.zt.scaled = 
-  sweep(ctrl.rep2.zt.norm.pos,1,100/rowSums(ctrl.rep2.zt.norm.pos),'*')
-# rowSums(ctrl.rep2.zt.scaled)
-ctrl.rep3.zt.scaled = 
-  sweep(ctrl.rep3.zt.norm.pos,1,100/rowSums(ctrl.rep3.zt.norm.pos),'*')
-# rowSums(ctrl.rep3.zt.scaled)
-```
-
-Reduced Ctrl:
+Scaling of the reduced dataset.
 
 ```{r}
 ctrl.zt.scaled = 
-  sweep(ctrl.zt.reduced,1,100/rowSums(ctrl.zt.reduced),'*')
-# rowSums(ctrl.zt.scaled)
-```
-
-*Each Replicate of RNase:*
-
-```{r}
-rnase.rep1.zt.scaled = 
-  sweep(rnase.rep1.zt.norm.pos,1,100/rowSums(rnase.rep1.zt.norm.pos),'*')
-# rowSums(rnase.rep1.zt.scaled)
-rnase.rep2.zt.scaled = 
-  sweep(rnase.rep2.zt.norm.pos,1,100/rowSums(rnase.rep2.zt.norm.pos),'*')
-# rowSums(rnase.rep2.zt.scaled)
-rnase.rep3.zt.scaled = 
-  sweep(rnase.rep3.zt.norm.pos,1,100/rowSums(rnase.rep3.zt.norm.pos),'*')
-# rowSums(rnase.rep3.zt.scaled)
-```
-
-*Reduced RNase*
-
-```{r}
+  sweep(ctrl.zt.reduced.ns,1,100/rowSums(ctrl.zt.reduced.ns),'*')
 rnase.zt.scaled = 
-  sweep(rnase.zt.reduced,1,100/rowSums(rnase.zt.reduced),'*')
-# rowSums(rnase.zt.scaled)
+  sweep(rnase.zt.reduced.ns,1,100/rowSums(rnase.zt.reduced.ns),'*')
 ```
 
-Now we have normalized/scaled our data using z-transformation. The two variables that will be used later on either contain the normalized and scaled (zt) data of the control: **ctrl.zt** or the normalized and scaled (zt) data of the rnase: **rnase.mms**
+Now we have normalized/scaled our data using z-transformation. The two variables that will be used later on either contain the normalized and scaled (zt) data of the control: **ctrl.zt** or the normalized and scaled (zt) data of the rnase: **rnase.zt**
 
 ```{r}
-ctrl.zt <- ctrl.zt.scaled
-rnase.zt <- rnase.zt.scaled
+new.colnames.ctrl <- c("Fraction_1_Ctrl","Fraction_2_Ctrl","Fraction_3_Ctrl","Fraction_4_Ctrl","Fraction_5_Ctrl","Fraction_6_Ctrl","Fraction_7_Ctrl","Fraction_8_Ctrl","Fraction_9_Ctrl","Fraction_10_Ctrl","Fraction_11_Ctrl","Fraction_12_Ctrl","Fraction_13_Ctrl","Fraction_14_Ctrl","Fraction_15_Ctrl","Fraction_16_Ctrl","Fraction_17_Ctrl","Fraction_18_Ctrl","Fraction_19_Ctrl","Fraction_20_Ctrl","Fraction_21_Ctrl","Fraction_22_Ctrl","Fraction_23_Ctrl","Fraction_24_Ctrl","Fraction_25_Ctrl")
+new.colnames.rnase <- c("Fraction_1_RNase","Fraction_2_RNase","Fraction_3_RNase","Fraction_4_RNase","Fraction_5_RNase","Fraction_6_RNase","Fraction_7_RNase","Fraction_8_RNase","Fraction_9_RNase","Fraction_10_RNase","Fraction_11_RNase","Fraction_12_RNase","Fraction_13_RNase","Fraction_14_RNase","Fraction_15_RNase","Fraction_16_RNase","Fraction_17_RNase","Fraction_18_RNase","Fraction_19_RNase","Fraction_20_RNase","Fraction_21_RNase","Fraction_22_RNase","Fraction_23_RNase","Fraction_24_RNase","Fraction_25_RNase")
 
-View(ctrl.zt)
-View(rnase.zt)
+ctrl.zt <- ctrl.zt.scaled
+colnames(ctrl.zt) <- new.colnames.ctrl
+
+rnase.zt <- rnase.zt.scaled
+colnames(rnase.zt) <- new.colnames.rnase
+
+# View(ctrl.zt)
+# View(rnase.zt)
 ```
 
 ### 3.3. Min-Max-Scaling
@@ -826,11 +793,16 @@ plot(rnase.mms.scaled[1,], xlab="fraction", ylab="protein amount", col="blue", p
 Now we have normalized/scaled our data using min-max-scaling. The two variables that will be used later on either contain the normalized/scaled (mms) of the control: **ctrl.mms** or the normalized/scaled (mms) and scaled data of the rnase: **rnase.mms**
 
 ```{r}
-ctrl.mms <- ctrl.mms.scaled
-rnase.mms <- rnase.mms.scaled
+new.colnames.ctrl <- c("Fraction_1_Ctrl","Fraction_2_Ctrl","Fraction_3_Ctrl","Fraction_4_Ctrl","Fraction_5_Ctrl","Fraction_6_Ctrl","Fraction_7_Ctrl","Fraction_8_Ctrl","Fraction_9_Ctrl","Fraction_10_Ctrl","Fraction_11_Ctrl","Fraction_12_Ctrl","Fraction_13_Ctrl","Fraction_14_Ctrl","Fraction_15_Ctrl","Fraction_16_Ctrl","Fraction_17_Ctrl","Fraction_18_Ctrl","Fraction_19_Ctrl","Fraction_20_Ctrl","Fraction_21_Ctrl","Fraction_22_Ctrl","Fraction_23_Ctrl","Fraction_24_Ctrl","Fraction_25_Ctrl")
+new.colnames.rnase <- c("Fraction_1_RNase","Fraction_2_RNase","Fraction_3_RNase","Fraction_4_RNase","Fraction_5_RNase","Fraction_6_RNase","Fraction_7_RNase","Fraction_8_RNase","Fraction_9_RNase","Fraction_10_RNase","Fraction_11_RNase","Fraction_12_RNase","Fraction_13_RNase","Fraction_14_RNase","Fraction_15_RNase","Fraction_16_RNase","Fraction_17_RNase","Fraction_18_RNase","Fraction_19_RNase","Fraction_20_RNase","Fraction_21_RNase","Fraction_22_RNase","Fraction_23_RNase","Fraction_24_RNase","Fraction_25_RNase")
 
-View(ctrl.mms)
-View(rnase.mms)
+ctrl.mms <- ctrl.mms.scaled
+colnames(ctrl.mms) <- new.colnames.ctrl
+rnase.mms <- rnase.mms.scaled
+colnames(rnase.mms) <- new.colnames.rnase
+
+# View(ctrl.mms)
+# View(rnase.mms)
 ```
 
 The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames: **ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
