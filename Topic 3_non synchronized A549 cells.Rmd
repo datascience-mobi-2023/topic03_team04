@@ -130,7 +130,6 @@ rnase.rep3.naremoved <- MS.Table.naremoved[,126:150]
 
 Now we calculate the correlation of the replicates. This time the proteins that containes replicates with only 0 are eliminated, so there should be no NAs anymore.
 
-
 ```{r}
 ctrl.cor.naremoved <- 
   cbind(ctrl.cor.rep1.rep2.naremoved <- 
@@ -188,7 +187,7 @@ non.reproducible <- unique(c(non.reproducible.ctrl, non.reproducible.rnase))
 
 length(non.reproducible.rnase)
 length(non.reproducible.ctrl)
-View(non.reproducible)
+
 #View(non.reproducible2)
 ```
 
@@ -209,8 +208,7 @@ length(non.reproducible)
 #View(non.reproducible)
 ```
 
-
-Other proteins are a bit trickier. Some proteins have two replicates similar to each other (correlation < 0.9) and a third one that completely different. These Proeins have one very good and two bad correlations. The different replicates is often the third one (batch effect ?). To avoid loosing too many proteins and still to still have safe data, we try to ignore the bad replicates. For this we first set them to NA: After the normalization-set we can ignore them. 
+Other proteins are a bit trickier. Some proteins have two replicates similar to each other (correlation \< 0.9) and a third one that completely differs. These Proteins have one very high and two smaller correlations. The different replicate is often the third one (mabye batch effect). To avoid loosing too many proteins and still to still have safe data, we try to ignore the bad replicates. For this we first set them to NA: After the normalization-set we can ignore them.
 
 ```{r}
 
@@ -219,12 +217,12 @@ for (x in 1:dim(ctrl.rep)[1]){
     if (ctrl.cor.removed[x, 3] < 0.9){
       ctrl.rep[x, 1:25] <- NA 
     }
-    if (rnase.cor.removed[x, 2] < 0.9){
+    if (ctrl.cor.removed[x, 2] < 0.9){
       ctrl.rep[x, 26:50] <- NA
     }}
   
-  if (rnase.cor.removed[x, 3] < 0.9) {
-    if (rnase.cor.removed[x, 2] < 0.9){
+  if (ctrl.cor.removed[x, 3] < 0.9) {
+    if (ctrl.cor.removed[x, 2] < 0.9){
       ctrl.rep[x, 51:75] <- NA
     }
   }
@@ -246,19 +244,18 @@ for (x in 1:dim(rnase.rep)[1]){
   }
 }
 
-#Nr <- c(1:dim(rnase.rep)[1])
-#rnase.with.proteinnumbers <- cbind(Nr, rnase.rep[,1:25], Nr, rnase.rep[,26:50], Nr, rnase.rep[,51:75])
-View(e.with.proteinnumbers)
+Nr <- c(1:dim(rnase.rep)[1])
+rnase.with.proteinnumbers <- cbind(Nr, rnase.rep[,1:25], Nr, rnase.rep[,26:50], Nr, rnase.rep[,51:75])
+#View(rnase.with.proteinnumbers)
 #View(rnase.cor.removed)
 
 ctrl.with.proteinnumbers <- cbind(Nr, ctrl.rep[,1:25], Nr, ctrl.rep[,26:50], Nr, ctrl.rep[,51:75])
-#View(ctrl.with.proteinnumbers)
+View(ctrl.rep)
 
 
 ```
 
-We now have 3074 Proteins left. 
-They are stored in new variables:
+We now have 3074 Proteins left. They are stored in new variables:
 
 ```{r}
 
@@ -266,7 +263,6 @@ ctrl.clean <- ctrl.rep
 rnase.clean <- rnase.rep
 
 ```
-
 
 We now have clean data, with proteins that have reproducible data we can use for further analysis.
 
@@ -345,7 +341,7 @@ rnase.rep3.mvm.norm <- t(apply(rnase.rep3, 1, function(x) {
 
 #### 3.1.2. Reduction
 
-To reduce we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates. 
+To reduce we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates.
 
 ```{r}
 
@@ -364,7 +360,7 @@ r3c0[is.na(r3c)] <- 0
 ctrl.mvm.reduced <-  (r1c0 + r2c0 + r3c0)/(3-((sum(as.numeric(is.na(r1c[x,])) + as.numeric(is.na(r2c[x,])) + as.numeric(is.na(r3c[x,]))))/25))
 
 
-#View(ctrl.mvm.reduced)
+View(ctrl.mvm.reduced)
 ```
 
 ```{r}
@@ -384,12 +380,8 @@ r3r0[is.na(r3r)] <- 0
 rnase.mvm.reduced <-  (r1r0 + r2r0 + r3r0)/(3 - ((sum(as.numeric(is.na(r1r[x,])) + as.numeric(is.na(r2r[x,])) + as.numeric(is.na(r3r[x,]))))/25))
                         
 
-#View(rnase.mvm.reduced)
+View(rnase.mvm.reduced)
 ```
-
-
-
-
 
 #### 3.1.3. Scaling
 
@@ -434,38 +426,6 @@ View(rnase.mvm)
 
 #### 3.2.1. Normalization
 
-Normalization with z-Transformation: We use the scale command. EXPLANATION WHY Z-TRANSFORMATION !!
-
-NOTE to better understand the sweep function.
-
-```{r}
-m <- matrix(1:6, nrow = 2)
-m
-# Subtract the mean of each column from the corresponding elements in the matrix
-swept_matrix <- sweep(m, 2, colMeans(m), FUN = "-")
-
-print(swept_matrix)
-
-applied_matrix <- apply(m, 2, function(x) x - mean(x))
-
-print(applied_matrix)
-```
-
-Here we can not use the dataframes with NAs in them. This step will be perofrmed later on. For now we use the values from before. 
-
-```{r}
-ctrl.reprod <- MS.Table.naremoved[-non.reproducible,1:75]
-rnase.reprod <- MS.Table.naremoved[-non.reproducible,76:150]
-
-ctrl.rep1z <- ctrl.reprod[,1:25]
-ctrl.rep2z <- ctrl.reprod[,26:50]
-ctrl.rep3z <- ctrl.reprod[,51:75]
-rnase.rep1z <- rnase.reprod[,1:25]
-rnase.rep2z <- rnase.reprod[,26:50]
-rnase.rep3z <- rnase.reprod[,51:75]
-
-```
-
 First the normalization for the Ctrl: 
 
 Since the protein amount in each replicate is different, it is better to calculate the mean for each replicate separately. However the sd-value does not have to be adapted. Because the replicates have the same variance (same procedure for every replicate in the wet lab), we don't have to calculate the standard devidation for the replicates in each fraction extra. We can calculate the sd-value for one row /sd.
@@ -473,23 +433,23 @@ Since the protein amount in each replicate is different, it is better to calcula
 *sd-values and mean values of Ctrl:*
 
 ```{r}
-sd.ctrl <- apply(ctrl.rep1z, 1, sd)
+sd.ctrl <- apply(ctrl.rep, 1, sd)
 
-mean.ctrl.rep1 <- apply(ctrl.rep1z, 1, mean)
-mean.ctrl.rep2 <- apply(ctrl.rep2z, 1, mean)
-mean.ctrl.rep3 <- apply(ctrl.rep3z, 1, mean)
+mean.ctrl.rep1 <- apply(ctrl.rep1, 1, mean)
+mean.ctrl.rep2 <- apply(ctrl.rep2, 1, mean)
+mean.ctrl.rep3 <- apply(ctrl.rep3, 1, mean)
 ```
 
 *Normalization of Ctrl:*
 
 ```{r}
-ctrl.rep1.meanvalue <- sweep(ctrl.rep1z,1,mean.ctrl.rep1,'-')
+ctrl.rep1.meanvalue <- sweep(ctrl.rep1,1,mean.ctrl.rep1,'-')
 ctrl.rep1.zt.norm <- sweep(ctrl.rep1.meanvalue,1,sd.ctrl,'/')
 
-ctrl.rep2.meanvalue <- sweep(ctrl.rep2z,1,mean.ctrl.rep2,'-')
+ctrl.rep2.meanvalue <- sweep(ctrl.rep2,1,mean.ctrl.rep2,'-')
 ctrl.rep2.zt.norm <- sweep(ctrl.rep2.meanvalue,1,sd.ctrl,'/')
 
-ctrl.rep3.meanvalue <- sweep(ctrl.rep3z,1,mean.ctrl.rep3,'-')
+ctrl.rep3.meanvalue <- sweep(ctrl.rep3,1,mean.ctrl.rep3,'-')
 ctrl.rep3.zt.norm <- sweep(ctrl.rep3.meanvalue,1,sd.ctrl,'/')
 
 #calculate again the min value for each protein
@@ -506,23 +466,23 @@ ctrl.rep3.zt.norm.pos <- sweep(ctrl.rep3.zt.norm,1,min.ctrl.rep3.zt.norm,FUN = '
 *sd-values and mean values of RNase:*
 
 ```{r}
-sd.rnase = apply(rnase.rep1z, 1, sd)
+sd.rnase = apply(rnase.rep, 1, sd)
 
-mean.rnase.rep1 <- apply(rnase.rep1z, 1, mean)
-mean.rnase.rep2 <- apply(rnase.rep2z, 1, mean)
-mean.rnase.rep3 <- apply(rnase.rep3z, 1, mean)
+mean.rnase.rep1 <- apply(rnase.rep1, 1, mean)
+mean.rnase.rep2 <- apply(rnase.rep2, 1, mean)
+mean.rnase.rep3 <- apply(rnase.rep3, 1, mean)
 ```
 
 *Normalization of RNase:*
 
 ```{r}
-rnase.rep1.meanvalue <- sweep(rnase.rep1z,1,mean.rnase.rep1,'-')
+rnase.rep1.meanvalue <- sweep(rnase.rep1,1,mean.rnase.rep1,'-')
 rnase.rep1.zt.norm <- sweep(rnase.rep1.meanvalue,1,sd.rnase,'/')
 
-rnase.rep2.meanvalue <- sweep(rnase.rep2z,1,mean.rnase.rep2,'-')
+rnase.rep2.meanvalue <- sweep(rnase.rep2,1,mean.rnase.rep2,'-')
 rnase.rep2.zt.norm <- sweep(rnase.rep2.meanvalue,1,sd.rnase,'/')
 
-rnase.rep3.meanvalue <- sweep(rnase.rep3z,1,mean.rnase.rep3,'-')
+rnase.rep3.meanvalue <- sweep(rnase.rep3,1,mean.rnase.rep3,'-')
 rnase.rep3.zt.norm <- sweep(rnase.rep3.meanvalue,1,sd.rnase,'/')
 
 #calculate again the min value for each protein
@@ -536,72 +496,108 @@ rnase.rep2.zt.norm.pos <- sweep(rnase.rep2.zt.norm,1,min.rnase.rep2.zt.norm,FUN 
 rnase.rep3.zt.norm.pos <- sweep(rnase.rep3.zt.norm,1,min.rnase.rep3.zt.norm,FUN = '-')
 ```
 
-#### 3.2.2. Reduction
+#### 3.2.2. Scaling
+
+Each Replicate of Ctrl:
+
+```{r}
+ctrl.rep1.zt.scaled = 
+  sweep(ctrl.rep1.zt.norm.pos,1,100/rowSums(ctrl.rep1.zt.norm.pos),'*')
+# rowSums(ctrl.rep1.zt.scaled)
+ctrl.rep2.zt.scaled = 
+  sweep(ctrl.rep2.zt.norm.pos,1,100/rowSums(ctrl.rep2.zt.norm.pos),'*')
+# rowSums(ctrl.rep2.zt.scaled)
+ctrl.rep3.zt.scaled = 
+  sweep(ctrl.rep3.zt.norm.pos,1,100/rowSums(ctrl.rep3.zt.norm.pos),'*')
+# rowSums(ctrl.rep3.zt.scaled)
+
+ctrl.rep.zt.scaled = cbind(ctrl.rep1.zt.scaled,ctrl.rep2.zt.scaled,ctrl.rep3.zt.scaled)
+```
+
+Each Replicate of RNAse:
+
+```{r}
+rnase.rep1.zt.scaled = 
+  sweep(rnase.rep1.zt.norm.pos,1,100/rowSums(rnase.rep1.zt.norm.pos),'*')
+# rowSums(rnase.rep1.zt.scaled)
+rnase.rep2.zt.scaled = 
+  sweep(rnase.rep2.zt.norm.pos,1,100/rowSums(rnase.rep2.zt.norm.pos),'*')
+# rowSums(rnase.rep2.zt.scaled)
+rnase.rep3.zt.scaled = 
+  sweep(rnase.rep3.zt.norm.pos,1,100/rowSums(rnase.rep3.zt.norm.pos),'*')
+# rowSums(rnase.rep3.zt.scaled)
+
+rnase.rep.zt.scaled = cbind(rnase.rep1.zt.scaled,rnase.rep2.zt.scaled,rnase.rep3.zt.scaled)
+```
+
+#### 3.2.3. Reduction
 
 Now we can set the replicates with poor correlation to NA.
 
 ```{r}
 
-
-for (x in 1:dim(ctrl.rep1.zt.norm.pos)[1]){
-  if (ctrl.cor.removed[x, 1] < 0.9) {
-    if (ctrl.cor.removed[x, 3] < 0.9){
-      ctrl.rep1.zt.norm.pos[x, ] <- NA 
+for (x in 1:dim(ctrl.rep.zt.scaled)[1]){
+  if (ctrl.cor.removed[x, 1] < 0.8) {
+    if (ctrl.cor.removed[x, 3] < 0.8){
+      ctrl.rep1.zt.scaled[x, ] <- NA 
     }
-    if (rnase.cor.removed[x, 2] < 0.9){
-      ctrl.rep2.zt.norm.pos[x, ] <- NA
+    if (ctrl.cor.removed[x, 2] < 0.8){
+      ctrl.rep2.zt.scaled[x, ] <- NA
     }}
   
-  if (rnase.cor.removed[x, 3] < 0.9) {
-    if (rnase.cor.removed[x, 2] < 0.9){
-      ctrl.rep3.zt.norm.pos[x, ] <- NA
+  if (ctrl.cor.removed[x, 3] < 0.8) {
+    if (ctrl.cor.removed[x, 2] < 0.8){
+      ctrl.rep3.zt.scaled[x, ] <- NA
     }
   }
      }
 
-for (x in 1:dim(rnase.rep1.zt.norm.pos)[1]){
+for (x in 1:dim(rnase.rep.zt.scaled)[1]){
   if (rnase.cor.removed[x, 1] < 0.9) {
     if (rnase.cor.removed[x, 3] < 0.9){
-      rnase.rep1.zt.norm.pos[x, ] <- NA 
+      rnase.rep1.zt.scaled[x, ] <- NA 
     }
     if (rnase.cor.removed[x, 2] < 0.9){
-      rnase.rep1.zt.norm.pos[x, ] <- NA
+      rnase.rep2.zt.scaled[x, ] <- NA
     }}
   
   if (rnase.cor.removed[x, 3] < 0.9) {
     if (rnase.cor.removed[x, 2] < 0.9){
-      rnase.rep1.zt.norm.pos[x, ] <- NA
+      rnase.rep3.zt.scaled[x, ] <- NA
     }
   }
 }
 
-Nr <- c(1:dim(rnase.rep1.zt.norm.pos)[1])
-rnase.with.proteinnumbers <- cbind(Nr, rnase.rep1.zt.norm.pos, Nr, rnase.rep2.zt.norm.pos, Nr, rnase.rep3.zt.norm.pos)
-#View(rnase.with.proteinnumbers)
+Nr <- c(1:dim(rnase.rep1.zt.scaled)[1])
+rnase.with.proteinnumbers <- cbind(Nr, rnase.rep1.zt.scaled, Nr, rnase.rep2.zt.scaled, Nr, rnase.rep3.zt.scaled)
 
+View( ctrl.cor.removed)
+View( ctrl.rep2.zt.scaled)
+View( ctrl.rep3.zt.scaled)
 
 ```
 
-To reduce we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates. 
+To reduce we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates.
 
 ```{r}
 
-r1c <- ctrl.rep1.zt.norm.pos
-r2c <- ctrl.rep2.zt.norm.pos
-r3c <- ctrl.rep3.zt.norm.pos
+r1c.zt <- ctrl.rep1.zt.scaled
+r2c.zt <- ctrl.rep2.zt.scaled
+r3c.zt <- ctrl.rep3.zt.scaled
 
-r1c0 <- ctrl.rep1.zt.norm.pos
-r2c0 <- ctrl.rep2.zt.norm.pos
-r3c0 <- ctrl.rep3.zt.norm.pos
+r1c0.zt <- ctrl.rep1.zt.scaled
+r2c0.zt <- ctrl.rep2.zt.scaled
+r3c0.zt <- ctrl.rep3.zt.scaled
 
-r1c0[is.na(r1c)] <- 0
-r2c0[is.na(r2c)] <- 0
-r3c0[is.na(r3c)] <- 0
+r1c0.zt[is.na(r1c)] <- 0
+r2c0.zt[is.na(r2c)] <- 0
+r3c0.zt[is.na(r3c)] <- 0
 
-ctrl.zt.reduced <-  (r1c0 + r2c0 + r3c0)/(3-((sum(as.numeric(is.na(r1c[x,])) + as.numeric(is.na(r2c[x,])) + as.numeric(is.na(r3c[x,]))))/25))
+rc0.zt = r1c0.zt + r2c0.zt + r3c0.zt
 
+#ctrl.zt.reduced <- rc0.zt/(3-((sum(apply(r1c.zt,1,sum)) +  as.numeric(is.na(r2c.zt[x,])) + as.numeric(is.na(r3c.zt[x,]))))/25))
 
-#View(ctrl.zt.reduced)
+(apply(is.na(r1c.zt), 1, sum)+apply(is.na(r2c.zt), 1, sum)+apply(is.na(r3c.zt), 1, sum))
 ```
 
 ```{r}
@@ -621,7 +617,6 @@ r3r0[is.na(r3r)] <- 0
 rnase.zt.reduced <-  (r1r0 + r2r0 + r3r0)/(3 - ((sum(as.numeric(is.na(r1r[x,])) + as.numeric(is.na(r2r[x,])) + as.numeric(is.na(r3r[x,]))))/25))
                         
 
-#View(rnase.zt.reduced)
 ```
 
 #### 3.2.3. Scaling
@@ -734,7 +729,7 @@ test_normalized <- t(apply(test_matrix, 1, function(x){
 
 #### 3.3.2. Reduction
 
-To reduce we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates. 
+To reduce we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates.
 
 ```{r}
 
