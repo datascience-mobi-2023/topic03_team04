@@ -820,8 +820,10 @@ class(rnase.mms)
 ```
 
 ```{r}
+
+
 sd.by.row <- apply(rnase.zt, 1, function(x) sd(x[x < 20]))
-mean.sd <- mean(sd_by_row)
+mean.sd <- mean(sd.by.row)
 
 rnase3.peaks <- rnase.zt
 
@@ -834,24 +836,17 @@ peaks <- apply(rnase3.peaks, 1,
                  peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
                  peak_sd <- sapply(peak_indices,
                                     function(i) sd(x[(i-1):(i+1)]))
-                 peak_indices[peak_sd > 0.2488523]})
+                 peak_indices[peak_sd > mean.sd]})
 
 
-largevalues <- apply(rnase.zt, 1,function(x) {
+largevalues <- apply(rnase.zt[,2:24], 1,function(x) {
   largevalues_indices <- which(x > 9)
-  peak_mean <- sapply(largevalues_indices,
-                      function(i) {if (i > 1 & i < ncol(rnase.zt)) {mean(rnase.zt[(i-1):(i+1)])}
-                          else{NA}
-                       
-  largevalues_indices[peak_mean >9] 
-  unique(c(largevalues_indices - 1, largevalues_indices, largevalues_indices + 1))}})
-
-largevalues <- apply(rnase.zt, 1,function(x) {largevalues_indices <- which(x > 9)
-                 peak_mean <- sapply(largevalues_indices,
-                                    function(i) mean(rnase.zt[(i-1):(i+1)]))
-                 largevalues_indices[peak_mean >9] 
-               unique(c(largevalues_indices - 1, largevalues_indices, largevalues_indices + 1))
+  unique(c(largevalues_indices , largevalues_indices +1, largevalues_indices + 2))
 })
+
+
+
+View(largevalues)
 
 
 ```
@@ -859,12 +854,6 @@ largevalues <- apply(rnase.zt, 1,function(x) {largevalues_indices <- which(x > 9
 
 
 ```{r}
-largevalues <-apply(rnase3_scaled, 1,function(x) {largevalues_indices <- which(x > 9)
-                 peak_mean <- sapply(largevalues_indices,
-                                    function(i) mean(rnase3_scaled[(i-1):(i+1)]))
-                 largevalues_indices[peak_mean >9] 
-               unique(c(largevalues_indices - 1, largevalues_indices, largevalues_indices + 1))
-})
 
 
 localmaxima <- peaks
@@ -873,19 +862,12 @@ for (i in seq_along(localmaxima)) {
 }
 View(maxpeaks)
 View(localmaxima)
-View(rnase3_scaled)
-
-#View(largevalues)
-#Randwerte überprüfen 
-
-
-
 
 
                       
                   
 
-neighbors <- apply(rnase3_scaled, 1,
+neighbors <- apply(rnase.zt, 1,
                function(x) {
                  peak_indices <- which(diff(sign(diff(x))) == -2 & x[-c(1, length(x))] > 3) + 1
                  peak_sd <- sapply(peak_indices,
@@ -904,7 +886,7 @@ shoulderregion <- largevalues
 for (i in seq_along(shoulderregion)) {
     shoulderregion[[i]] <- shoulderregion[[i]][!shoulderregion[[i]] %in% neighbors[[i]]]
 }
-View(largevalues)
+
 View(shoulderregion)
 View(neighbors)
 ```
