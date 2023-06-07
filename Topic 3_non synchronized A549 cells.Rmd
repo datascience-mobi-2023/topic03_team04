@@ -806,3 +806,107 @@ colnames(rnase.mms) <- new.colnames.rnase
 ```
 
 The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames: **ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
+<<<<<<< Updated upstream
+=======
+
+##3. Peakfinder
+
+```{r}
+# View(ctrl.zt) 
+# View(rnase.zt)
+rnase.zt <- as.data.frame(rnase.zt)
+class(rnase.zt)
+class(rnase.mms)
+```
+
+```{r}
+sd.by.row <- apply(rnase.zt, 1, function(x) sd(x[x < 20]))
+mean.sd <- mean(sd_by_row)
+
+rnase3.peaks <- rnase.zt
+
+colnames(rnase3.peaks) <- paste0("Rnase_Fraction", seq_along(colnames(rnase.zt)) - 1)
+maxpeaks <- apply(rnase.zt, 1, function(x){which.max(x)
+  })
+
+peaks <- apply(rnase3.peaks, 1,
+               function(x) {
+                 peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
+                 peak_sd <- sapply(peak_indices,
+                                    function(i) sd(x[(i-1):(i+1)]))
+                 peak_indices[peak_sd > 0.2488523]})
+
+
+largevalues <- apply(rnase.zt, 1,function(x) {
+  largevalues_indices <- which(x > 9)
+  peak_mean <- sapply(largevalues_indices,
+                      function(i) {if (i > 1 & i < ncol(rnase.zt)) {mean(rnase.zt[(i-1):(i+1)])}
+                          else{NA}
+                       
+  largevalues_indices[peak_mean >9] 
+  unique(c(largevalues_indices - 1, largevalues_indices, largevalues_indices + 1))}})
+
+largevalues <- apply(rnase.zt, 1,function(x) {largevalues_indices <- which(x > 9)
+                 peak_mean <- sapply(largevalues_indices,
+                                    function(i) mean(rnase.zt[(i-1):(i+1)]))
+                 largevalues_indices[peak_mean >9] 
+               unique(c(largevalues_indices - 1, largevalues_indices, largevalues_indices + 1))
+})
+
+
+```
+
+
+
+```{r}
+largevalues <-apply(rnase3_scaled, 1,function(x) {largevalues_indices <- which(x > 9)
+                 peak_mean <- sapply(largevalues_indices,
+                                    function(i) mean(rnase3_scaled[(i-1):(i+1)]))
+                 largevalues_indices[peak_mean >9] 
+               unique(c(largevalues_indices - 1, largevalues_indices, largevalues_indices + 1))
+})
+
+
+localmaxima <- peaks
+for (i in seq_along(localmaxima)) {
+    localmaxima[[i]] <- localmaxima[[i]][!localmaxima[[i]] %in% maxpeaks[[i]]]
+}
+View(maxpeaks)
+View(localmaxima)
+View(rnase3_scaled)
+
+#View(largevalues)
+#Randwerte überprüfen 
+
+
+
+
+
+                      
+                  
+
+neighbors <- apply(rnase3_scaled, 1,
+               function(x) {
+                 peak_indices <- which(diff(sign(diff(x))) == -2 & x[-c(1, length(x))] > 3) + 1
+                 peak_sd <- sapply(peak_indices,
+                                    function(i) sd(x[(i-1):(i+1)]))
+                 peak_indices <- peak_indices[peak_sd > 1]
+                 c(peak_indices - 1, peak_indices, peak_indices + 1)
+})
+View(neighbors)
+#Probleme Bennung der Spalten um eins verschoben (keine Ahnung warum???)
+#Zeile 786 erkennt kein Maxima, da Spalte 25 größer als 24 muss noch behoben werden
+#
+
+```
+```{r}
+shoulderregion <- largevalues                  
+for (i in seq_along(shoulderregion)) {
+    shoulderregion[[i]] <- shoulderregion[[i]][!shoulderregion[[i]] %in% neighbors[[i]]]
+}
+View(largevalues)
+View(shoulderregion)
+View(neighbors)
+```
+
+>>>>>>> Stashed changes
