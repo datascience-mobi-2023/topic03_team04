@@ -317,7 +317,10 @@ View(rnase3_scaled)
 
 #View(largevalues)
 #Randwerte überprüfen 
+boundary <- apply(rnase3_scaled, 1, function(x){which( x[1] > 9 | x[ncol(rnase3_peaks)] > 9)
 
+})
+View(boundary)
 
 
 
@@ -339,6 +342,7 @@ View(neighbors)
 #
 
 ```
+
 ```{r}
 shoulderregion <- largevalues                  
 for (i in seq_along(shoulderregion)) {
@@ -348,4 +352,3 @@ View(largevalues)
 View(shoulderregion)
 View(neighbors)
 ```
-
