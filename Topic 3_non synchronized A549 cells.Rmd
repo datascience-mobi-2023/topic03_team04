@@ -888,7 +888,7 @@ neighbors.peaks <- apply(rnase.zt.peaks, 1,
 
 ```{r}
 shoulderregion <- largevalues                  
-for (i in seq_along(shoulderregion)) {shoulderregion[[i]] <- shoulderregion[[i]][!shoulderregion[[i]] %in% neighbors[[i]]]}
+for (i in seq_along(shoulderregion)) {shoulderregion[[i]] <- shoulderregion[[i]][!shoulderregion[[i]] %in% neighbors.peaks[[i]]]}
 
 #View(shoulderregion)
 #View(neighbors.peaks)
@@ -898,6 +898,55 @@ Identification of the boundaries (fraction 1 and fraction 25)
 ```{r}
 fraction1.peak <- which(rnase.zt[, 1] > rnase.zt[, 2] & rnase.zt[, 1] > rnase.zt[, 3])
 fraction25.peak <- which(rnase.zt[, 25] > rnase.zt[, 24] & rnase.zt[, 25] > rnase.zt[, 23])
+```
+```{r}
+#gaussian fit
+
+peaks <- maxpeaks
+heights <- maxpeaks.value
+sds <- sd.by.row
+
+# Daten in Listen von Vektoren umwandeln
+peaks_list <- as.list(as.data.frame(t(peaks)))
+heights_list <- as.list(as.data.frame(t(heights)))
+sds_list <- as.list(as.data.frame(t(sds)))
+
+# Daten in ein DataFrame umwandeln
+df <- data.frame(peaks = I(peaks_list), heights = I(heights_list), sds = I(sds_list))
+
+# Gauß-Funktion definieren
+gaussian <- function(x, a, b, c) {
+  a * exp(-((x - b)^2) / (2 * c^2))
+}
+
+# Gauß-Kurven für alle Zeile erstellen
+x <- seq(-5, 5, length.out = 100)
+gaussians <- apply(df, 1, function(row) {
+  y <- sapply(seq_along(row$peaks), function(i) {
+    gaussian(x, row$heights[i], row$peaks[i], row$sds[i])
+  })
+  rowSums(y)
+})
+
+
+
+# Anzahl der Plots pro Zeile und Spalte festlegen
+nrow <- 2
+ncol <- 2
+
+# Plot-Fenster einrichten
+par(mfrow = c(nrow, ncol))
+
+# Gauß-Kurven zeichnen
+for (i in 1:ncol(gaussians)) {
+  plot(x, gaussians[,i], type = "l", lty = 1,
+       main = paste("Row", i))
+}
+
+
+
+
+
 ```
 
 >>>>>>> Stashed changes
