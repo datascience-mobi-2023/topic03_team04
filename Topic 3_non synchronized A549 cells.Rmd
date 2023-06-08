@@ -659,9 +659,12 @@ colnames(ctrl.zt) <- new.colnames.ctrl
 rnase.zt <- rnase.zt.scaled
 colnames(rnase.zt) <- new.colnames.rnase
 
+test100 <- apply(rnase.zt,1,sum)
+
 # View(ctrl.zt)
 # View(rnase.zt)
 ```
+
 
 ### 3.3. Min-Max-Scaling
 
@@ -814,85 +817,87 @@ The result of this part are three times (Methods) two (Ctrl and RNase) normalize
 ```{r}
 # View(ctrl.zt) 
 # View(rnase.zt)
-rnase.zt <- as.data.frame(rnase.zt)
-class(rnase.zt)
-class(rnase.mms)
+rnase.zt
+Nr <- c(1:dim(rnase.zt)[1])
+rnase.with.proteinnumbers <- cbind(Nr, rnase.zt)
+View(rnase.with.proteinnumbers)
 ```
 
+calculation of sd to later sort small fluctuations out. 
 ```{r}
-
-
-sd.by.row <- apply(rnase.zt, 1, function(x) sd(x[x < 20]))
+sd.by.row <- apply(rnase.zt, 1, function(x) sd(x[x < 8]))
 mean.sd <- mean(sd.by.row)
+mean.sd
 
-rnase3.peaks <- rnase.zt
+rnase.zt.peaks <- rnase.zt
+```
 
-colnames(rnase3.peaks) <- paste0("Rnase_Fraction", seq_along(colnames(rnase.zt)) - 1)
-maxpeaks <- apply(rnase.zt, 1, function(x){which.max(x)
-  })
+new names for the identification of the peaks between fraction 2 and 24. For each fraction the maximum value.
+```{r}
+colnames(rnase.zt.peaks) <- paste0("Rnase_Fraction", seq_along(colnames(rnase.zt.peaks)) - 1)
+maxpeaks <- apply(rnase.zt.peaks, 1, function(x){which.max(x)})
+maxpeaks.value <- apply(rnase.zt.peaks, 1, function(x){max(x)})
+min(maxpeaks.value)
+```
 
-peaks <- apply(rnase3.peaks, 1,
+Calculation of all peaks: global and local
+```{r}
+peaks <- apply(rnase.zt.peaks, 1,
                function(x) {
                  peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
                  peak_sd <- sapply(peak_indices,
                                     function(i) sd(x[(i-1):(i+1)]))
                  peak_indices[peak_sd > mean.sd]})
-
-
-largevalues <- apply(rnase.zt[,2:24], 1,function(x) {
-  largevalues_indices <- which(x > 9)
-  peak_mean <- sapply(largevalues_indices,
-    function(i) mean(rnase.zt[(i-1):(i+1)]))
-                 largevalues_indices[peak_mean >9] 
-               
-  unique(c(largevalues_indices , largevalues_indices, largevalues_indices+1))
-})
-View(rnase.zt)
-
-
-View(largevalues)
-
-
+peaks.values <- lapply(seq_along(peaks), function(i) rnase.zt.peaks[i, peaks[[i]]])
 ```
 
-
-
 ```{r}
-
 
 localmaxima <- peaks
-for (i in seq_along(localmaxima)) {
-    localmaxima[[i]] <- localmaxima[[i]][!localmaxima[[i]] %in% maxpeaks[[i]]]
-}
-View(maxpeaks)
-View(localmaxima)
-
-
-                      
-                  
-
-neighbors <- apply(rnase.zt, 1,
-               function(x) {
-                 peak_indices <- which(diff(sign(diff(x))) == -2 & x[-c(1, length(x))] > 3) + 1
-                 peak_sd <- sapply(peak_indices,
-                                    function(i) sd(x[(i-1):(i+1)]))
-                 peak_indices <- peak_indices[peak_sd > 1]
-                 c(peak_indices - 1, peak_indices, peak_indices + 1)
-})
-View(neighbors)
-#Probleme Bennung der Spalten um eins verschoben (keine Ahnung warum???)
-#Zeile 786 erkennt kein Maxima, da Spalte 25 größer als 24 muss noch behoben werden
-#
+for (i in seq_along(localmaxima)) {localmaxima[[i]] <- localmaxima[[i]][!localmaxima[[i]] %in% maxpeaks[[i]]]}
 
 ```
+
+
+
+Shoulder regions: include values with high protein amount, which are not included in the local or global maxima.
+
+1. generell identification of regions with high values
+```{r}
+largevalues <- apply(rnase.zt.peaks[,2:24], 1, function(x) {
+  largevalues_indices <- which(x > 5) + 1# to start again with 2
+  peak_mean <- sapply(largevalues_indices, function(i) mean(x[(i-1):(i+1)]))
+  largevalues_indices <- largevalues_indices[peak_mean > 5]
+  unique(c(largevalues_indices - 1 , largevalues_indices, largevalues_indices + 1))
+})
+
+#View(largevalues)
+```
+
+2. identification of regions around local and global peaks
+```{r}
+neighbors.peaks <- apply(rnase.zt.peaks, 1,
+               function(x) { peak_indices <- which(diff(sign(diff(x))) == -2 & x[-c(1, length(x))] > 3) + 1
+                 peak_sd <- sapply(peak_indices,function(i) sd(x[(i-1):(i+1)]))
+                 peak_indices <- peak_indices[peak_sd > mean.sd]
+                 c(peak_indices - 1, peak_indices, peak_indices + 1)})
+              
+#View(neighbors.peaks)
+```
+
+
 ```{r}
 shoulderregion <- largevalues                  
-for (i in seq_along(shoulderregion)) {
-    shoulderregion[[i]] <- shoulderregion[[i]][!shoulderregion[[i]] %in% neighbors[[i]]]
-}
+for (i in seq_along(shoulderregion)) {shoulderregion[[i]] <- shoulderregion[[i]][!shoulderregion[[i]] %in% neighbors[[i]]]}
 
-View(shoulderregion)
-View(neighbors)
+#View(shoulderregion)
+#View(neighbors.peaks)
+```
+
+Identification of the boundaries (fraction 1 and fraction 25)
+```{r}
+fraction1.peak <- which(rnase.zt[, 1] > rnase.zt[, 2] & rnase.zt[, 1] > rnase.zt[, 3])
+fraction25.peak <- which(rnase.zt[, 25] > rnase.zt[, 24] & rnase.zt[, 25] > rnase.zt[, 23])
 ```
 
 >>>>>>> Stashed changes
