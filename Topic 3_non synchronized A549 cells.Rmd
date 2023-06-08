@@ -839,12 +839,15 @@ peaks <- apply(rnase3.peaks, 1,
                  peak_indices[peak_sd > mean.sd]})
 
 
-largevalues <-apply(rnase.zt, 1,function(x) {largevalues_indices <- which(x > 9)
-                 peak_mean <- sapply(largevalues_indices,
-                                    function(i) mean(rnase.zt[(i-1):(i+1)]))
+largevalues <- apply(rnase.zt[,2:24], 1,function(x) {
+  largevalues_indices <- which(x > 9)
+  peak_mean <- sapply(largevalues_indices,
+    function(i) mean(rnase.zt[(i-1):(i+1)]))
                  largevalues_indices[peak_mean >9] 
-               unique(c(largevalues_indices-1, largevalues_indices, largevalues_indices + 1))
+               
+  unique(c(largevalues_indices , largevalues_indices, largevalues_indices+1))
 })
+View(rnase.zt)
 
 
 View(largevalues)
