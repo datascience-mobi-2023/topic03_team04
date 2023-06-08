@@ -920,7 +920,7 @@ gaussian <- function(x, a, b, c) {
 }
 
 # Gauß-Kurven für alle Zeile erstellen
-x <- seq(-5, 5, length.out = 100)
+x <- seq(1, 25, length.out = 100)
 gaussians <- apply(df, 1, function(row) {
   y <- sapply(seq_along(row$peaks), function(i) {
     gaussian(x, row$heights[i], row$peaks[i], row$sds[i])
@@ -930,11 +930,10 @@ gaussians <- apply(df, 1, function(row) {
 
 
 
-# Anzahl der Plots pro Zeile und Spalte festlegen
+# Anzahl Graphen pro Plot bestimmen
 nrow <- 2
 ncol <- 2
 
-# Plot-Fenster einrichten
 par(mfrow = c(nrow, ncol))
 
 # Gauß-Kurven zeichnen
