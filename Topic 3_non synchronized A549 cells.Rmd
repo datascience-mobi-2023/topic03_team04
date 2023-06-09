@@ -811,6 +811,41 @@ colnames(rnase.mms) <- new.colnames.rnase
 The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames: **ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
 <<<<<<< Updated upstream
 =======
+##4.line graphs
+In the following code the rnase.zt dataframe is used as an example. If rnase.zt ist exchanged by any of the other names of the data frames, line graphs for this data frame will be created. 
+```{r}
+library(ggplot2)
+
+# Anzahl der Zeilen im Dataframe
+num_rows <- nrow(rnase.zt)
+
+# Erstelle einen leeren Plot für jeden Graphen
+plots_RNase <- list()
+
+# Iteriere über jede Zeile und erstelle den stetigen Graphen
+for (i in 1:num_rows) {
+  row_data <- rnase.zt[i, ]
+  
+  # Überprüfe, ob genügend nicht-NA-Werte vorhanden sind
+  if (sum(!is.na(row_data)) >= 2) {
+    df <- data.frame(x = 1:length(row_data), y = as.numeric(row_data))
+    
+    # Erstelle den Plot mit ggplot2 
+    p <- ggplot(df, aes(x = x, y = y, color = "green")) +
+      geom_line() +
+      xlab("X-Achse") +
+      ylab("Y-Achse")
+    
+    
+    plots_RNase.zt[[i]] <- p
+  } else {
+        
+    plots_RNase.zt[[i]] <- NULL
+  }
+}
+```
+Man kann nun aus der Liste auf die einzelnen Plots zugreifen.
+Zum Beispiel: plots_RNase.zt[[1]] für den ersten Plot, plots_RNase.zt[[2]] für den zweiten Plot, usw.
 
 ##3. Peakfinder
 
@@ -945,6 +980,35 @@ for (i in 1:ncol(gaussians)) {
 
 
 
+
+```
+
+```{r}
+#gaussian fit in ein bisschen präziser formuliert, ohne extra Listen und dataframes 
+
+# Gauß-Funktion definieren
+gaussian <- function(x, a, b, c) {
+  a * exp(-((x - b)^2) / (2 * c^2))
+}
+
+# Daten vorbereiten
+peaks <- maxpeaks
+heights <- maxpeaks.value
+sds <- sd.by.row
+
+# Anzahl der Plots pro Zeile und Spalte festlegen
+nrow <- 2
+ncol <- 2
+
+par(mfrow = c(nrow, ncol))
+
+# Gauß-Kurven zeichnen
+for (i in 1:length(peaks)) {
+  x <- seq(1, 25, length.out = 100)
+  y <- gaussian(x, heights[i], peaks[i], sds[i])
+  
+  plot(x, y, type = "l", lty = 1, main = paste("Row", i))
+}
 
 ```
 
