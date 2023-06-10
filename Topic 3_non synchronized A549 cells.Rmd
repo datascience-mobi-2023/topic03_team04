@@ -922,11 +922,27 @@ neighbors.peaks <- apply(rnase.zt.peaks, 1,
 
 
 ```{r}
-shoulderregion <- largevalues                  
-for (i in seq_along(shoulderregion)) {shoulderregion[[i]] <- shoulderregion[[i]][!shoulderregion[[i]] %in% neighbors.peaks[[i]]]}
+largevalues_without_maxima <- largevalues                  
+for (i in seq_along(largevalues_without_maxima)) {largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][!largevalues_without_maxima[[i]] %in% neighbors.peaks[[i]]]}
 
-#View(shoulderregion)
-#View(neighbors.peaks)
+find_consecutive_numbers <- function(x) {
+diffs <- c(1, diff(x))
+groups <- rle(diffs)
+shoulderregion <- which(groups$values == 1 & groups$lengths >= 3)
+if (length(shoulderregion) > 0) {
+starts <- cumsum(groups$lengths)[shoulderregion] - groups$lengths[shoulderregion] + 1
+ends <- cumsum(groups$lengths)[shoulderregion]
+shoulderregion <- mapply(function(start, end) x[start:end], starts, ends)
+}
+}
+
+shoulderregion <- lapply(largevalues_without_maxima, find_consecutive_numbers)
+
+
+
+View(shoulderregion)
+View(largevalues_without_maxima)
+
 ```
 
 Identification of the boundaries (fraction 1 and fraction 25)
