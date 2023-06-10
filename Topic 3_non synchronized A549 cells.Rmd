@@ -1,5 +1,5 @@
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE) 
+#knitr::opts_chunk$set(echo = TRUE) 
 ```
 
 # Proteome-wide Screen for RNA-dependent Proteins: *non-synchronized A549 cells*
@@ -812,7 +812,9 @@ The result of this part are three times (Methods) two (Ctrl and RNase) normalize
 <<<<<<< Updated upstream
 =======
 ##4.line graphs
-In the following code the rnase.zt dataframe is used as an example. If rnase.zt ist exchanged by any of the other names of the data frames, line graphs for this data frame will be created. 
+
+The follwing code uses the dataframes from the z-Transformation as an example. If .zt is exchanged by .mvm or .mms the lines for the other normalization methods can be plotted. 
+We start by plotting the amount of each protein in the 25 fractions for the RNase group. 
 ```{r}
 library(ggplot2)
 
@@ -820,32 +822,104 @@ library(ggplot2)
 num_rows <- nrow(rnase.zt)
 
 # Erstelle einen leeren Plot für jeden Graphen
-plots_RNase <- list()
+plots_RNase.zt <- list()
 
 # Iteriere über jede Zeile und erstelle den stetigen Graphen
 for (i in 1:num_rows) {
-  row_data <- rnase.zt[i, ]
+  row_data_rnase <- rnase.zt[i, ]
   
   # Überprüfe, ob genügend nicht-NA-Werte vorhanden sind
-  if (sum(!is.na(row_data)) >= 2) {
-    df <- data.frame(x = 1:length(row_data), y = as.numeric(row_data))
+  if (sum(!is.na(row_data_rnase)) >= 2) {
+    df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
     
     # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = y, color = "green")) +
+    p <- ggplot(df, aes(x = x, y = yrnase, color = "green")) +
       geom_line() +
-      xlab("X-Achse") +
-      ylab("Y-Achse")
+      geom_point() +
+      xlab("Fractions") +
+      ylab("Protein amount") 
+    
     
     
     plots_RNase.zt[[i]] <- p
   } else {
-        
+    
     plots_RNase.zt[[i]] <- NULL
   }
 }
+
 ```
-Man kann nun aus der Liste auf die einzelnen Plots zugreifen.
-Zum Beispiel: plots_RNase.zt[[1]] für den ersten Plot, plots_RNase.zt[[2]] für den zweiten Plot, usw.
+
+Next we create the plots for the Control group. 
+```{r}
+library(ggplot2)
+
+# Anzahl der Zeilen im Dataframe
+num_rows <- nrow(ctrl.zt)
+
+# Erstelle einen leeren Plot für jeden Graphen
+plots_Ctrl.zt <- list()
+
+# Iteriere über jede Zeile und erstelle den stetigen Graphen
+for (i in 1:num_rows) {
+  row_data_ctrl <- ctrl.zt[i, ]
+  
+  # Überprüfe, ob genügend nicht-NA-Werte vorhanden sind
+  if (sum(!is.na(row_data_ctrl)) >= 2) {
+    df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
+    
+    # Erstelle den Plot mit ggplot2 
+    p <- ggplot(df, aes(x = x, y = yctrl, color = "red")) +
+      geom_line() +
+      geom_point() +
+      xlab("Fractions") +
+      ylab("Protein amount") 
+    
+    
+    
+    plots_Ctrl.zt[[i]] <- p
+  } else {
+    
+    plots_Ctrl.zt[[i]] <- NULL
+  }
+}
+```
+
+The following code creates two plots in one diagram, so that the Control and RNase group can be compared. 
+```{r}
+library(ggplot2)
+
+num_rows <- nrow(ctrl.zt)
+
+plots_Ctrl_RNase.zt <- list()
+
+for (i in 1:num_rows) {
+  row_data_ctrl <- ctrl.zt[i, ]
+  
+  if (sum(!is.na(row_data_ctrl)) >= 2) {
+    df <- data.frame(x = 1:length(row_data),yctrl= as.numeric(row_data_ctrl),yrnase= as.numeric(row_data_rnase))
+    
+    
+    p <- ggplot(df, aes(x = x))+
+      geom_line(aes(y=yrnase,color="green"))+
+      geom_point(aes(y=yrnase,color="green"))+
+      geom_line(aes(y=yctrl, color="red"))+
+      geom_point(aes(y=yctrl, color="red"))+
+      xlab("Fractions") +
+      ylab("Protein amount") 
+    
+    
+    
+    plots_Ctrl_RNase.zt[[i]] <- p
+  } else {
+    
+    plots_Ctrl_RNase.zt[[i]] <- NULL
+  }
+}
+plots_Ctrl_RNase.zt[[1]]
+```
+Thanks to the created list it is now possible to look at each protein seperatly.
+For example: plots_Ctrl_RNase.zt[[1]] for the first, plots_Ctrl_RNase.zt[[2]] for the second, and so on. 
 
 ##3. Peakfinder
 
@@ -1021,9 +1095,9 @@ par(mfrow = c(nrow, ncol))
 # Gauß-Kurven zeichnen
 for (i in 1:length(peaks)) {
   x <- seq(1, 25, length.out = 100)
-  y <- gaussian(x, heights[i], peaks[i], sds[i])
+  y2 <- gaussian(x, heights[i], peaks[i], sds[i])
   
-  plot(x, y, type = "l", lty = 1, main = paste("Row", i))
+  plot(x, y2, type = "l", lty = 1, main = paste("Row", i))
 }
 
 ```
