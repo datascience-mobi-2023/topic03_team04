@@ -1,0 +1,44 @@
+
+```
+```{r}
+library(ggplot2)
+
+# Gauß-Funktion definieren
+gaussian <- function(x, a, b, c) {
+  a * exp(-((x - b)^2) / (2 * c^2))
+}
+
+# Daten vorbereiten
+peaks <- maxpeaks
+heights <- maxpeaks.value
+sds <- sd.by.row
+
+# Liste für die Plots erstellen
+plots_gaussian <- list()
+
+# Gauß-Kurven zeichnen und in der Liste speichern
+for (i in 1:length(peaks)) {
+  x <- seq(1, 25, length.out = 100)
+  y2 <- gaussian(x, heights[i], peaks[i], sds[i])
+  
+  # Daten in einem Datenrahmen speichern
+  data <- data.frame(x = x, y = y2)
+  
+  # Plot erstellen und in der Liste speichern
+  p <- ggplot(data, aes(x = x, y = y)) +
+    geom_line(color = "blue") +
+    labs(title = paste("Row", i))
+  
+  plots_gaussian[[i]] <- p
+  
+
+}
+
+
+```
+
+
+```{r}
+print(plots_gaussian[[1]])
+```
+
