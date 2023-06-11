@@ -806,3 +806,75 @@ colnames(rnase.mms) <- new.colnames.rnase
 ```
 
 The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames: **ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
+<<<<<<< HEAD
+=======
+
+## Identification of global Peaks
+
+```{r}
+# View(ctrl.zt) 
+# View(rnase.zt)
+Nr <- c(1:dim(rnase.zt)[1])
+rnase.with.proteinnumbers <- cbind(Nr, rnase.zt)
+View(rnase.with.proteinnumbers)
+```
+
+
+```{r}
+maxpeaks.rnase.zt <- apply(rnase.zt, 1, function(x){which.max(x)})
+maxpeaks.value.rnase.zt <- apply(rnase.zt, 1, function(x){max(x)})
+
+maxpeaks.ctrl.zt <- apply(ctrl.zt, 1, function(x){which.max(x)})
+maxpeaks.value.ctrl.zt <- apply(ctrl.zt, 1, function(x){max(x)})
+
+View(maxpeaks.ctrl.zt)
+```
+
+
+## Identification of shifts
+
+```{r}
+n = 2
+shift_zt_global <- maxpeaks.ctrl.zt - maxpeaks.rnase.zt
+shift_zt_named <- shift_zt_global
+for (i in 1:nrow(rnase.zt)) {
+  if (shift_zt_named [i] < (-n)){shift_zt_named [i] <- "right shift"}
+  else if (shift_zt_named [i] > n){shift_zt_named [i] <- "left shift"}
+  else (shift_zt_named [i] <- "no shift")
+}
+View(shift_zt_named)
+length(shift_zt_named[shift_zt_named == "right shift"])
+length(shift_zt_named[shift_zt_named == "no shift"])
+length(shift_zt_named[shift_zt_named == "left shift"])
+```
+```{r}
+shift_zt_global_df <- as.data.frame(shift_zt_global)
+View(shift_zt_global_df)
+```
+
+```{r}
+n = 3
+shift_zt_named <- shift_zt_global_df
+for (i in 1:nrow(shift_zt_global_df)) {
+  if (shift_zt_named [i,1] <= -n){shift_zt_named [i,1] <- "right shift"}
+  else if (shift_zt_named [i,1] >= n){shift_zt_named [i,1] <- "left shift"}
+  else (shift_zt_named [i,1] <- "no shift")
+}
+View(shift_zt_named)
+length(shift_zt_named[shift_zt_named == "right shift"])
+length(shift_zt_named[shift_zt_named == "no shift"])
+length(shift_zt_named[shift_zt_named == "left shift"])
+```
+
+```{r}
+maxpeaks.ctrl.zt.df <- as.data.frame(maxpeaks.ctrl.zt)
+maxpeaks.rnase.zt.df <- as.data.frame(maxpeaks.rnase.zt)
+
+ggplot(
+  shift_zt_named,
+  aes(y = maxpeaks.ctrl.zt.df, x = maxpeaks.rnase.zt.df)) +
+  geom_count() +
+  ggtitle("Shifting behaviour of proteins") +
+  xlab("global maximum RNase condition") + ylab("global maximum Ctrl conditions")
+```
+>>>>>>> dd9e563 (Little bit with huge problem)
