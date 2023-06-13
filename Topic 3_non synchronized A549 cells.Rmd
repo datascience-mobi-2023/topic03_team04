@@ -820,7 +820,10 @@ The result of this part are three times (Methods) two (Ctrl and RNase) normalize
 rnase.zt
 Nr <- c(1:dim(rnase.zt)[1])
 rnase.with.proteinnumbers <- cbind(Nr, rnase.zt)
-View(rnase.with.proteinnumbers)
+# View(rnase.with.proteinnumbers)
+Nr <- c(1:dim(ctrl.zt)[1])
+ctrl.with.proteinnumbers <- cbind(Nr, ctrl.zt)
+View(ctrl.with.proteinnumbers)
 ```
 
 calculation of sd to later sort small fluctuations out. 
@@ -912,9 +915,23 @@ View(largevalues_without_maxima)
 
 Identification of the boundaries (fraction 1 and fraction 25)
 ```{r}
-fraction1.peak <- which(rnase.zt[, 1] > rnase.zt[, 2] & rnase.zt[, 1] > rnase.zt[, 3])
-fraction25.peak <- which(rnase.zt[, 25] > rnase.zt[, 24] & rnase.zt[, 25] > rnase.zt[, 23])
+fraction1.peak.rnase <- which(rnase.zt[, 1] > rnase.zt[, 2] & rnase.zt[, 1] > rnase.zt[, 3])
+length(fraction1.peak)
+fraction25.peak.rnase <- which(rnase.zt[, 25] > rnase.zt[, 24] & rnase.zt[, 25] > rnase.zt[, 23] & ctrl.zt[, 25] + ctrl.zt[, 24] + ctrl.zt[, 23] > 10) # wenn der peak am Ende nicht insgesamt 10 überschreitet, ist es relativ unrelevant. Scheinbar fallen viele Proteine am Ende etwas aus.
+fraction25.peak.rnase
 ```
+precipitated proteins:
+```{r}
+precipitated.rnase <- which(rnase.zt[, 25] > rnase.zt[, 24] & rnase.zt[, 25] > rnase.zt[, 23] & rnase.zt[, 25] + rnase.zt[, 24] + rnase.zt[, 23] == 100)
+precipitated.ctrl <- which(ctrl.zt[, 25] > ctrl.zt[, 24] & ctrl.zt[, 25] > ctrl.zt[, 23] & ctrl.zt[, 25] + ctrl.zt[, 24] + ctrl.zt[, 23] == 100)
+
+precipitated.zt <- unique(c(precipitated.rnase,precipitated.ctrl))
+precipitated.zt
+precipitated.rnase
+precipitated.ctrl
+rnase.zt[fraction25.peak.rnase,]
+```
+
 
 ```{r}
 probs <- (1-0.683)
