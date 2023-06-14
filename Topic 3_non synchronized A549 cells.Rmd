@@ -806,3 +806,82 @@ colnames(rnase.mms) <- new.colnames.rnase
 ```
 
 The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames: **ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
+
+## 4. Peak Identification
+
+### 4.1. Peaks for data set with mean value - normalization
+
+#### 4.1.1. Global Peak
+
+First the global peak identification for the control data set. We calculate the fraction and the protein amount under the global peak. Second we do the same for the rnase data set.
+
+```{r}
+globalpeak.ctrl.mvm <- apply(ctrl.mvm, 1, function(x){which.max(x)})
+globalpeak.value.ctrl.mvm <- apply(ctrl.mvm, 1, function(x){max(x)})
+
+globalpeak.rnase.mvm <- apply(rnase.mvm, 1, function(x){which.max(x)})
+globalpeak.value.rnase.mvm <- apply(rnase.mvm, 1, function(x){max(x)})
+```
+
+#### 4.1.2. Lokal Peaks
+
+First we have to calculate all the peaks, meaning global and local. We start again with the ctrl group. We start with calculating the sd to later sort out small fluctuations.
+
+```{r}
+peakidentif.ctrl <- ctrl.mvm
+peakidentif.rnase <- rnase.mvm
+
+sd.byrow.ctrl <- apply(peakidentif.ctrl, 1, function(x) sd(x[x < 8]))
+sd.mean.ctrl <- mean(sd.byrow.ctrl)
+sd.byrow.rnase <- apply(peakidentif.rnase, 1, function(x) sd(x[x < 8]))
+sd.mean.rnase <- mean(sd.byrow.rnase)
+
+sd.mean.ctrl
+sd.mean.rnase
+```
+
+```{r}
+sd.mean.ctrl
+```
+
+```{r}
+sd.mean.rnase
+```
+
+calculation of sd to later sort small fluctuations out.
+
+```{r}
+sd.by.row <- apply(rnase.zt, 1, function(x) sd(x[x < 8]))
+mean.sd <- mean(sd.by.row)
+mean.sd
+
+rnase.zt.peaks <- rnase.zt
+```
+
+new names for the identification of the peaks between fraction 2 and 24. For each fraction the maximum value.
+
+```{r}
+colnames(rnase.zt.peaks) <- paste0("Rnase_Fraction", seq_along(colnames(rnase.zt.peaks)) - 1)
+maxpeaks <- apply(rnase.zt.peaks, 1, function(x){which.max(x)})
+maxpeaks.value <- apply(rnase.zt.peaks, 1, function(x){max(x)})
+min(maxpeaks.value)
+```
+
+Calculation of all peaks: global and local
+
+```{r}
+peaks <- apply(rnase.zt.peaks, 1,
+               function(x) {
+                 peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
+                 peak_sd <- sapply(peak_indices,
+                                    function(i) sd(x[(i-1):(i+1)]))
+                 peak_indices[peak_sd > mean.sd]})
+peaks.values <- lapply(seq_along(peaks), function(i) rnase.zt.peaks[i, peaks[[i]]])
+```
+
+```{r}
+
+localmaxima <- peaks
+for (i in seq_along(localmaxima)) {localmaxima[[i]] <- localmaxima[[i]][!localmaxima[[i]] %in% maxpeaks[[i]]]}
+
+```
