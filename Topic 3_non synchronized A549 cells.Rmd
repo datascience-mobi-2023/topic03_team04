@@ -807,11 +807,13 @@ colnames(rnase.mms) <- new.colnames.rnase
 
 The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames: **ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
 
-## 4. Peak Identification
+## 4. Line Graph
 
-### 4.1. Peaks for data set with mean value - normalization
+## 5. Peak Identification
 
-#### 4.1.1. Global Peak
+### 5.1. Peaks for data set with mean value method - normalization
+
+#### 5.1.1. Global Peak
 
 First the global peak identification for the control data set. We calculate the fraction and the protein amount under the global peak. Second we do the same for the rnase data set.
 
@@ -823,65 +825,270 @@ globalpeak.rnase.mvm <- apply(rnase.mvm, 1, function(x){which.max(x)})
 globalpeak.value.rnase.mvm <- apply(rnase.mvm, 1, function(x){max(x)})
 ```
 
-#### 4.1.2. Lokal Peaks
+#### 5.1.2. Local Peaks
 
 First we have to calculate all the peaks, meaning global and local. We start again with the ctrl group. We start with calculating the sd to later sort out small fluctuations.
 
 ```{r}
-peakidentif.ctrl <- ctrl.mvm
-peakidentif.rnase <- rnase.mvm
+peakidentif.ctrl.mvm <- ctrl.mvm
+peakidentif.rnase.mvm <- rnase.mvm
 
-sd.byrow.ctrl <- apply(peakidentif.ctrl, 1, function(x) sd(x[x < 8]))
-sd.mean.ctrl <- mean(sd.byrow.ctrl)
-sd.byrow.rnase <- apply(peakidentif.rnase, 1, function(x) sd(x[x < 8]))
-sd.mean.rnase <- mean(sd.byrow.rnase)
+sd.byrow.ctrl.mvm <- apply(peakidentif.ctrl.mvm, 1, function(x) sd(x[x < 8]))
+sd.mean.ctrl.mvm <- mean(sd.byrow.ctrl.mvm)
+sd.byrow.rnase.mvm <- apply(peakidentif.rnase.mvm, 1, function(x) sd(x[x < 8]))
+sd.mean.rnase.mvm <- mean(sd.byrow.rnase.mvm)
+```
 
-sd.mean.ctrl
-sd.mean.rnase
+Now we give the fractions new names. Thereby we take into regard that the length of peak_indices is shorter than the length of each row of our normalized data set. Afterwards we calculate each peak and look which did not occur as global peaks to identify the local peaks. Again starting with the control data set.
+
+```{r}
+colnames(peakidentif.ctrl.mvm) <- paste0("Rnase_Fraction", seq_along(colnames(peakidentif.ctrl.mvm)) - 1)
+
+allpeaks.ctrl.mvm <- apply(peakidentif.ctrl.mvm, 1,function(x) {
+        peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
+        peak_sd <- sapply(peak_indices, function(i) sd(x[(i-1):(i+1)]))
+             peak_indices[peak_sd > sd.mean.ctrl.mvm]})
+
+peak.values.ctrl.mvm <- lapply(seq_along(allpeaks.ctrl.mvm), function(i) peakidentif.ctrl.mvm[i, allpeaks.ctrl[[i]]])
+
+localpeaks.ctrl.mvm <- allpeaks.ctrl.mvm 
+for (i in seq_along(localpeaks.ctrl.mvm)) {localpeaks.ctrl.mvm[[i]] <- localpeaks.ctrl.mvm[[i]][!localpeaks.ctrl.mvm[[i]] %in% globalpeak.ctrl.mvm[[i]]]}
+
+localpeaks.values.ctrl.mvm <- lapply(seq_along(localpeaks.ctrl.mvm), function(i) peakidentif.ctrl.mvm[i, localpeaks.ctrl.mvm[[i]]])
 ```
 
 ```{r}
-sd.mean.ctrl
+colnames(peakidentif.rnase.mvm) <- paste0("Rnase_Fraction", seq_along(colnames(peakidentif.rnase.mvm)) - 1)
+
+allpeaks.rnase.mvm <- apply(peakidentif.rnase.mvm, 1,function(x) {
+        peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
+        peak_sd <- sapply(peak_indices, function(i) sd(x[(i-1):(i+1)]))
+             peak_indices[peak_sd > sd.mean.rnase.mvm]})
+
+peak.values.rnase.mvm <- lapply(seq_along(allpeaks.rnase.mvm), function(i) peakidentif.rnase.mvm[i, allpeaks.rnase.mvm[[i]]])
+
+localpeaks.rnase.mvm <- allpeaks.rnase.mvm 
+for (i in seq_along(localpeaks.rnase.mvm)) {localpeaks.rnase.mvm[[i]] <- localpeaks.rnase.mvm[[i]][!localpeaks.rnase.mvm[[i]] %in% globalpeak.rnase.mvm[[i]]]}
+
+localpeaks.values.rnase.mvm <- lapply(seq_along(localpeaks.rnase.mvm), function(i) peakidentif.rnase[i, localpeaks.rnase.mvm[[i]]])
+```
+
+#### 5.1.3. Boundaries
+
+Futhermore, we have to look if there are peaks in fraction 1 or fraction 25. Again, we start with the identification of the boundaries for the control group.
+
+```{r}
+fraction1.peak.ctrl.mvm <- which(peakidentif.ctrl.mvm[, 1] > peakidentif.ctrl.mvm[, 2] & peakidentif.ctrl.mvm[, 1] > peakidentif.ctrl.mvm[, 3])
+# length(fraction1.peak.ctrl.mvm)
+
+fraction25.peak.ctrl.mvm <- which(peakidentif.ctrl.mvm[, 25] > peakidentif.ctrl.mvm[, 24] & peakidentif.ctrl.mvm[, 25] > peakidentif.ctrl.mvm[, 23] & peakidentif.ctrl.mvm[, 25] + peakidentif.ctrl.mvm[, 24] +peakidentif.ctrl.mvm[, 23] > 10) # wenn der peak am Ende nicht insgesamt 10 überschreitet, ist es relativ unrelevant. Scheinbar fallen viele Proteine am Ende etwas aus.
+# length(fraction25.peak.ctrl.mvm)
 ```
 
 ```{r}
-sd.mean.rnase
+fraction1.peak.rnase.mvm <- which(peakidentif.rnase.mvm[, 1] > peakidentif.rnase.mvm[, 2] & peakidentif.rnase.mvm[, 1] > peakidentif.rnase.mvm[, 3])
+# length(fraction1.peak.rnase.mvm)
+
+fraction25.peak.rnase.mvm <- which(peakidentif.rnase.mvm[, 25] > peakidentif.rnase.mvm[, 24] & peakidentif.rnase.mvm[, 25] > peakidentif.rnase.mvm[, 23] & peakidentif.rnase.mvm[, 25] + peakidentif.rnase.mvm[, 24] + peakidentif.rnase.mvm[, 23] > 10)
+# length(fraction25.peak.rnase.mvm)
 ```
 
-calculation of sd to later sort small fluctuations out.
+#### 5.1.4. Precipitated Proteins
+
+At last we identify the precipitated proteins:
 
 ```{r}
-sd.by.row <- apply(rnase.zt, 1, function(x) sd(x[x < 8]))
-mean.sd <- mean(sd.by.row)
-mean.sd
+precipitated.ctrl.mvm <- which(peakidentif.ctrl.mvm[, 25] > peakidentif.ctrl.mvm[, 24] & peakidentif.ctrl.mvm[, 25] > peakidentif.ctrl.mvm[, 23] & peakidentif.ctrl.mvm[, 25] + peakidentif.ctrl.mvm[, 24] + peakidentif.ctrl.mvm[, 23] == 100)
 
-rnase.zt.peaks <- rnase.zt
+precipitated.rnase.mvm <- which(peakidentif.rnase.mvm[, 25] > peakidentif.rnase.mvm[, 24] & peakidentif.rnase.mvm[, 25] > peakidentif.rnase.mvm[, 23] & peakidentif.rnase.mvm[, 25] + peakidentif.rnase.mvm[, 24] + peakidentif.rnase.mvm[, 23] == 100)
+
+precipitated.mvm <- unique(c(precipitated.ctrl.mvm,precipitated.rnase.mvm))
 ```
 
-new names for the identification of the peaks between fraction 2 and 24. For each fraction the maximum value.
+### 5.2. Peaks for data set with z_transformation - normalization
+
+#### 5.2.1. Global Peak
+
+First the global peak identification for the control data set. We calculate the fraction and the protein amount under the global peak. Second we do the same for the rnase data set.
 
 ```{r}
-colnames(rnase.zt.peaks) <- paste0("Rnase_Fraction", seq_along(colnames(rnase.zt.peaks)) - 1)
-maxpeaks <- apply(rnase.zt.peaks, 1, function(x){which.max(x)})
-maxpeaks.value <- apply(rnase.zt.peaks, 1, function(x){max(x)})
-min(maxpeaks.value)
+globalpeak.ctrl.zt <- apply(ctrl.zt, 1, function(x){which.max(x)})
+globalpeak.value.ctrl.zt <- apply(ctrl.zt, 1, function(x){max(x)})
+
+globalpeak.rnase.zt <- apply(rnase.zt, 1, function(x){which.max(x)})
+globalpeak.value.rnase.zt <- apply(rnase.zt, 1, function(x){max(x)})
 ```
 
-Calculation of all peaks: global and local
+#### 5.2.2. Local Peaks
+
+First we have to calculate all the peaks, meaning global and local. We start again with the ctrl group. We start with calculating the sd to later sort out small fluctuations.
 
 ```{r}
-peaks <- apply(rnase.zt.peaks, 1,
-               function(x) {
-                 peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
-                 peak_sd <- sapply(peak_indices,
-                                    function(i) sd(x[(i-1):(i+1)]))
-                 peak_indices[peak_sd > mean.sd]})
-peaks.values <- lapply(seq_along(peaks), function(i) rnase.zt.peaks[i, peaks[[i]]])
+peakidentif.ctrl.zt <- ctrl.zt
+peakidentif.rnase.zt <- rnase.zt
+
+sd.byrow.ctrl.zt <- apply(peakidentif.ctrl.zt, 1, function(x) sd(x[x < 8]))
+sd.mean.ctrl.zt <- mean(sd.byrow.ctrl.zt)
+sd.byrow.rnase.zt <- apply(peakidentif.rnase.zt, 1, function(x) sd(x[x < 8]))
+sd.mean.rnase.zt <- mean(sd.byrow.rnase.zt)
+```
+
+Now we give the fractions new names. Thereby we take into regard that the length of peak_indices is shorter than the length of each row of our normalized data set. Afterwards we calculate each peak and look which did not occur as global peaks to identify the local peaks. Again starting with the control data set.
+
+```{r}
+colnames(peakidentif.ctrl.zt) <- paste0("Rnase_Fraction", seq_along(colnames(peakidentif.ctrl.zt)) - 1)
+
+allpeaks.ctrl.zt <- apply(peakidentif.ctrl.zt, 1,function(x) {
+        peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
+        peak_sd <- sapply(peak_indices, function(i) sd(x[(i-1):(i+1)]))
+             peak_indices[peak_sd > sd.mean.ctrl.zt]})
+
+peak.values.ctrl.zt <- lapply(seq_along(allpeaks.ctrl.zt), function(i) peakidentif.ctrl.zt[i, allpeaks.ctrl.zt[[i]]])
+
+localpeaks.ctrl.zt <- allpeaks.ctrl.zt 
+for (i in seq_along(localpeaks.ctrl.zt)) {localpeaks.ctrl.zt[[i]] <- localpeaks.ctrl.zt[[i]][!localpeaks.ctrl.zt[[i]] %in% globalpeak.ctrl.zt[[i]]]}
+
+localpeaks.values.ctrl.zt <- lapply(seq_along(localpeaks.ctrl.zt), function(i) peakidentif.ctrl.zt[i, localpeaks.ctrl.zt[[i]]])
 ```
 
 ```{r}
+colnames(peakidentif.rnase.zt) <- paste0("Rnase_Fraction", seq_along(colnames(peakidentif.rnase.zt)) - 1)
 
-localmaxima <- peaks
-for (i in seq_along(localmaxima)) {localmaxima[[i]] <- localmaxima[[i]][!localmaxima[[i]] %in% maxpeaks[[i]]]}
+allpeaks.rnase.zt <- apply(peakidentif.rnase.zt, 1,function(x) {
+        peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
+        peak_sd <- sapply(peak_indices, function(i) sd(x[(i-1):(i+1)]))
+             peak_indices[peak_sd > sd.mean.rnase.zt]})
 
+peak.values.rnase.zt <- lapply(seq_along(allpeaks.rnase.zt), function(i) peakidentif.rnase.zt[i, allpeaks.rnase.zt[[i]]])
+
+localpeaks.rnase.zt <- allpeaks.rnase.zt
+for (i in seq_along(localpeaks.rnase.zt)) {localpeaks.rnase.zt[[i]] <- localpeaks.rnase.zt[[i]][!localpeaks.rnase.zt[[i]] %in% globalpeak.rnase.zt[[i]]]}
+
+localpeaks.values.rnase.zt <- lapply(seq_along(localpeaks.rnase.zt), function(i) peakidentif.rnase.zt[i, localpeaks.rnase.zt[[i]]])
+```
+
+#### 5.2.3. Boundaries
+
+Futhermore, we have to look if there are peaks in fraction 1 or fraction 25. Again, we start with the identification of the boundaries for the control group.
+
+```{r}
+fraction1.peak.ctrl.zt <- which(peakidentif.ctrl.zt[, 1] > peakidentif.ctrl.zt[, 2] & peakidentif.ctrl.zt[, 1] > peakidentif.ctrl.zt[, 3])
+# length(fraction1.peak.ctrl.zt)
+
+fraction25.peak.ctrl.zt <- which(peakidentif.ctrl.zt[, 25] > peakidentif.ctrl.zt[, 24] & peakidentif.ctrl.zt[, 25] > peakidentif.ctrl.zt[, 23] & peakidentif.ctrl.zt[, 25] + peakidentif.ctrl.zt[, 24] +peakidentif.ctrl.zt[, 23] > 10) # wenn der peak am Ende nicht insgesamt 10 überschreitet, ist es relativ unrelevant. Scheinbar fallen viele Proteine am Ende etwas aus.
+# length(fraction25.peak.ctrl.zt)
+```
+
+```{r}
+fraction1.peak.rnase.zt <- which(peakidentif.rnase.zt[, 1] > peakidentif.rnase.zt[, 2] & peakidentif.rnase.zt[, 1] > peakidentif.rnase.zt[, 3])
+# length(fraction1.peak.rnase.zt)
+
+fraction25.peak.rnase.zt <- which(peakidentif.rnase.zt[, 25] > peakidentif.rnase.zt[, 24] & peakidentif.rnase.zt[, 25] > peakidentif.rnase.zt[, 23] & peakidentif.rnase.zt[, 25] + peakidentif.rnase.zt[, 24] + peakidentif.rnase.zt[, 23] > 10)
+# length(fraction25.peak.rnase.zt)
+```
+
+#### 5.2.4. Precipitated Proteins
+
+At last we identify the precipitated proteins:
+
+```{r}
+precipitated.ctrl.zt <- which(peakidentif.ctrl.zt[, 25] > peakidentif.ctrl.zt[, 24] & peakidentif.ctrl.zt[, 25] > peakidentif.ctrl.zt[, 23] & peakidentif.ctrl.zt[, 25] + peakidentif.ctrl.zt[, 24] + peakidentif.ctrl.zt[, 23] == 100)
+
+precipitated.rnase.zt <- which(peakidentif.rnase.zt[, 25] > peakidentif.rnase.zt[, 24] & peakidentif.rnase.zt[, 25] > peakidentif.rnase.zt[, 23] & peakidentif.rnase.zt[, 25] + peakidentif.rnase.zt[, 24] + peakidentif.rnase.zt[, 23] == 100)
+
+precipitated.zt <- unique(c(precipitated.ctrl.zt,precipitated.rnase.zt))
+```
+
+### 5.3. Peaks for data set with min - max - scaling
+
+#### 5.2.1. Global Peak
+
+First the global peak identification for the control data set. We calculate the fraction and the protein amount under the global peak. Second we do the same for the rnase data set.
+
+```{r}
+globalpeak.ctrl.mms <- apply(ctrl.mms, 1, function(x){which.max(x)})
+globalpeak.value.ctrl.mms <- apply(ctrl.mms, 1, function(x){max(x)})
+
+globalpeak.rnase.mms <- apply(rnase.mms, 1, function(x){which.max(x)})
+globalpeak.value.rnase.mms <- apply(rnase.mms, 1, function(x){max(x)})
+```
+
+#### 5.2.2. Local Peaks
+
+First we have to calculate all the peaks, meaning global and local. We start again with the ctrl group. We start with calculating the sd to later sort out small fluctuations.
+
+```{r}
+peakidentif.ctrl.mms <- ctrl.mms
+peakidentif.rnase.mms <- rnase.mms
+
+sd.byrow.ctrl.mms <- apply(peakidentif.ctrl.mms, 1, function(x) sd(x[x < 8]))
+sd.mean.ctrl.mms <- mean(sd.byrow.ctrl.mms)
+sd.byrow.rnase.mms <- apply(peakidentif.rnase.mms, 1, function(x) sd(x[x < 8]))
+sd.mean.rnase.mms <- mean(sd.byrow.rnase.mms)
+```
+
+Now we give the fractions new names. Thereby we take into regard that the length of peak_indices is shorter than the length of each row of our normalized data set. Afterwards we calculate each peak and look which did not occur as global peaks to identify the local peaks. Again starting with the control data set.
+
+```{r}
+colnames(peakidentif.ctrl.mms) <- paste0("Rnase_Fraction", seq_along(colnames(peakidentif.ctrl.mms)) - 1)
+
+allpeaks.ctrl.mms <- apply(peakidentif.ctrl.mms, 1,function(x) {
+        peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
+        peak_sd <- sapply(peak_indices, function(i) sd(x[(i-1):(i+1)]))
+             peak_indices[peak_sd > sd.mean.ctrl.mms]})
+
+peak.values.ctrl.mms <- lapply(seq_along(allpeaks.ctrl.mms), function(i) peakidentif.ctrl.mms[i, allpeaks.ctrl.mms[[i]]])
+
+localpeaks.ctrl.mms <- allpeaks.ctrl.mms 
+for (i in seq_along(localpeaks.ctrl.mms)) {localpeaks.ctrl.mms[[i]] <- localpeaks.ctrl.mms[[i]][!localpeaks.ctrl.mms[[i]] %in% globalpeak.ctrl.mms[[i]]]}
+
+localpeaks.values.ctrl.mms <- lapply(seq_along(localpeaks.ctrl.mms), function(i) peakidentif.ctrl.mms[i, localpeaks.ctrl.mms[[i]]])
+```
+
+```{r}
+colnames(peakidentif.rnase.mms) <- paste0("Rnase_Fraction", seq_along(colnames(peakidentif.rnase.mms)) - 1)
+
+allpeaks.rnase.mms <- apply(peakidentif.rnase.mms, 1,function(x) {
+        peak_indices <- which(diff(sign(diff(x)))==-2 & x[-c(1,length(x))] > 3) + 1
+        peak_sd <- sapply(peak_indices, function(i) sd(x[(i-1):(i+1)]))
+             peak_indices[peak_sd > sd.mean.rnase.mms]})
+
+peak.values.rnase.mms <- lapply(seq_along(allpeaks.rnase.mms), function(i) peakidentif.rnase.mms[i, allpeaks.rnase.mms[[i]]])
+
+localpeaks.rnase.mms <- allpeaks.rnase.mms
+for (i in seq_along(localpeaks.rnase.mms)) {localpeaks.rnase.mms[[i]] <- localpeaks.rnase.mms[[i]][!localpeaks.rnase.mms[[i]] %in% globalpeak.rnase.mms[[i]]]}
+
+localpeaks.values.rnase.mms <- lapply(seq_along(localpeaks.rnase.mms), function(i) peakidentif.rnase.mms[i, localpeaks.rnase.mms[[i]]])
+```
+
+#### 5.2.3. Boundaries
+
+Futhermore, we have to look if there are peaks in fraction 1 or fraction 25. Again, we start with the identification of the boundaries for the control group.
+
+```{r}
+fraction1.peak.ctrl.mms <- which(peakidentif.ctrl.mms[, 1] > peakidentif.ctrl.mms[, 2] & peakidentif.ctrl.mms[, 1] > peakidentif.ctrl.mms[, 3])
+# length(fraction1.peak.ctrl.mms)
+
+fraction25.peak.ctrl.mms <- which(peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 24] & peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 23] & peakidentif.ctrl.mms[, 25] + peakidentif.ctrl.mms[, 24] +peakidentif.ctrl.mms[, 23] > 10) # wenn der peak am Ende nicht insgesamt 10 überschreitet, ist es relativ unrelevant. Scheinbar fallen viele Proteine am Ende etwas aus.
+# length(fraction25.peak.ctrl.mms)
+```
+
+```{r}
+fraction1.peak.rnase.mms <- which(peakidentif.rnase.mms[, 1] > peakidentif.rnase.mms[, 2] & peakidentif.rnase.mms[, 1] > peakidentif.rnase.mms[, 3])
+# length(fraction1.peak.rnase.mms)
+
+fraction25.peak.rnase.mms <- which(peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 24] & peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 23] & peakidentif.rnase.mms[, 25] + peakidentif.rnase.mms[, 24] + peakidentif.rnase.mms[, 23] > 10)
+# length(fraction25.peak.rnase.mms)
+```
+
+#### 5.2.4. Precipitated Proteins
+
+At last we identify the precipitated proteins:
+
+```{r}
+precipitated.ctrl.mms <- which(peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 24] & peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 23] & peakidentif.ctrl.mms[, 25] + peakidentif.ctrl.mms[, 24] + peakidentif.ctrl.mms[, 23] == 100)
+
+precipitated.rnase.mms <- which(peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 24] & peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 23] & peakidentif.rnase.mms[, 25] + peakidentif.rnase.mms[, 24] + peakidentif.rnase.mms[, 23] == 100)
+
+precipitated.mms <- unique(c(precipitated.ctrl.mms,precipitated.rnase.mms))
 ```
