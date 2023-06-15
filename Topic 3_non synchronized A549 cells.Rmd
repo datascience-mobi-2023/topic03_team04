@@ -834,6 +834,7 @@ for (i in 1:num_rows) {
     plots_rnase.mvm[[i]] <- NULL
   }
 }
+
 ```
 
 
@@ -1003,10 +1004,6 @@ for (i in 1:num_rows) {
   }
 }
 plots_ctrl_rnase.zt[[1]]
-```
-```{r}
-ctrl.zt[1,]
-rnase.zt[1,]
 ```
 
 ### 4.3. Line Graphs for the min - max - scaling
