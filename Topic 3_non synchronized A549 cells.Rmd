@@ -820,11 +820,12 @@ for (i in 1:num_rows) {
     df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
     
     # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yrnase, color = "red")) +
-      geom_line() +
-      geom_point() +
+    p <- ggplot(df, aes(x = x, y = yrnase)) +
+      geom_line(color = "tomato") +
+      geom_point(color = "tomato") +
       xlab("Fractions") +
-      ylab("Protein amount") 
+      ylab("Protein amount")+
+      labs(title = "RNase MVM")
     
     
     
@@ -836,6 +837,8 @@ for (i in 1:num_rows) {
 }
 
 ```
+
+
 
 
 Next we create the plots for the Control group. 
@@ -853,11 +856,12 @@ for (i in 1:num_rows) {
     df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
     
     # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yctrl, color = "blue")) +
-      geom_line() +
-      geom_point() +
+    p <- ggplot(df, aes(x = x, y = yctrl)) +
+      geom_line(color = "skyblue2") +
+      geom_point(color = "skyblue2") +
       xlab("Fractions") +
-      ylab("Protein amount") 
+      ylab("Protein amount") +
+      labs(title = "Control MVM")
     
     
     
@@ -869,6 +873,7 @@ for (i in 1:num_rows) {
 }
 ```
 
+
 The following code creates two plots in one diagram, so that the Control and RNase group can be compared. 
 ```{r}
 library(ggplot2)
@@ -879,9 +884,11 @@ plots_ctrl_rnase.mvm <- list()
 
 for (i in 1:num_rows) {
   row_data_ctrl <- ctrl.mvm[i, ]
+  row_data_rnase <- rnase.mvm[i, ]
   
   if (sum(!is.na(row_data_ctrl)) >= 2) {
     df <- data.frame(x = 1:length(row_data_ctrl),yctrl= as.numeric(row_data_ctrl),yrnase= as.numeric(row_data_rnase))
+
     
     
     p <- ggplot(df, aes(x = x))+
@@ -890,7 +897,9 @@ for (i in 1:num_rows) {
       geom_line(aes(y=yctrl, color="CTRL"))+
       geom_point(aes(y=yctrl, color="CTRL"))+
       xlab("Fractions") +
-      ylab("Protein amount") 
+      ylab("Protein amount") +
+      labs(title = "Control and RNase MVM")+
+      scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
     
     
     
@@ -900,8 +909,10 @@ for (i in 1:num_rows) {
     plots_ctrl_rnase.mvm[[i]] <- NULL
   }
 }
-plots_ctrl_rnase.mvm[[1]]
+
 ```
+
+
 
 ### 4.2. Line Graphs for the z_transformation - normalization
 
@@ -919,16 +930,19 @@ plots_rnase.zt <- list()
 for (i in 1:num_rows) {
   row_data_rnase <- rnase.zt[i, ]
   
+  
   # Überprüfe, ob genügend nicht-NA-Werte vorhanden sind
   if (sum(!is.na(row_data_rnase)) >= 2) {
     df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
     
     # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yrnase, color = "red")) +
-      geom_line() +
-      geom_point() +
+    p <- ggplot(df, aes(x = x, y = yrnase)) +
+      geom_line(color = "tomato") +
+      geom_point(color = "tomato") +
       xlab("Fractions") +
-      ylab("Protein amount") 
+      ylab("Protein amount") +
+      labs(title = "RNase zT")
+      
     
     
     
@@ -939,6 +953,7 @@ for (i in 1:num_rows) {
   }
 }
 ```
+
 
 
 Next we create the plots for the Control group. 
@@ -956,11 +971,12 @@ for (i in 1:num_rows) {
     df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
     
     # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yctrl, color = "blue")) +
-      geom_line() +
-      geom_point() +
+    p <- ggplot(df, aes(x = x, y = yctrl)) +
+      geom_line(color = "skyblue2") +
+      geom_point(color = "skyblue2") +
       xlab("Fractions") +
-      ylab("Protein amount") 
+      ylab("Protein amount") +
+      labs(title = "Control zT")
     
     
     
@@ -982,6 +998,7 @@ plots_ctrl_rnase.zt <- list()
 
 for (i in 1:num_rows) {
   row_data_ctrl <- ctrl.zt[i, ]
+  row_data_rnase <- rnase.zt[i, ]
   
   if (sum(!is.na(row_data_ctrl)) >= 2) {
     df <- data.frame(x = 1:length(row_data_ctrl),yctrl= as.numeric(row_data_ctrl),yrnase= as.numeric(row_data_rnase))
@@ -993,7 +1010,9 @@ for (i in 1:num_rows) {
       geom_line(aes(y=yctrl, color="CTRL"))+
       geom_point(aes(y=yctrl, color="CTRL"))+
       xlab("Fractions") +
-      ylab("Protein amount") 
+      ylab("Protein amount") +
+      labs(title = "Control and RNase zT") +
+      scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
     
     
     
@@ -1003,8 +1022,8 @@ for (i in 1:num_rows) {
     plots_ctrl_rnase.zt[[i]] <- NULL
   }
 }
-plots_ctrl_rnase.zt[[1]]
 ```
+
 
 ### 4.3. Line Graphs for the min - max - scaling
 
@@ -1027,11 +1046,12 @@ for (i in 1:num_rows) {
     df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
     
     # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yrnase, color = "red")) +
-      geom_line() +
-      geom_point() +
+    p <- ggplot(df, aes(x = x, y = yrnase)) +
+      geom_line(color = "tomato") +
+      geom_point(color = "tomato") +
       xlab("Fractions") +
-      ylab("Protein amount") 
+      ylab("Protein amount")+
+      labs(title = "RNase MMS")
     
     
     
@@ -1042,6 +1062,7 @@ for (i in 1:num_rows) {
   }
 }
 ```
+
 
 
 Next we create the plots for the Control group. 
@@ -1059,11 +1080,12 @@ for (i in 1:num_rows) {
     df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
     
     # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yctrl, color = "blue")) +
-      geom_line() +
-      geom_point() +
+    p <- ggplot(df, aes(x = x, y = yctrl)) +
+      geom_line(color = "skyblue2") +
+      geom_point(color = "skyblue2") +
       xlab("Fractions") +
-      ylab("Protein amount") 
+      ylab("Protein amount") +
+      labs(title = "Control MMS")
     
     
     
@@ -1075,6 +1097,8 @@ for (i in 1:num_rows) {
 }
 ```
 
+
+
 The following code creates two plots in one diagram, so that the Control and RNase group can be compared. 
 ```{r}
 library(ggplot2)
@@ -1085,6 +1109,7 @@ plots_ctrl_rnase.mms <- list()
 
 for (i in 1:num_rows) {
   row_data_ctrl <- ctrl.mms[i, ]
+  row_data_rnase <- rnase.mms[i, ]
   
   if (sum(!is.na(row_data_ctrl)) >= 2) {
     df <- data.frame(x = 1:length(row_data_ctrl),yctrl= as.numeric(row_data_ctrl),yrnase= as.numeric(row_data_rnase))
@@ -1096,7 +1121,9 @@ for (i in 1:num_rows) {
       geom_line(aes(y=yctrl, color="CTRL"))+
       geom_point(aes(y=yctrl, color="CTRL"))+
       xlab("Fractions") +
-      ylab("Protein amount") 
+      ylab("Protein amount") +
+      labs(title = "Control and RNase MMS") +
+      scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
     
     
     
@@ -1106,8 +1133,10 @@ for (i in 1:num_rows) {
     plots_ctrl_rnase.mms[[i]] <- NULL
   }
 }
-plots_ctrl_rnase.mms[[1]]
+
 ```
+
+
 
 ## 5. Peak Identification
 
