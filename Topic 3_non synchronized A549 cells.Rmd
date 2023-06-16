@@ -868,13 +868,14 @@ Shoulder regions: include values with high protein amount, which are not include
 1. generell identification of regions with high values
 ```{r}
 largevalues <- apply(rnase.zt.peaks[,2:24], 1, function(x) {
-  largevalues_indices <- which(x > 5) + 1# to start again with 2
+  largevalues_indices <- which(x > 4.5) + 1# to start again with 2
   peak_mean <- sapply(largevalues_indices, function(i) mean(x[(i-1):(i+1)]))
-  largevalues_indices <- largevalues_indices[peak_mean > 5]
+  largevalues_indices <- largevalues_indices[peak_mean > 4.5]
   unique(c(largevalues_indices - 1 , largevalues_indices, largevalues_indices + 1))
 })
 
-#View(largevalues)
+
+
 ```
 
 2. identification of regions around local and global peaks
@@ -885,52 +886,110 @@ neighbors.peaks <- apply(rnase.zt.peaks, 1,
                  peak_indices <- peak_indices[peak_sd > mean.sd]
                  c(peak_indices - 1, peak_indices, peak_indices + 1)})
               
-#View(neighbors.peaks)
+View(neighbors.peaks)
 ```
 
-
-```{r}
-largevalues_without_maxima <- largevalues                  
-for (i in seq_along(largevalues_without_maxima)) {largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][!largevalues_without_maxima[[i]] %in% neighbors.peaks[[i]]]}
-
-find_consecutive_numbers <- function(x) {
-diffs <- c(1, diff(x))
-groups <- rle(diffs)
-shoulderregion <- which(groups$values == 1 & groups$lengths >= 3)
-if (length(shoulderregion) > 0) {
-starts <- cumsum(groups$lengths)[shoulderregion] - groups$lengths[shoulderregion] + 1
-ends <- cumsum(groups$lengths)[shoulderregion]
-shoulderregion <- mapply(function(start, end) x[start:end], starts, ends)
-}
-}
-
-shoulderregion <- lapply(largevalues_without_maxima, find_consecutive_numbers)
-
-
-
-View(shoulderregion)
-View(largevalues_without_maxima)
-
-```
 
 Identification of the boundaries (fraction 1 and fraction 25)
 ```{r}
 fraction1.peak.rnase <- which(rnase.zt[, 1] > rnase.zt[, 2] & rnase.zt[, 1] > rnase.zt[, 3])
-length(fraction1.peak)
+length(fraction1.peak.rnase)
 fraction25.peak.rnase <- which(rnase.zt[, 25] > rnase.zt[, 24] & rnase.zt[, 25] > rnase.zt[, 23] & ctrl.zt[, 25] + ctrl.zt[, 24] + ctrl.zt[, 23] > 10) # wenn der peak am Ende nicht insgesamt 10 überschreitet, ist es relativ unrelevant. Scheinbar fallen viele Proteine am Ende etwas aus.
 fraction25.peak.rnase
+
+boundary1.rnase <- lapply(1:nrow(rnase.zt), function(i) {
+  if (rnase.zt[i, 1] > rnase.zt[i, 2] & rnase.zt[i, 1] > rnase.zt[i, 3] & (rnase.zt[i, 1] + rnase.zt[i, 2] + rnase.zt[i, 3]) > 10) {
+    return(c(1,2,3))
+  } else {
+    return(NA)
+  }
+})
+boundary25.rnase <-lapply(1:nrow(rnase.zt), function(i) {
+  if (rnase.zt[i, 25] > rnase.zt[i, 24] & rnase.zt[i, 25] > rnase.zt[i, 23] & (rnase.zt[i, 25] + rnase.zt[i, 24] + rnase.zt[i, 23]) > 10) {
+    return(c(25,24,23))
+  } else {
+    return(NA)
+  }
+})
+View(fraction25.peak.rnase)
+View(boundary25.rnase)
+View(boundary1.rnase)
+View(fraction1.peak.rnase)
+View(rnase.with.proteinnumbers)
 ```
 precipitated proteins:
 ```{r}
 precipitated.rnase <- which(rnase.zt[, 25] > rnase.zt[, 24] & rnase.zt[, 25] > rnase.zt[, 23] & rnase.zt[, 25] + rnase.zt[, 24] + rnase.zt[, 23] == 100)
 precipitated.ctrl <- which(ctrl.zt[, 25] > ctrl.zt[, 24] & ctrl.zt[, 25] > ctrl.zt[, 23] & ctrl.zt[, 25] + ctrl.zt[, 24] + ctrl.zt[, 23] == 100)
-
 precipitated.zt <- unique(c(precipitated.rnase,precipitated.ctrl))
 precipitated.zt
 precipitated.rnase
 precipitated.ctrl
 rnase.zt[fraction25.peak.rnase,]
 ```
+```{r}
+  #Das ganze könnte noch enorm fehlerhaft sein! Beschreibung folgt, wenn code tatsächlich funktioniert
+
+#decreasingvalues <- apply(rnase.zt, 1, function(i) {
+  #decrease_indices <- which(sapply(1:(length(i)-2), function(j) all(diff(i[j:(j+2)]) #> 0)))
+  #unique(c(decrease_indices - 1 , decrease_indices, decrease_indices + 1))
+#})
+
+  
+#increasingvalues <- apply(rnase.zt, 1, function(i) {
+ # increase_indices <- which(sapply(1:(length(i)-2), function(j) all(diff(i[j:(j+2)]) > 0)))
+ # unique(c(increase_indices - 1 , increase_indices, increase_indices + 1))
+#})
+Ersatzdecreaseincrease <- apply(rnase.zt, 1, function(x) {
+    indices <- which(sapply(1:(length(x)-2), function(i) {
+      !all(diff(x[i:(i+2)]) > 0) & !all(diff(x[i:(i+2)]) < 0)
+    }))
+    if (length(indices) > 0) {
+      return(indices)
+    } else {
+      returninteger(0)
+    }
+  })
+View(Ersatzdecreaseincrease)
+
+largevalues_without_maxima <- largevalues                  
+for (i in seq_along(largevalues_without_maxima)) {largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][!largevalues_without_maxima[[i]] %in% maxpeaks[[i]]]}
+
+largevalues_without_maxima <- largevalues                  
+for (i in seq_along(largevalues_without_maxima)) {largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][!largevalues_without_maxima[[i]] %in% neighbors.peaks[[i]]]}
+
+for (i in seq_along(largevalues_without_maxima)) {
+    largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][largevalues_without_maxima[[i]] %in% Ersatzdecreaseincrease[[i]]]
+}
+
+#for (i in seq_along(largevalues_without_maxima)) {largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][!largevalues_without_maxima[[i]] %in% decreasingvalues[[i]]]}
+
+#for (i in seq_along(largevalues_without_maxima)) {largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][!largevalues_without_maxima[[i]] %in% increasingvalues[[i]]]} 
+
+for (i in seq_along(largevalues_without_maxima)) {largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][!largevalues_without_maxima[[i]] %in% boundary25.rnase[[i]]]}
+
+
+for (i in seq_along(largevalues_without_maxima)) {largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][!largevalues_without_maxima[[i]] %in% boundary1.rnase[[i]]]}
+
+find_consecutive_numbers <- function(x) {
+    diffs <- c(1, diff(x))
+    groups <- rle(diffs)
+    shoulderregion <- which(groups$values == 1 & groups$lengths >= 3)
+    if (length(shoulderregion) > 0) {
+        starts <- cumsum(groups$lengths)[shoulderregion] - groups$lengths[shoulderregion] + 1
+        ends <- cumsum(groups$lengths)[shoulderregion]
+        shoulderregion <- mapply(function(start, end) x[start:end], starts, ends)
+    }
+    return(shoulderregion)
+}
+shoulderregion <- lapply(largevalues_without_maxima, find_consecutive_numbers)
+
+View(shoulderregion)
+View(largevalues_without_maxima)
+
+```
+
+
 
 
 ```{r}
@@ -1130,5 +1189,7 @@ plots_Ctrl_RNase.zt[[1]]
 ```
 Thanks to the created list it is now possible to look at each protein seperatly.
 For example: plots_Ctrl_RNase.zt[[1]] for the first, plots_Ctrl_RNase.zt[[2]] for the second, and so on. 
+```{r}
+
 
 >>>>>>> Stashed changes
