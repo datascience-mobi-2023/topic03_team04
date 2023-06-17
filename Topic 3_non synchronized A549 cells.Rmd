@@ -1745,6 +1745,61 @@ for (i in 1:num_rows) {
 }
 ```
 
+###6.4 Plotting of gauss curves 
+
+####6.4.1 example of how to plot the curves for all proteins of the Control group 
+
+```{r}
+num_rows <- nrow(parameter_gaussian_ctrl.zt_table)
+plots_gaussian_ctrl.zt <- list()
+x <- c(1:25)
+for (i in 1:num_rows) {
+  a <- parameter_gaussian_ctrl.zt_table[i, 1]
+  mu <- parameter_gaussian_ctrl.zt_table[i, 2]
+  sigma <- parameter_gaussian_ctrl.zt_table[i, 3]
+  row_data_gaussian_ctrl.zt <- parameter_gaussian_ctrl.zt_table[i, ]
+
+  if (sum(!is.na(row_data_gaussian_ctrl.zt)) >= 2) {
+    df <- data.frame(x = 1:length(row_data_gaussian_ctrl.zt), y = as.numeric(row_data_gaussian_ctrl.zt))
+
+    # Erstellen eines neuen leeren Plots
+    plot_new <- plot(NULL, xlim = c(min(x), max(x)), ylim = c(min(df$y), max(df$y)), 
+                     xlab = "Fraction", ylab = "Protein amount", col = "palegreen2", lwd = 2)
+
+    # Zeichnen der Kurve auf dem neuen Plot
+    curve(gauss(x, a, mu, sigma), from = min(x), to = max(x), add = TRUE, col = "palegreen2", lwd = 2)
+
+    # Speichern des neuen Plots in der Liste
+    plots_gaussian_ctrl.zt[[i]] <- plot_new
+    
+  } else {
+    plots_gaussian_ctrl.zt[[i]] <- NULL
+  }
+
+}
+```
+
+####6.4.2 example how to plot the Control and RNase curve of one specific protein 
+```{r}
+n=1  #Number of protein you want to see
+x <- c(1:25)
+a1<- parameter_gaussian_ctrl.zt_table[n, 1 ]
+mu1 <- parameter_gaussian_ctrl.zt_table[n, 2]
+sigma1 <- parameter_gaussian_ctrl.zt_table[n,3]
+
+a2<- parameter_gaussian_rnase.zt_table[n, 1 ]
+mu2 <- parameter_gaussian_rnase.zt_table[n, 2]
+sigma2 <- parameter_gaussian_rnase.zt_table[n,3]
+
+plot(x, type = "n", ylim= c(0,50))
+
+curve(gauss(x, a=a1, mu=mu1, sigma=sigma1), from = min(x), to = max(x), add = TRUE, col = "palegreen2", lwd = 2)+
+curve(gauss(x, a=a2, mu=mu2, sigma=sigma2), from = min(x), to = max(x), add = TRUE, col = "violet", lwd = 2)
+```
+
+Hinweis: Um die Graphen einer anderen Normalisierungsmethode zu sehen, kann zt in mvm oder mms abgeändert werden.
+
+
 ## 7. Shifts
 
 Load the relevant data:
