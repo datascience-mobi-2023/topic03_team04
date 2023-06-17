@@ -797,30 +797,50 @@ colnames(rnase.mms) <- new.colnames.rnase
 
 The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames: **ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
 
+Safe the normalized data:
+
+```{r}
+saveRDS(ctrl.mvm, file = "Non_synchronized_A549_ctrl.mvm")
+saveRDS(rnase.mvm, file = "Non_synchronized_A549_rnase.mvm")
+
+saveRDS(ctrl.zt, file = "Non_synchronized_A549_ctrl.zt")
+saveRDS(rnase.zt, file = "Non_synchronized_A549_rnase.zt")
+
+saveRDS(ctrl.mms, file = "Non_synchronized_A549_ctrl.mms")
+saveRDS(rnase.mms, file = "Non_synchronized_A549_rnase.mms")
+```
+
 ## 4. Line Graph
+
+```{r}
+ctrl.mvm <- readRDS("Non_synchronized_A549_ctrl.mvm")
+rnase.mvm <- readRDS("Non_synchronized_A549_rnase.mvm")
+
+ctrl.zt <- readRDS("Non_synchronized_A549_ctrl.zt")
+rnase.zt <- readRDS("Non_synchronized_A549_rnase.zt")
+
+ctrl.mms <- readRDS("Non_synchronized_A549_ctrl.mms")
+rnase.mms <- readRDS("Non_synchronized_A549_rnase.mms")
+```
 
 ### 4.1. Line Graphs for the mean value method - normalization
 
-We start by plotting the amount of each protein in the 25 fractions for the RNase group. 
+We start by plotting the amount of each protein in the 25 fractions for the RNase group.
+
 ```{r}
 library(ggplot2)
 
-# Anzahl der Zeilen im Dataframe
 num_rows <- nrow(rnase.mvm)
 
-# Erstelle einen leeren Plot für jeden Graphen
 plots_rnase.mvm <- list()
 
-# Iteriere über jede Zeile und erstelle den stetigen Graphen
 for (i in 1:num_rows) {
   row_data_rnase <- rnase.mvm[i, ]
   
-  # Überprüfe, ob genügend nicht-NA-Werte vorhanden sind
-  if (sum(!is.na(row_data_rnase)) >= 2) {
+   if (sum(!is.na(row_data_rnase)) >= 2) {
     df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
     
-    # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yrnase)) +
+        p <- ggplot(df, aes(x = x, y = yrnase)) +
       geom_line(color = "tomato") +
       geom_point(color = "tomato") +
       xlab("Fractions") +
@@ -838,10 +858,8 @@ for (i in 1:num_rows) {
 
 ```
 
+Next we create the plots for the Control group.
 
-
-
-Next we create the plots for the Control group. 
 ```{r}
 library(ggplot2)
 
@@ -873,12 +891,15 @@ for (i in 1:num_rows) {
 }
 ```
 
+The following code creates two plots in one diagram, so that the Control and RNase group can be compared.
 
-The following code creates two plots in one diagram, so that the Control and RNase group can be compared. 
 ```{r}
 library(ggplot2)
 
 num_rows <- nrow(ctrl.mvm)
+
+names.as.colum <- ctrl.mvm
+protein.names <- rownames(names.as.colum)
 
 plots_ctrl_rnase.mvm <- list()
 
@@ -898,7 +919,7 @@ for (i in 1:num_rows) {
       geom_point(aes(y=yctrl, color="CTRL"))+
       xlab("Fractions") +
       ylab("Protein amount") +
-      labs(title = "Control and RNase MVM")+
+      labs(title = paste("Mean Value Method -",protein.names[i]))+
       scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
     
     
@@ -909,42 +930,39 @@ for (i in 1:num_rows) {
     plots_ctrl_rnase.mvm[[i]] <- NULL
   }
 }
-
 ```
 
+Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
 
+```{r}
+# print( plots_ctrl_rnase.mvm[[6]])
+```
 
 ### 4.2. Line Graphs for the z_transformation - normalization
 
-We start by plotting the amount of each protein in the 25 fractions for the RNase group. 
+We start by plotting the amount of each protein in the 25 fractions for the RNase group.
+
 ```{r}
 library(ggplot2)
 
-# Anzahl der Zeilen im Dataframe
 num_rows <- nrow(rnase.zt)
 
-# Erstelle einen leeren Plot für jeden Graphen
 plots_rnase.zt <- list()
 
-# Iteriere über jede Zeile und erstelle den stetigen Graphen
 for (i in 1:num_rows) {
   row_data_rnase <- rnase.zt[i, ]
   
   
-  # Überprüfe, ob genügend nicht-NA-Werte vorhanden sind
-  if (sum(!is.na(row_data_rnase)) >= 2) {
+   if (sum(!is.na(row_data_rnase)) >= 2) {
     df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
     
-    # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yrnase)) +
+      p <- ggplot(df, aes(x = x, y = yrnase)) +
       geom_line(color = "tomato") +
       geom_point(color = "tomato") +
       xlab("Fractions") +
       ylab("Protein amount") +
       labs(title = "RNase zT")
       
-    
-    
     
     plots_rnase.zt[[i]] <- p
   } else {
@@ -954,9 +972,8 @@ for (i in 1:num_rows) {
 }
 ```
 
+Next we create the plots for the Control group.
 
-
-Next we create the plots for the Control group. 
 ```{r}
 library(ggplot2)
 
@@ -970,14 +987,12 @@ for (i in 1:num_rows) {
     if (sum(!is.na(row_data_ctrl)) >= 2) {
     df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
     
-    # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yctrl)) +
+      p <- ggplot(df, aes(x = x, y = yctrl)) +
       geom_line(color = "skyblue2") +
       geom_point(color = "skyblue2") +
       xlab("Fractions") +
       ylab("Protein amount") +
       labs(title = "Control zT")
-    
     
     
     plots_ctrl.zt[[i]] <- p
@@ -988,11 +1003,15 @@ for (i in 1:num_rows) {
 }
 ```
 
-The following code creates two plots in one diagram, so that the Control and RNase group can be compared. 
+The following code creates two plots in one diagram, so that the Control and RNase group can be compared.
+
 ```{r}
 library(ggplot2)
 
 num_rows <- nrow(ctrl.zt)
+
+names.as.colum <- ctrl.zt
+protein.names <- rownames(names.as.colum)
 
 plots_ctrl_rnase.zt <- list()
 
@@ -1011,7 +1030,7 @@ for (i in 1:num_rows) {
       geom_point(aes(y=yctrl, color="CTRL"))+
       xlab("Fractions") +
       ylab("Protein amount") +
-      labs(title = "Control and RNase zT") +
+      labs(title = paste("zt Transformation -",protein.names[i])) +
       scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
     
     
@@ -1024,35 +1043,35 @@ for (i in 1:num_rows) {
 }
 ```
 
+Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
+
+```{r}
+# print(plots_ctrl_rnase.zt[[7]])
+```
 
 ### 4.3. Line Graphs for the min - max - scaling
 
-We start by plotting the amount of each protein in the 25 fractions for the RNase group. 
+We start by plotting the amount of each protein in the 25 fractions for the RNase group.
+
 ```{r}
 library(ggplot2)
 
-# Anzahl der Zeilen im Dataframe
 num_rows <- nrow(rnase.mms)
 
-# Erstelle einen leeren Plot für jeden Graphen
 plots_rnase.mms <- list()
 
-# Iteriere über jede Zeile und erstelle den stetigen Graphen
 for (i in 1:num_rows) {
   row_data_rnase <- rnase.mms[i, ]
   
-  # Überprüfe, ob genügend nicht-NA-Werte vorhanden sind
-  if (sum(!is.na(row_data_rnase)) >= 2) {
+   if (sum(!is.na(row_data_rnase)) >= 2) {
     df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
     
-    # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yrnase)) +
+      p <- ggplot(df, aes(x = x, y = yrnase)) +
       geom_line(color = "tomato") +
       geom_point(color = "tomato") +
       xlab("Fractions") +
       ylab("Protein amount")+
       labs(title = "RNase MMS")
-    
     
     
     plots_rnase.mms[[i]] <- p
@@ -1063,9 +1082,8 @@ for (i in 1:num_rows) {
 }
 ```
 
+Next we create the plots for the Control group.
 
-
-Next we create the plots for the Control group. 
 ```{r}
 library(ggplot2)
 
@@ -1079,15 +1097,13 @@ for (i in 1:num_rows) {
     if (sum(!is.na(row_data_ctrl)) >= 2) {
     df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
     
-    # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yctrl)) +
+      p <- ggplot(df, aes(x = x, y = yctrl)) +
       geom_line(color = "skyblue2") +
       geom_point(color = "skyblue2") +
       xlab("Fractions") +
       ylab("Protein amount") +
       labs(title = "Control MMS")
-    
-    
+
     
     plots_ctrl.mms[[i]] <- p
   } else {
@@ -1097,13 +1113,15 @@ for (i in 1:num_rows) {
 }
 ```
 
+The following code creates two plots in one diagram, so that the Control and RNase group can be compared.
 
-
-The following code creates two plots in one diagram, so that the Control and RNase group can be compared. 
 ```{r}
 library(ggplot2)
 
 num_rows <- nrow(ctrl.mms)
+
+names.as.colum <- ctrl.mms
+protein.names <- rownames(names.as.colum)
 
 plots_ctrl_rnase.mms <- list()
 
@@ -1122,7 +1140,7 @@ for (i in 1:num_rows) {
       geom_point(aes(y=yctrl, color="CTRL"))+
       xlab("Fractions") +
       ylab("Protein amount") +
-      labs(title = "Control and RNase MMS") +
+      labs(title = paste("Min Max Scaling -",protein.names[i])) +
       scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
     
     
@@ -1133,12 +1151,26 @@ for (i in 1:num_rows) {
     plots_ctrl_rnase.mms[[i]] <- NULL
   }
 }
-
 ```
 
+Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
 
+```{r}
+# print(plots_ctrl_rnase.mms[[7]])
+```
 
 ## 5. Peak Identification
+
+```{r}
+ctrl.mvm <- readRDS("Non_synchronized_A549_ctrl.mvm")
+rnase.mvm <- readRDS("Non_synchronized_A549_rnase.mvm")
+
+ctrl.zt <- readRDS("Non_synchronized_A549_ctrl.zt")
+rnase.zt <- readRDS("Non_synchronized_A549_rnase.zt")
+
+ctrl.mms <- readRDS("Non_synchronized_A549_ctrl.mms")
+rnase.mms <- readRDS("Non_synchronized_A549_rnase.mms")
+```
 
 ### 5.1. Peaks for data set with mean value method - normalization
 
@@ -1178,7 +1210,7 @@ allpeaks.ctrl.mvm <- apply(peakidentif.ctrl.mvm, 1,function(x) {
         peak_sd <- sapply(peak_indices, function(i) sd(x[(i-1):(i+1)]))
              peak_indices[peak_sd > sd.mean.ctrl.mvm]})
 
-peak.values.ctrl.mvm <- lapply(seq_along(allpeaks.ctrl.mvm), function(i) peakidentif.ctrl.mvm[i, allpeaks.ctrl[[i]]])
+peak.values.ctrl.mvm <- lapply(seq_along(allpeaks.ctrl.mvm), function(i) peakidentif.ctrl.mvm[i, allpeaks.ctrl.mvm[[i]]])
 
 localpeaks.ctrl.mvm <- allpeaks.ctrl.mvm 
 for (i in seq_along(localpeaks.ctrl.mvm)) {localpeaks.ctrl.mvm[[i]] <- localpeaks.ctrl.mvm[[i]][!localpeaks.ctrl.mvm[[i]] %in% globalpeak.ctrl.mvm[[i]]]}
@@ -1199,7 +1231,7 @@ peak.values.rnase.mvm <- lapply(seq_along(allpeaks.rnase.mvm), function(i) peaki
 localpeaks.rnase.mvm <- allpeaks.rnase.mvm 
 for (i in seq_along(localpeaks.rnase.mvm)) {localpeaks.rnase.mvm[[i]] <- localpeaks.rnase.mvm[[i]][!localpeaks.rnase.mvm[[i]] %in% globalpeak.rnase.mvm[[i]]]}
 
-localpeaks.values.rnase.mvm <- lapply(seq_along(localpeaks.rnase.mvm), function(i) peakidentif.rnase[i, localpeaks.rnase.mvm[[i]]])
+localpeaks.values.rnase.mvm <- lapply(seq_along(localpeaks.rnase.mvm), function(i) peakidentif.rnase.mvm[i, localpeaks.rnase.mvm[[i]]])
 ```
 
 #### 5.1.3. Boundaries
@@ -1330,7 +1362,7 @@ precipitated.zt <- unique(c(precipitated.ctrl.zt,precipitated.rnase.zt))
 
 ### 5.3. Peaks for data set with min - max - scaling
 
-#### 5.2.1. Global Peak
+#### 5.3.1. Global Peak
 
 First the global peak identification for the control data set. We calculate the fraction and the protein amount under the global peak. Second we do the same for the rnase data set.
 
@@ -1342,7 +1374,7 @@ globalpeak.rnase.mms <- apply(rnase.mms, 1, function(x){which.max(x)})
 globalpeak.value.rnase.mms <- apply(rnase.mms, 1, function(x){max(x)})
 ```
 
-#### 5.2.2. Local Peaks
+#### 5.3.2. Local Peaks
 
 First we have to calculate all the peaks, meaning global and local. We start again with the ctrl group. We start with calculating the sd to later sort out small fluctuations.
 
@@ -1390,7 +1422,7 @@ for (i in seq_along(localpeaks.rnase.mms)) {localpeaks.rnase.mms[[i]] <- localpe
 localpeaks.values.rnase.mms <- lapply(seq_along(localpeaks.rnase.mms), function(i) peakidentif.rnase.mms[i, localpeaks.rnase.mms[[i]]])
 ```
 
-#### 5.2.3. Boundaries
+#### 5.3.3. Boundaries
 
 Futhermore, we have to look if there are peaks in fraction 1 or fraction 25. Again, we start with the identification of the boundaries for the control group.
 
@@ -1410,7 +1442,7 @@ fraction25.peak.rnase.mms <- which(peakidentif.rnase.mms[, 25] > peakidentif.rna
 # length(fraction25.peak.rnase.mms)
 ```
 
-#### 5.2.4. Precipitated Proteins
+#### 5.3.4. Precipitated Proteins
 
 At last we identify the precipitated proteins:
 
@@ -1420,4 +1452,151 @@ precipitated.ctrl.mms <- which(peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms
 precipitated.rnase.mms <- which(peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 24] & peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 23] & peakidentif.rnase.mms[, 25] + peakidentif.rnase.mms[, 24] + peakidentif.rnase.mms[, 23] == 100)
 
 precipitated.mms <- unique(c(precipitated.ctrl.mms,precipitated.rnase.mms))
+```
+
+Save all relevant data:
+
+```{r}
+# mvm
+saveRDS(globalpeak.ctrl.mvm, file = "Non_synchronized_A549_globalpeak.ctrl.mvm")
+saveRDS(globalpeak.value.ctrl.mvm, file = "Non_synchronized_A549_globalpeak.value.ctrl.mvm")
+
+saveRDS(globalpeak.rnase.mvm, file = "Non_synchronized_A549_globalpeak.rnase.mvm")
+saveRDS(globalpeak.value.rnase.mvm, file = "Non_synchronized_A549_globalpeak.value.rnase.mvm")
+
+saveRDS(localpeaks.ctrl.mvm, file = "Non_synchronized_A549_localpeaks.ctrl.mvm")
+saveRDS(localpeaks.values.ctrl.mvm, file = "Non_synchronized_A549_localpeaks.values.ctrl.mvm")
+
+saveRDS(localpeaks.rnase.mvm, file = "Non_synchronized_A549_localpeaks.rnase.mvm")
+saveRDS(localpeaks.values.rnase.mvm, file = "Non_synchronized_A549_localpeaks.values.rnase.mvm")
+
+saveRDS(fraction1.peak.ctrl.mvm, file = "Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+saveRDS(fraction25.peak.ctrl.mvm, file = "Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+
+saveRDS(fraction1.peak.ctrl.mvm, file = "Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+saveRDS(fraction25.peak.ctrl.mvm, file = "Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+
+saveRDS(precipitated.mvm, file = "Non_synchronized_A549_precipitated.mvm")
+```
+
+```{r}
+# zt
+saveRDS(globalpeak.ctrl.zt, file = "Non_synchronized_A549_globalpeak.ctrl.zt")
+saveRDS(globalpeak.value.ctrl.zt, file = "Non_synchronized_A549_globalpeak.value.ctrl.zt")
+
+saveRDS(globalpeak.rnase.zt, file = "Non_synchronized_A549_globalpeak.rnase.zt")
+saveRDS(globalpeak.value.rnase.zt, file = "Non_synchronized_A549_globalpeak.value.rnase.zt")
+
+saveRDS(localpeaks.ctrl.zt, file = "Non_synchronized_A549_localpeaks.ctrl.zt")
+saveRDS(localpeaks.values.ctrl.zt, file = "Non_synchronized_A549_localpeaks.values.ctrl.zt")
+
+saveRDS(localpeaks.rnase.zt, file = "Non_synchronized_A549_localpeaks.rnase.zt")
+saveRDS(localpeaks.values.rnase.zt, file = "Non_synchronized_A549_localpeaks.values.rnase.zt")
+
+saveRDS(fraction1.peak.ctrl.zt, file = "Non_synchronized_A549_fraction1.peak.ctrl.zt")
+saveRDS(fraction25.peak.ctrl.zt, file = "Non_synchronized_A549_fraction25.peak.ctrl.zt")
+
+saveRDS(fraction1.peak.ctrl.zt, file = "Non_synchronized_A549_fraction1.peak.ctrl.zt")
+saveRDS(fraction25.peak.ctrl.zt, file = "Non_synchronized_A549_fraction25.peak.ctrl.zt")
+
+saveRDS(precipitated.zt, file = "Non_synchronized_A549_precipitated.zt")
+```
+
+```{r}
+# mms
+saveRDS(globalpeak.ctrl.mms, file = "Non_synchronized_A549_globalpeak.ctrl.mms")
+saveRDS(globalpeak.value.ctrl.mms, file = "Non_synchronized_A549_globalpeak.value.ctrl.mms")
+
+saveRDS(globalpeak.rnase.mms, file = "Non_synchronized_A549_globalpeak.rnase.mms")
+saveRDS(globalpeak.value.rnase.mms, file = "Non_synchronized_A549_globalpeak.value.rnase.mms")
+
+saveRDS(localpeaks.ctrl.mms, file = "Non_synchronized_A549_localpeaks.ctrl.mms")
+saveRDS(localpeaks.values.ctrl.mms, file = "Non_synchronized_A549_localpeaks.values.ctrl.mms")
+
+saveRDS(localpeaks.rnase.mms, file = "Non_synchronized_A549_localpeaks.rnase.mms")
+saveRDS(localpeaks.values.rnase.mms, file = "Non_synchronized_A549_localpeaks.values.rnase.mms")
+
+saveRDS(fraction1.peak.ctrl.mms, file = "Non_synchronized_A549_fraction1.peak.ctrl.mms")
+saveRDS(fraction25.peak.ctrl.mms, file = "Non_synchronized_A549_fraction25.peak.ctrl.mms")
+
+saveRDS(fraction1.peak.ctrl.mms, file = "Non_synchronized_A549_fraction1.peak.ctrl.mms")
+saveRDS(fraction25.peak.ctrl.mms, file = "Non_synchronized_A549_fraction25.peak.ctrl.mms")
+
+saveRDS(precipitated.mms, file = "Non_synchronized_A549_precipitated.mms")
+```
+
+## 6. Shifts
+
+Load the relevant data:
+
+```{r}
+#mvm
+
+globalpeak.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mvm")
+globalpeak.value.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mvm")
+
+globalpeak.rnase.mvm <- readRDS("Non_synchronized_A549_globalpeak.rnase.mvm")
+globalpeak.value.rnase.mvm <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.mvm")
+
+localpeaks.ctrl.mvm <- readRDS("Non_synchronized_A549_localpeaks.ctrl.mvm")
+localpeaks.values.ctrl.mvm <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.mvm")
+
+localpeaks.rnase.mvm <- readRDS("Non_synchronized_A549_localpeaks.rnase.mvm")
+localpeaks.values.rnase.mvm <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.mvm")
+
+fraction1.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+fraction25.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+
+fraction1.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+fraction25.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+
+precipitated.mvm <- readRDS("Non_synchronized_A549_precipitated.mvm")
+```
+
+```{r}
+#zt
+
+globalpeak.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.ctrl.zt")
+globalpeak.value.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.zt")
+
+globalpeak.rnase.zt <- readRDS("Non_synchronized_A549_globalpeak.rnase.zt")
+globalpeak.value.rnase.zt <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.zt")
+
+localpeaks.ctrl.zt <- readRDS("Non_synchronized_A549_localpeaks.ctrl.zt")
+localpeaks.values.ctrl.zt <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.zt")
+
+localpeaks.rnase.zt <- readRDS("Non_synchronized_A549_localpeaks.rnase.zt")
+localpeaks.values.rnase.zt <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.zt")
+
+fraction1.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.zt")
+fraction25.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.zt")
+
+fraction1.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.zt")
+fraction25.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.zt")
+
+precipitated.zt <- readRDS("Non_synchronized_A549_precipitated.zt")
+```
+
+```{r}
+#mms
+
+globalpeak.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mms")
+globalpeak.value.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mms")
+
+globalpeak.rnase.mms <- readRDS("Non_synchronized_A549_globalpeak.rnase.mms")
+globalpeak.value.rnase.mms <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.mms")
+
+localpeaks.ctrl.mms <- readRDS("Non_synchronized_A549_localpeaks.ctrl.mms")
+localpeaks.values.ctrl.mms <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.mms")
+
+localpeaks.rnase.mms <- readRDS("Non_synchronized_A549_localpeaks.rnase.mms")
+localpeaks.values.rnase.mms <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.mms")
+
+fraction1.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mms")
+fraction25.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mms")
+
+fraction1.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mms")
+fraction25.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mms")
+
+precipitated.mms <- readRDS("Non_synchronized_A549_precipitated.mms")
 ```
