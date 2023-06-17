@@ -93,7 +93,7 @@ rnase.rep3.reprod <- MS_Table_reordered[,126:150]
 
 Here we calculate the correlation between the replicates and put them together in one data frame (ctrl.cor and rnase.cor) (?)
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning = FALSE}
 ctrl.cor <- 
   cbind(ctrl.cor.rep1.rep2 <- 
           sapply(seq.int(dim(ctrl.rep1.reprod)[1]), function(x) cor(as.numeric(ctrl.rep1.reprod[x,]), as.numeric(ctrl.rep2.reprod[x,]))),
@@ -1525,11 +1525,12 @@ saveRDS(fraction25.peak.ctrl.mms, file = "Non_synchronized_A549_fraction25.peak.
 saveRDS(precipitated.mms, file = "Non_synchronized_A549_precipitated.mms")
 ```
 
-## 6. Gaussian fit 
+## 6. Gaussian fit
 
 ### 6.1 Gaussian fit for Mean Value Method normalized data
 
 Defining relevant parameters for the gauss curve for all proteins of the Control group.
+
 ```{r}
 # Anzahl der Zeilen im Dataframe
 num_rows <- nrow(ctrl.mvm)
@@ -1572,6 +1573,7 @@ for (i in 1:num_rows) {
 ```
 
 Defining relevant parameters for the gauss curve for all proteins of the RNase group.
+
 ```{r}
 num_rows <- nrow(rnase.mvm)
 
@@ -1608,6 +1610,7 @@ for (i in 1:num_rows) {
 ### 6.2 Gaussian fit for z-Transformation normalized data
 
 Defining relevant parameters for the gauss curve for all proteins of the Control group.
+
 ```{r}
 num_rows <- nrow(ctrl.zt)
 
@@ -1642,6 +1645,7 @@ for (i in 1:num_rows) {
 ```
 
 Defining relevant parameters for the gauss curve for all proteins of the RNase group.
+
 ```{r}
 num_rows <- nrow(rnase.zt)
 
@@ -1678,6 +1682,7 @@ for (i in 1:num_rows) {
 ### 6.3 Gaussian fit for Min-Max-Scaling normalized data
 
 Defining relevant parameters for the gauss curve for all proteins of the Control group.
+
 ```{r}
 num_rows <- nrow(ctrl.mms)
 
@@ -1712,6 +1717,7 @@ for (i in 1:num_rows) {
 ```
 
 Defining relevant parameters for the gauss curve for all proteins of the RNase group.
+
 ```{r}
 num_rows <- nrow(rnase.mvm)
 
@@ -1745,9 +1751,9 @@ for (i in 1:num_rows) {
 }
 ```
 
-###6.4 Plotting of gauss curves 
+###6.4 Plotting of gauss curves
 
-####6.4.1 example of how to plot the curves for all proteins of the Control group 
+####6.4.1 example of how to plot the curves for all proteins of the Control group
 
 ```{r}
 num_rows <- nrow(parameter_gaussian_ctrl.zt_table)
@@ -1779,7 +1785,8 @@ for (i in 1:num_rows) {
 }
 ```
 
-####6.4.2 example how to plot the Control and RNase curve of one specific protein 
+####6.4.2 example how to plot the Control and RNase curve of one specific protein
+
 ```{r}
 n=1  #Number of protein you want to see
 x <- c(1:25)
@@ -1798,7 +1805,6 @@ curve(gauss(x, a=a2, mu=mu2, sigma=sigma2), from = min(x), to = max(x), add = TR
 ```
 
 Hinweis: Um die Graphen einer anderen Normalisierungsmethode zu sehen, kann zt in mvm oder mms abgeändert werden.
-
 
 ## 7. Shifts
 
@@ -1921,14 +1927,28 @@ length(shift_mvm_named[shift_mvm_named == "left shift"])
 ```{r}
 length(shift_mvm_named[shift_mvm_named == "precipitated"])
 ```
+ 
+To be able to use the data whether a protein is clustered or not, we need to put it in a vector
+```{r}
+precipitated.mvm
+
+precipitated.mvm.v <- vector(mode = "numeric", length = dim(ctrl.mvm)[1])
+
+for (i in 1:dim(ctrl.mvm)[1]){
+  if (i %in% precipitated.mvm){
+    precipitated.mvm.v[i] <- 1
+  }
+  else {
+    precipitated.mvm.v[i] <- 0
+  }
+}
+
+```
 
 ### 6.2. Shifts with z-Transformation
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
-```{r}
-precipitated.zt
-```
 
 ```{r}
 n = 2
@@ -1961,13 +1981,27 @@ length(shift_zt_named[shift_zt_named == "left shift"])
 length(shift_zt_named[shift_zt_named == "precipitated"])
 ```
 
+
+To be able to use the data whether a protein is clustered or not, we need to put it in a vector
+```{r}
+precipitated.zt
+
+precipitated.zt.v <- vector(mode = "numeric", length = dim(ctrl.zt)[1])
+
+for (i in 1:dim(ctrl.zt)[1]){
+  if (i %in% precipitated.zt){
+    precipitated.zt.v[i] <- 1
+  }
+  else {
+    precipitated.zt.v[i] <- 0
+  }
+}
+```
+
+
 ### 6.3. Shifts with Min-Max Scaling
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
-
-```{r}
-precipitated.mms
-```
 
 ```{r}
 n = 2
@@ -2000,30 +2034,54 @@ length(shift_mms_named[shift_mms_named == "left shift"])
 length(shift_mms_named[shift_mms_named == "precipitated"])
 ```
 
+To be able to use the data whether a protein is clustered or not, we need to put it in a vector
+```{r}
+precipitated.mms
+
+precipitated.mms.v <- vector(mode = "numeric", length = dim(ctrl.mms)[1])
+
+for (i in 1:dim(ctrl.mms)[1]){
+  if (i %in% precipitated.mms){
+    precipitated.mms.v[i] <- 1
+  }
+  else {
+    precipitated.mms.v[i] <- 0
+  }
+}
+
+```
+
 ## 8. Kmeans clustering
 
 ### 8.1. MVM
 
 First we will set the variables:
+Nur temporär das kmeans funktioniert
+
+```{r}
+#shift of local maxima
+lshift.mvm <- sample(1:100, length(shift.mms), replace = TRUE)
+
+```
+
 ```{r}
 
 gshift <- shift_mvm_global
 lshift <- lshift.mvm
-precipitated <- precipitated.mvm
+precipitated <- precipitated.mvm.v
 
 w.gshift <- 1
 w.lshift <- 0
-w.precipitated <- 0
+w.precipitated <- 5
 
-peak.ctrl <- peak.mvm.ctrl
-peak.rnase <- peak.mvm.rnase
+peak.ctrl <- globalpeak.ctrl.mvm
+peak.rnase <- globalpeak.rnase.mvm
 
 ```
 
 #### 8.1.1. Parameters
 
-We want kmeans to consider different parameters for this we put them in a matrix.
-Here we create and normalize/scale the matrix:
+We want kmeans to consider different parameters for this we put them in a matrix. Here we create and normalize/scale the matrix:
 
 ```{r}
 parameters.raw <- cbind(gshift, lshift, precipitated)
@@ -2050,7 +2108,6 @@ for (i in seq_along(weight)){
 parameters <- parameters.scaled
 
 ```
-
 
 #### 8.1.2. kmeans - clustering
 
@@ -2132,24 +2189,24 @@ dot.plot +
 ### 8.2. zt
 
 First we will set the variables:
+
 ```{r}
 
 gshift <- shift_zt_global
 lshift <- lshift.mvm
-precipitated <- precipitated.mvm
+precipitated <- precipitated.zt.v
 
 w.gshift <- 1
 w.lshift <- 0
-w.precipitated <- 0
+w.precipitated <- 5
 
-peak.ctrl <- peak.mms.ctrl
-peak.rnase <- peak.mms.rnase
+peak.ctrl <- globalpeak.ctrl.zt
+peak.rnase <- globalpeak.rnase.zt
 ```
 
 #### 8.2.1. Parameters
 
-We want kmeans to consider different parameters for this we put them in a matrix.
-Here we create and normalize/scale the matrix:
+We want kmeans to consider different parameters for this we put them in a matrix. Here we create and normalize/scale the matrix:
 
 ```{r}
 parameters.raw <- cbind(gshift, lshift, precipitated)
@@ -2177,7 +2234,6 @@ parameters <- parameters.scaled
 
 ```
 
-
 #### 8.2.2. kmeans - clustering
 
 Now we cluster the proteins depending on their parameters:
@@ -2188,7 +2244,7 @@ n <- 3
 km.zt <- kmeans(parameters, centers = n, nstart = 100)
 ```
 
-#### 8.2.3. Plot 
+#### 8.2.3. Plot
 
 Let's plot the peaks against each other:
 
@@ -2259,7 +2315,7 @@ dot.plot +
 
 First we will set the variables:
 
-Nur temporär das kmeans funktioniert  
+Nur temporär das kmeans funktioniert
 
 ```{r}
 #shift of local maxima
@@ -2276,7 +2332,7 @@ precipitated.mms <- sample(1:2, length(shift.mms), replace = TRUE)
 
 gshift <- shift_mms_global
 lshift <- lshift.mms
-precipitated <- precipitated.mms
+precipitated <- precipitated.mms.v
 
 w.gshift <- 1
 w.lshift <- 5
@@ -2289,8 +2345,7 @@ peak.rnase <- peak.mms.rnase
 
 #### 8.3.1. Parameters
 
-We want kmeans to consider different parameters for this we put them in a matrix.
-Here we create and normalize/scale the matrix:
+We want kmeans to consider different parameters for this we put them in a matrix. Here we create and normalize/scale the matrix:
 
 ```{r}
 parameters.raw <- cbind(gshift, lshift, precipitated)
@@ -2304,7 +2359,7 @@ parameters.scaled <- apply(parameters.raw, 2, function(x) {
 
 ```
 
-Not every variable has the same importance. We can weigh them accordingly. 
+Not every variable has the same importance. We can weigh them accordingly.
 
 ```{r}
 
@@ -2321,10 +2376,9 @@ View(parameters)
 
 ```
 
-
 #### 8.3.2. kmeans - clustering
 
-Now we want to calculate the shift between RNase and Control samples. The value of the RNase-peak will be subtracted from the value of the Control-peak. To know what would be the optimum of clusters we use the elbow method 
+Now we want to calculate the shift between RNase and Control samples. The value of the RNase-peak will be subtracted from the value of the Control-peak. To know what would be the optimum of clusters we use the elbow method
 
 ```{r}
 
