@@ -1525,7 +1525,227 @@ saveRDS(fraction25.peak.ctrl.mms, file = "Non_synchronized_A549_fraction25.peak.
 saveRDS(precipitated.mms, file = "Non_synchronized_A549_precipitated.mms")
 ```
 
-## 6. Shifts
+## 6. Gaussian fit 
+
+### 6.1 Gaussian fit for Mean Value Method normalized data
+
+Defining relevant parameters for the gauss curve for all proteins of the Control group.
+```{r}
+# Anzahl der Zeilen im Dataframe
+num_rows <- nrow(ctrl.mvm)
+
+# Tabelle zum Speichern der Parameter
+parameter_gaussian_ctrl.mvm_table <- data.frame(a = numeric(),
+                              mu = numeric(),
+                              sigma = numeric())
+
+# Iteriere über jede Zeile 
+for (i in 1:num_rows) {
+  x <- c(1:25)
+  y <- as.numeric(ctrl.mvm[i,])
+
+  # Gaussfunktion: f(x) = a * exp(-((x - mu)^2) / (2 * sigma^2))
+  gauss <- function(x, a, mu, sigma) {
+    return(a * exp(-((x - mu)^2) / (2 * sigma^2)))
+  }
+
+  #Finden der besten Parameter für die Gaussfunktion, um die Datenpunkte anzupassen
+  fit_function <- function(params) {
+    a <- params[1]
+    mu <- params[2]
+    sigma <- params[3]
+
+    # Berechne die Summe der quadrierten Abweichungen zwischen der Gaussfunktion und den Datenpunkten
+    squared_diff <- (gauss(x, a, mu, sigma) - y)^2
+    sum_squared_diff <- sum(squared_diff)
+
+    return(sum_squared_diff)
+  }
+
+  # Schätze die Parameter, die die besten Anpassungswerte liefern
+  initial_params <- c(1, 3, 1)  # Startwerte für die Parameter a, mu und sigma
+  optimized_params <- optim(initial_params, fit_function)$par
+
+  # Speichere die geschätzten Parameter in der Tabelle
+  parameter_gaussian_ctrl.mvm_table <- rbind(parameter_gaussian_ctrl.mvm_table, optimized_params)
+}
+```
+
+Defining relevant parameters for the gauss curve for all proteins of the RNase group.
+```{r}
+num_rows <- nrow(rnase.mvm)
+
+parameter_gaussian_rnase.mvm_table <- data.frame(a = numeric(),
+                              mu = numeric(),
+                              sigma = numeric())
+
+for (i in 1:num_rows) {
+  x <- c(1:25)
+  y <- as.numeric(rnase.mvm[i,])
+
+  gauss <- function(x, a, mu, sigma) {
+    return(a * exp(-((x - mu)^2) / (2 * sigma^2)))
+  }
+
+  fit_function <- function(params) {
+    a <- params[1]
+    mu <- params[2]
+    sigma <- params[3]
+
+    squared_diff <- (gauss(x, a, mu, sigma) - y)^2
+    sum_squared_diff <- sum(squared_diff)
+
+    return(sum_squared_diff)
+  }
+
+  initial_params <- c(1, 3, 1) 
+  optimized_params <- optim(initial_params, fit_function)$par
+  
+  parameter_gaussian_rnase.mvm_table <- rbind(parameter_gaussian_rnase.mvm_table, optimized_params)
+}
+```
+
+### 6.2 Gaussian fit for z-Transformation normalized data
+
+Defining relevant parameters for the gauss curve for all proteins of the Control group.
+```{r}
+num_rows <- nrow(ctrl.zt)
+
+parameter_gaussian_ctrl.zt_table <- data.frame(a = numeric(),
+                              mu = numeric(),
+                              sigma = numeric())
+ 
+for (i in 1:num_rows) {
+  x <- c(1:25)
+  y <- as.numeric(ctrl.zt[i,])
+
+  gauss <- function(x, a, mu, sigma) {
+    return(a * exp(-((x - mu)^2) / (2 * sigma^2)))
+  }
+
+  fit_function <- function(params) {
+    a <- params[1]
+    mu <- params[2]
+    sigma <- params[3]
+    
+    squared_diff <- (gauss(x, a, mu, sigma) - y)^2
+    sum_squared_diff <- sum(squared_diff)
+
+    return(sum_squared_diff)
+  }
+
+  initial_params <- c(1, 3, 1) 
+  optimized_params <- optim(initial_params, fit_function)$par
+
+  parameter_gaussian_ctrl.zt_table <- rbind(parameter_gaussian_ctrl.zt_table, optimized_params)
+}
+```
+
+Defining relevant parameters for the gauss curve for all proteins of the RNase group.
+```{r}
+num_rows <- nrow(rnase.zt)
+
+parameter_gaussian_rnase.zt_table <- data.frame(a = numeric(),
+                              mu = numeric(),
+                              sigma = numeric())
+
+for (i in 1:num_rows) {
+  x <- c(1:25)
+  y <- as.numeric(rnase.zt[i,])
+
+  gauss <- function(x, a, mu, sigma) {
+    return(a * exp(-((x - mu)^2) / (2 * sigma^2)))
+  }
+
+  fit_function <- function(params) {
+    a <- params[1]
+    mu <- params[2]
+    sigma <- params[3]
+
+    squared_diff <- (gauss(x, a, mu, sigma) - y)^2
+    sum_squared_diff <- sum(squared_diff)
+
+    return(sum_squared_diff)
+  }
+
+  initial_params <- c(1, 3, 1) 
+  optimized_params <- optim(initial_params, fit_function)$par
+  
+  parameter_gaussian_rnase.zt_table <- rbind(parameter_gaussian_rnase.zt_table, optimized_params)
+}
+```
+
+### 6.3 Gaussian fit for Min-Max-Scaling normalized data
+
+Defining relevant parameters for the gauss curve for all proteins of the Control group.
+```{r}
+num_rows <- nrow(ctrl.mms)
+
+parameter_gaussian_ctrl.mms_table <- data.frame(a = numeric(),
+                              mu = numeric(),
+                              sigma = numeric())
+ 
+for (i in 1:num_rows) {
+  x <- c(1:25)
+  y <- as.numeric(ctrl.mms[i,])
+
+  gauss <- function(x, a, mu, sigma) {
+    return(a * exp(-((x - mu)^2) / (2 * sigma^2)))
+  }
+
+  fit_function <- function(params) {
+    a <- params[1]
+    mu <- params[2]
+    sigma <- params[3]
+    
+    squared_diff <- (gauss(x, a, mu, sigma) - y)^2
+    sum_squared_diff <- sum(squared_diff)
+
+    return(sum_squared_diff)
+  }
+
+  initial_params <- c(1, 3, 1) 
+  optimized_params <- optim(initial_params, fit_function)$par
+
+  parameter_gaussian_ctrl.mms_table <- rbind(parameter_gaussian_ctrl.mms_table, optimized_params)
+}
+```
+
+Defining relevant parameters for the gauss curve for all proteins of the RNase group.
+```{r}
+num_rows <- nrow(rnase.mvm)
+
+parameter_gaussian_rnase.mvm_table <- data.frame(a = numeric(),
+                              mu = numeric(),
+                              sigma = numeric())
+
+for (i in 1:num_rows) {
+  x <- c(1:25)
+  y <- as.numeric(rnase.mvm[i,])
+
+  gauss <- function(x, a, mu, sigma) {
+    return(a * exp(-((x - mu)^2) / (2 * sigma^2)))
+  }
+
+  fit_function <- function(params) {
+    a <- params[1]
+    mu <- params[2]
+    sigma <- params[3]
+
+    squared_diff <- (gauss(x, a, mu, sigma) - y)^2
+    sum_squared_diff <- sum(squared_diff)
+
+    return(sum_squared_diff)
+  }
+
+  initial_params <- c(1, 3, 1) 
+  optimized_params <- optim(initial_params, fit_function)$par
+  
+  parameter_gaussian_rnase.mvm_table <- rbind(parameter_gaussian_rnase.mvm_table, optimized_params)
+}
+```
+
+## 7. Shifts
 
 Load the relevant data:
 
