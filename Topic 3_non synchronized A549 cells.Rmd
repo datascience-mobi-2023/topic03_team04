@@ -1600,3 +1600,440 @@ fraction25.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.
 
 precipitated.mms <- readRDS("Non_synchronized_A549_precipitated.mms")
 ```
+
+
+### 6.3. MMS
+
+Nur temporär das kemans funktioniert  
+
+```{r}
+#control group
+peak.mms.ctrl <- c()
+for (x in 1:dim(ctrl.mms)[1]){
+   peak.mms.ctrl[x] <- which(ctrl.mms[x,] == 1)
+}
+
+#RNase group
+peak.mms.rnase <- c()
+for (x in 1:dim(rnase.mms)[1]){
+   peak.mms.rnase[x] <- which(rnase.mms[x,] == 1)
+}
+
+#shift of global maxima
+gshift.mms <- peak.mms.ctrl - peak.mms.rnase
+
+#shift of local maxima
+lshift.mms <- sample(1:100, length(shift.mms), replace = TRUE)
+
+#overlap
+overlap.mms <- sample(1:100, length(shift.mms), replace = TRUE)
+
+#precipitated
+precipitated.mms <- sample(1:2, length(shift.mms), replace = TRUE)
+```
+
+
+## 7. Kmeans clustering
+
+### 7.1. MVM
+
+First we will set the variables:
+```{r}
+
+gshift <- gshift.mvm
+lshift <- lshift.mvm
+precipitated <- precipitated.mvm
+
+w.gshift <- 1
+w.lshift <- 0
+w.precipitated <- 0
+
+peak.ctrl <- peak.mvm.ctrl
+peak.rnase <- peak.mvm.rnase
+
+```
+
+#### 7.1.1. Parameters
+
+We want kmeans to consider different parameters for this we put them in a matrix.
+Here we create and normalize/scale the matrix:
+
+```{r}
+parameters.raw <- cbind(gshift, lshift, precipitated)
+
+rownames(parameters.raw) <- rownames(ctrl.mvm)
+
+#hier erst mal MMS, welche wir nehmen können wir noch entscheiden. 
+parameters.scaled <- apply(parameters.raw, 2, function(x) {
+  normalized <- (x-min(x))/(max(x)-min(x))
+})
+
+```
+
+Not every variable has the same importance. We can weigh the
+
+```{r}
+
+weight <- c(w.gshift, w.lshift, w.precipitated)
+
+for (i in seq_along(weight)){
+  parameters.scaled[,i] <- parameters.scaled[,i]*weight[i]
+}
+
+parameters <- parameters.scaled
+
+```
+
+
+#### 7.1.2. kmeans - clustering
+
+Now we cluster the proteins depending on their parameters:
+
+```{r}
+# n = Number of clusters
+n <- 3
+km.mvm <- kmeans(parameters, centers = n, nstart = 100)
+```
+
+#### 7.1.3. Plot
+
+Let's plot the peaks against each other:
+
+```{r}
+cluster <- km.mvm$cluster
+
+#abhängig davon ob es drei oder vier cluster gibt werden unterschiedliche Vektoren verwendet:
+
+if (n == 3){
+  col <- c("springgreen", "violetred1", "cyan")
+  vjust <- c(1, -0.5, -0.5)
+  labels <- c("no shift", "left shift", "right shift")
+}
+if (n == 4){
+  col <- c("springgreen", "violetred1", "cyan", "orange")
+  vjust <- c(-0.5, -0.5, -0.5, -0.5)
+  labels <- c("left shift", "right shift", "no shift", "precipitated")
+}
+
+library("ggplot2")
+
+#hier wird ein Datframe mit allen für den dotplot relevanten daten erstellt
+peaks <- data.frame(peak.ctrl, peak.rnase, cluster)
+
+
+#für den barplot muss der auch die Ergebnisse des Clusterings als Dataframe dargestellt werden
+number.of.clusters <- data.frame(value = cluster)
+
+#das cluster muss als factor dargestellt sein, vector geht nicht
+peaks$cluster <- factor(peaks$cluster)
+
+#hier wird der dotplot erstellt der die peaks gegeneinander aufträgt. Die Punkte werden abhängig von ihrer shiftart eingefärbt
+dot.plot <- ggplot(peaks, aes(peak.ctrl,peak.rnase)) + 
+  geom_point(aes(colour = cluster), shape = 19, alpha = 0.5, size = 2)+
+  labs(x = "Fraction of Control Peak", y = "Fraction of RNase Peak", title = "Peak distribution")+
+  coord_equal()+
+  scale_colour_manual(values = col,labels = labels)+
+  theme_light()
+
+
+# hier wird ein Barplot erstellt der anzeigt, wie oft die shifttypes jeweils vorkommen
+bar.plot <- ggplot(number.of.clusters, aes(factor(value)))+
+  geom_bar(fill = col
+           , width = 0.5)+
+  theme_minimal()+
+  theme(axis.text.x = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_rect(color = "grey", fill = NA),
+        panel.background = element_rect(fill = "white", colour = NA))+
+  geom_text(stat = 'count', 
+            aes(label = after_stat(count)), 
+            vjust = vjust, 
+            size = 2.5)
+
+#hier werden die beiden plots zusammengefügt. Der barplot wird unten rechts klein angezeigt
+dot.plot +
+  annotation_custom(grob = ggplotGrob(bar.plot), 
+                    xmin = 15, 
+                    xmax = 27, 
+                    ymin = -1, 
+                    ymax = 8)
+```
+
+### 7.2. zt
+
+First we will set the variables:
+```{r}
+
+gshift <- gshift.mvm
+lshift <- lshift.mvm
+precipitated <- precipitated.mvm
+
+w.gshift <- 1
+w.lshift <- 0
+w.precipitated <- 0
+
+peak.ctrl <- peak.mms.ctrl
+peak.rnase <- peak.mms.rnase
+```
+
+#### 7.2.1. Parameters
+
+We want kmeans to consider different parameters for this we put them in a matrix.
+Here we create and normalize/scale the matrix:
+
+```{r}
+parameters.raw <- cbind(gshift, lshift, precipitated)
+
+rownames(parameters.raw) <- rownames(ctrl.zt)
+
+#hier erst mal MMS, welche wir nehmen können wir noch entscheiden. 
+parameters.scaled <- apply(parameters.raw, 2, function(x) {
+  normalized <- (x-min(x))/(max(x)-min(x))
+})
+
+```
+
+Not every variable has the same importance. We can weigh the
+
+```{r}
+
+weight <- c(w.gshift, w.lshift, w.precipitated)
+
+for (i in seq_along(weight)){
+  parameters.scaled[,i] <- parameters.scaled[,i]*weight[i]
+}
+
+parameters <- parameters.scaled
+
+```
+
+
+#### 7.2.2. kmeans - clustering
+
+Now we cluster the proteins depending on their parameters:
+
+```{r}
+# n = Number of clusters
+n <- 3
+km.zt <- kmeans(parameters, centers = n, nstart = 100)
+```
+
+#### 7.2.3. Plot 
+
+Let's plot the peaks against each other:
+
+```{r}
+cluster <- km.zt$cluster
+
+#abhängig davon ob es drei oder vier cluster gibt werden unterschiedliche Vektoren verwendet:
+
+if (n == 3){
+  col <- c("springgreen", "violetred1", "cyan")
+  vjust <- c(1, -0.5, -0.5)
+  labels <- c("no shift", "left shift", "right shift")
+}
+if (n == 4){
+  col <- c("springgreen", "violetred1", "cyan", "orange")
+  vjust <- c(-0.5, -0.5, -0.5, -0.5)
+  labels <- c("left shift", "right shift", "no shift", "precipitated")
+}
+
+library("ggplot2")
+
+#hier wird ein Datframe mit allen für den dotplot relevanten daten erstellt
+peaks <- data.frame(peak.ctrl, peak.rnase, cluster)
+
+
+#für den barplot muss der auch die Ergebnisse des Clusterings als Dataframe dargestellt werden
+number.of.clusters <- data.frame(value = cluster)
+
+#das cluster muss als factor dargestellt sein, vector geht nicht
+peaks$cluster <- factor(peaks$cluster)
+
+#hier wird der dotplot erstellt der die peaks gegeneinander aufträgt. Die Punkte werden abhängig von ihrer shiftart eingefärbt
+dot.plot <- ggplot(peaks, aes(peak.ctrl,peak.rnase)) + 
+  geom_point(aes(colour = cluster), shape = 19, alpha = 0.5, size = 2)+
+  labs(x = "Fraction of Control Peak", y = "Fraction of RNase Peak", title = "Peak distribution")+
+  coord_equal()+
+  scale_colour_manual(values = col,labels = labels)+
+  theme_light()
+
+
+# hier wird ein Barplot erstellt der anzeigt, wie oft die shifttypes jeweils vorkommen
+bar.plot <- ggplot(number.of.clusters, aes(factor(value)))+
+  geom_bar(fill = col
+           , width = 0.5)+
+  theme_minimal()+
+  theme(axis.text.x = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_rect(color = "grey", fill = NA),
+        panel.background = element_rect(fill = "white", colour = NA))+
+  geom_text(stat = 'count', 
+            aes(label = after_stat(count)), 
+            vjust = vjust, 
+            size = 2.5)
+
+#hier werden die beiden plots zusammengefügt. Der barplot wird unten rechts klein angezeigt
+dot.plot +
+  annotation_custom(grob = ggplotGrob(bar.plot), 
+                    xmin = 15, 
+                    xmax = 27, 
+                    ymin = -1, 
+                    ymax = 8)
+```
+
+### 7.3. MMS
+
+First we will set the varables:
+```{r}
+
+gshift <- gshift.mms
+lshift <- lshift.mms
+precipitated <- precipitated.mms
+
+w.gshift <- 1
+w.lshift <- 0
+w.precipitated <- 0
+
+peak.ctrl <- peak.mms.ctrl
+peak.rnase <- peak.mms.rnase
+
+```
+
+#### 7.3.1. Parameters
+
+We want kmeans to consider different parameters for this we put them in a matrix.
+Here we create and normalize/scale the matrix:
+
+```{r}
+parameters.raw <- cbind(gshift, lshift, precipitated)
+
+rownames(parameters.raw) <- rownames(ctrl.mms)
+
+#hier erst mal MMS, welche wir nehmen können wir noch entscheiden. 
+parameters.scaled <- apply(parameters.raw, 2, function(x) {
+  normalized <- (x-min(x))/(max(x)-min(x))
+})
+
+```
+
+Not every variable has the same importance. We can weigh them accordingly. 
+
+```{r}
+
+weight <- c(w.gshift, w.lshift, w.precipitated)
+
+for (i in seq_along(weight)){
+  parameters.scaled[,i] <- parameters.scaled[,i]*weight[i]
+}
+
+parameters <- parameters.scaled
+
+#View(parameters)
+```
+
+
+#### 7.3.2. kmeans - clustering
+
+Now we want to calculate the shift between RNase and Control samples. The value of the RNase-peak will be subtracted from the value of the Control-peak. To know what would be the optimum of clusters we use the elbow method 
+
+```{r}
+
+
+wss <- sapply(1:5, function(x){
+  kmeans(parameters, centers = x, nstart = 100)$tot.withinss
+})
+
+
+library("ggplot2")
+wss.df <- data.frame(values = wss)
+ggplot(wss.df, aes(x = 1:length(wss), y = values))+
+  geom_line(col = "mediumvioletred")+
+  geom_point(col = "midnightblue")+
+  labs(x = "Number of clusters", y = "number of assigned proteins")+
+  theme(panel.border = element_rect(color="grey", fill = NA))
+
+
+```
+
+Now we cluster the proteins depending on their shift:
+
+```{r}
+# n = Number of clusters
+n <- 3
+km.mms <- kmeans(parameters, centers = n, nstart = 100)
+```
+
+#### 7.3.3. Plot
+
+Let's plot the peaks against each other:
+
+```{r}
+
+cluster <- km.mms$cluster
+
+#abhängig davon ob es drei oder vier cluster gibt werden unterschiedliche Vektoren verwendet:
+
+if (n == 3){
+  col <- c("springgreen", "violetred1", "cyan")
+  vjust <- c(1, -0.5, -0.5)
+  labels <- c("no shift", "left shift", "right shift")
+}
+if (n == 4){
+  col <- c("springgreen", "violetred1", "cyan", "orange")
+  vjust <- c(-0.5, -0.5, -0.5, -0.5)
+  labels <- c("left shift", "right shift", "no shift", "precipitated")
+}
+
+library("ggplot2")
+
+#hier wird ein Datframe mit allen für den dotplot relevanten daten erstellt
+peaks <- data.frame(peak.ctrl, peak.rnase, cluster)
+
+
+#für den barplot muss der auch die Ergebnisse des Clusterings als Dataframe dargestellt werden
+number.of.clusters <- data.frame(value = cluster)
+
+#das cluster muss als factor dargestellt sein, vector geht nicht
+peaks$cluster <- factor(peaks$cluster)
+
+#hier wird der dotplot erstellt der die peaks gegeneinander aufträgt. Die Punkte werden abhängig von ihrer shiftart eingefärbt
+dot.plot <- ggplot(peaks, aes(peak.ctrl,peak.rnase)) + 
+  geom_point(aes(colour = cluster), shape = 19, alpha = 0.5, size = 2)+
+  labs(x = "Fraction of Control Peak", y = "Fraction of RNase Peak", title = "Peak distribution")+
+  coord_equal()+
+  scale_colour_manual(values = col,labels = labels)+
+  theme_light()
+
+
+# hier wird ein Barplot erstellt der anzeigt, wie oft die shifttypes jeweils vorkommen
+bar.plot <- ggplot(number.of.clusters, aes(factor(value)))+
+  geom_bar(fill = col
+           , width = 0.5)+
+  theme_minimal()+
+  theme(axis.text.x = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_rect(color = "grey", fill = NA),
+        panel.background = element_rect(fill = "white", colour = NA))+
+  geom_text(stat = 'count', 
+            aes(label = after_stat(count)), 
+            vjust = vjust, 
+            size = 2.5)
+
+#hier werden die beiden plots zusammengefügt. Der barplot wird unten rechts klein angezeigt
+dot.plot +
+  annotation_custom(grob = ggplotGrob(bar.plot), 
+                    xmin = 15, 
+                    xmax = 27, 
+                    ymin = -1, 
+                    ymax = 8)
+```
