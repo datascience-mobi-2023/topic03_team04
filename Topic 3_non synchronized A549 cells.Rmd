@@ -1030,7 +1030,7 @@ for (i in 1:num_rows) {
       geom_point(aes(y=yctrl, color="CTRL"))+
       xlab("Fractions") +
       ylab("Protein amount") +
-      labs(title = paste("zt Transformation -",protein.names[i])) +
+      labs(title = paste("z Transformation -",protein.names[i])) +
       scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
     
     
@@ -1530,6 +1530,17 @@ saveRDS(precipitated.mms, file = "Non_synchronized_A549_precipitated.mms")
 Load the relevant data:
 
 ```{r}
+ctrl.mvm <- readRDS("Non_synchronized_A549_ctrl.mvm")
+rnase.mvm <- readRDS("Non_synchronized_A549_rnase.mvm")
+
+ctrl.zt <- readRDS("Non_synchronized_A549_ctrl.zt")
+rnase.zt <- readRDS("Non_synchronized_A549_rnase.zt")
+
+ctrl.mms <- readRDS("Non_synchronized_A549_ctrl.mms")
+rnase.mms <- readRDS("Non_synchronized_A549_rnase.mms")
+```
+
+```{r}
 #mvm
 
 globalpeak.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mvm")
@@ -1599,4 +1610,117 @@ fraction1.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mm
 fraction25.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mms")
 
 precipitated.mms <- readRDS("Non_synchronized_A549_precipitated.mms")
+```
+
+### 6.1. Shifts with Mean Value Method
+
+In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
+
+```{r}
+n = 2
+shift_mvm_global <- globalpeak.rnase.mvm - globalpeak.ctrl.mvm
+
+shift_mvm_named <- shift_mvm_global
+for (i in 1:nrow(rnase.mvm)) {
+  if (i %in% precipitated.mvm) {shift_mvm_named[i] <- "precipitated"}
+  else if (shift_mvm_global [i] < (-n)){shift_mvm_named [i] <- "right shift"}
+  else if (shift_mvm_global [i] > n){shift_mvm_named [i] <- "left shift"}
+  else (shift_mvm_named [i] <- "no shift")
+}
+
+# View(shift_mvm_named)
+```
+
+```{r}
+length(shift_mvm_named[shift_mvm_named == "right shift"])
+```
+
+```{r}
+length(shift_mvm_named[shift_mvm_named == "no shift"])
+```
+
+```{r}
+length(shift_mvm_named[shift_mvm_named == "left shift"])
+```
+
+```{r}
+length(shift_mvm_named[shift_mvm_named == "precipitated"])
+```
+
+### 6.2. Shifts with z-Transformation
+
+In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
+
+```{r}
+precipitated.zt
+```
+
+```{r}
+n = 2
+shift_zt_global <- globalpeak.rnase.zt - globalpeak.ctrl.zt
+
+shift_zt_named <- shift_zt_global
+for (i in 1:nrow(ctrl.zt)) {
+  if (i %in% precipitated.zt) {shift_zt_named[i] <- "precipitated"}
+  else if (shift_zt_global [i] < (-n)){shift_zt_named [i] <- "right shift"}
+  else if (shift_zt_global [i] > n){shift_zt_named [i] <- "left shift"}
+  else (shift_zt_named [i] <- "no shift")
+}
+
+# View(shift_zt_named)
+```
+
+```{r}
+length(shift_zt_named[shift_zt_named == "right shift"])
+```
+
+```{r}
+length(shift_zt_named[shift_zt_named == "no shift"])
+```
+
+```{r}
+length(shift_zt_named[shift_zt_named == "left shift"])
+```
+
+```{r}
+length(shift_zt_named[shift_zt_named == "precipitated"])
+```
+
+### 6.3. Shifts with Min-Max Scaling
+
+In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
+
+```{r}
+precipitated.mms
+```
+
+```{r}
+n = 2
+shift_mms_global <- globalpeak.rnase.mms - globalpeak.ctrl.mms
+
+shift_mms_named <- shift_mms_global
+for (i in 1:nrow(ctrl.mms)) {
+  if (i %in% precipitated.mms) {shift_mms_named[i] <- "precipitated"}
+  else if (shift_mms_global [i] < (-n)){shift_mms_named [i] <- "right shift"}
+  else if (shift_mms_global [i] > n){shift_mms_named [i] <- "left shift"}
+  else (shift_mms_named [i] <- "no shift")
+}
+
+# View(shift_mms_named)
+```
+
+```{r}
+length(shift_mms_named[shift_mms_named == "right shift"])
+```
+
+```{r}
+length(shift_mms_named[shift_mms_named == "no shift"])
+```
+
+```{r}
+length(shift_mms_named[shift_mms_named == "left shift"])
+```
+
+```{r}
+length(shift_mms_named[shift_mms_named == "precipitated"])
 ```
