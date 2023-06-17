@@ -1652,10 +1652,6 @@ length(shift_mvm_named[shift_mvm_named == "precipitated"])
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
 ```{r}
-precipitated.zt
-```
-
-```{r}
 n = 2
 shift_zt_global <- globalpeak.rnase.zt - globalpeak.ctrl.zt
 
@@ -1691,10 +1687,6 @@ length(shift_zt_named[shift_zt_named == "precipitated"])
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
 ```{r}
-precipitated.mms
-```
-
-```{r}
 n = 2
 shift_mms_global <- globalpeak.rnase.mms - globalpeak.ctrl.mms
 
@@ -1723,4 +1715,89 @@ length(shift_mms_named[shift_mms_named == "left shift"])
 
 ```{r}
 length(shift_mms_named[shift_mms_named == "precipitated"])
+```
+```{r}
+# mvm
+saveRDS(shift_mvm_named, file = "Non_synchronized_A549_shift_mvm_named")
+
+# mms
+saveRDS(shift_zt_named, file = "Non_synchronized_A549_shift_zt_named")
+
+# mms
+saveRDS(shift_mms_named, file = "Non_synchronized_A549_shift_mms_named")
+```
+
+
+## Comparison with dataset RDeep2.0
+
+```{r}
+shift.mvm.named <- readRDS("Non_synchronized_A549_shift_mvm_named")
+shift.zt.named <- readRDS("Non_synchronized_A549_shift_zt_named")
+shift.mms.named <- readRDS("Non_synchronized_A549_shift_mms_named")
+```
+
+```{r}
+rdeep <- read.csv('RBP2GO_Human_database_RBPs.csv', header=TRUE, row.names=1, sep = ";")
+# View(rdeep)
+```
+
+```{r}
+text <- "Table_HS_Non_RBP.txt"
+csv <- "Table_HS_Non_RBP.csv"
+
+# Textdatei einlesen
+non.rdeep.text <- read.table(text, sep = "\t", header = TRUE, quote = "\"")
+
+# CSV-Datei schreiben
+write.csv(non.rdeep.text,csv, row.names = FALSE)
+
+non.rdeep <- read.csv(csv)
+View(non.rdeep)
+```
+
+### z-transformation
+
+Finally, we compare our results with the Database of RNA-Binding Proteins and their Functions from RBP2Go.
+
+```{r}
+shift.zt.named.df <- as.data.frame(shift.zt.named)
+
+names.rbps.zt <-  rownames(subset(shift.zt.named.df, shift_zt_named %in% c("right shift", "left shift")))
+
+names.non.rbps.zt <-  rownames(subset(shift.zt.named.df, shift_zt_named %in% c("no shift")))
+
+rownames.zt <- rownames(subset(shift.zt.named.df, shift_zt_named %in% c("no shift","right shift", "left shift")))
+
+```
+
+```{r}
+View(rdeep)
+```
+
+
+Check how many of our proteins are in the data set present and are RBPs or not.
+
+```{r}
+# Identify non_RBPS
+
+counter <- 0
+
+for (i in rownames.zt) {
+  if (i %in% non.rdeep$Entry_Name) {
+    counter <- counter + 1
+  }
+}
+counter
+```
+```{r}
+# Identify RBPS
+
+counter <- 0
+
+for (i in rownames.zt) {
+  if (i %in% rownames(rdeep)) {
+    counter <- counter + 1
+  }
+}
+counter
 ```
