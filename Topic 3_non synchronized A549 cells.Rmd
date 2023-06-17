@@ -817,7 +817,7 @@ The result of this part are three times (Methods) two (Ctrl and RNase) normalize
 ```{r}
 # View(ctrl.zt) 
 # View(rnase.zt)
-rnase.zt
+
 Nr <- c(1:dim(rnase.zt)[1])
 rnase.with.proteinnumbers <- cbind(Nr, rnase.zt)
 # View(rnase.with.proteinnumbers)
@@ -841,6 +841,7 @@ colnames(rnase.zt.peaks) <- paste0("Rnase_Fraction", seq_along(colnames(rnase.zt
 maxpeaks <- apply(rnase.zt.peaks, 1, function(x){which.max(x)})
 maxpeaks.value <- apply(rnase.zt.peaks, 1, function(x){max(x)})
 min(maxpeaks.value)
+
 ```
 
 Calculation of all peaks: global and local
@@ -852,6 +853,8 @@ peaks <- apply(rnase.zt.peaks, 1,
                                     function(i) sd(x[(i-1):(i+1)]))
                  peak_indices[peak_sd > mean.sd]})
 peaks.values <- lapply(seq_along(peaks), function(i) rnase.zt.peaks[i, peaks[[i]]])
+View(peaks)
+View(rnase.with.proteinnumbers)
 ```
 
 ```{r}
@@ -886,7 +889,7 @@ neighbors.peaks <- apply(rnase.zt.peaks, 1,
                  peak_indices <- peak_indices[peak_sd > mean.sd]
                  c(peak_indices - 1, peak_indices, peak_indices + 1)})
               
-View(neighbors.peaks)
+
 ```
 
 
@@ -911,11 +914,8 @@ boundary25.rnase <-lapply(1:nrow(rnase.zt), function(i) {
     return(NA)
   }
 })
-View(fraction25.peak.rnase)
-View(boundary25.rnase)
-View(boundary1.rnase)
-View(fraction1.peak.rnase)
-View(rnase.with.proteinnumbers)
+View(largevalues_without_maxima)
+
 ```
 precipitated proteins:
 ```{r}
@@ -926,6 +926,9 @@ precipitated.zt
 precipitated.rnase
 precipitated.ctrl
 rnase.zt[fraction25.peak.rnase,]
+
+
+
 ```
 ```{r}
   #Das ganze könnte noch enorm fehlerhaft sein! Beschreibung folgt, wenn code tatsächlich funktioniert
@@ -940,17 +943,57 @@ rnase.zt[fraction25.peak.rnase,]
  # increase_indices <- which(sapply(1:(length(i)-2), function(j) all(diff(i[j:(j+2)]) > 0)))
  # unique(c(increase_indices - 1 , increase_indices, increase_indices + 1))
 #})
-Ersatzdecreaseincrease <- apply(rnase.zt, 1, function(x) {
-    indices <- which(sapply(1:(length(x)-2), function(i) {
-      !all(diff(x[i:(i+2)]) > 0) & !all(diff(x[i:(i+2)]) < 0)
-    }))
-    if (length(indices) > 0) {
-      return(indices)
-    } else {
-      returninteger(0)
+
+#nonconsecutiveindices <- list()
+#for (i in 1:nrow(rnase.zt)) {
+ # row <- rnase.zt[i,]
+  #indices <- c()
+ # for (j in 1:(ncol(rnase.zt)-1)) {
+  #  values <- as.numeric(row[j:(j+1)])
+   # if (!(all(diff(values) > 0) || all(diff(values) < 0))) {
+     # indices <- c(indices, j)
+   # }
+  #}
+  #nonconsecutiveindices[[i]] <- indices
+#}
+
+#View(nonconsecutiveindices)
+#close_values <- list()
+#for (i in 1:nrow(rnase.zt)) {
+  #row <- rnase.zt[i,]
+  #indices <- c()
+  #for (j in 1:(ncol(rnase.zt)-2)) {
+   # values <- as.numeric(row[j:(j+2)])
+   # if (max(values[1], values[3]) != 0 && abs(values[1] - values[3]) / max(values[1], values[3]) < 0.1) {
+     # indices <- c(indices, j:(j+2))
+   # }
+  #}
+  #if (length(indices) == 0) {
+  #  close_values[[i]] <- numeric(0) # Verwende einen leeren Vektor statt NULL
+  #} else {
+ #   close_values[[i]] <- indices
+ # }
+#}
+
+close_values <- list()
+for (i in 1:nrow(rnase.zt)) {
+  row <- rnase.zt[i,]
+  indices <- c()
+  for (j in 1:(ncol(rnase.zt)-2)) {
+    values <- as.numeric(row[j:(j+2)])
+    if (sd(values) < 0.8) { 
+      indices <- c(indices, j:(j+2))
     }
-  })
-View(Ersatzdecreaseincrease)
+  }
+  if (length(indices) == 0) {
+    close_values[[i]] <- numeric(0)
+  } else {
+    close_values[[i]] <- indices
+  }
+}
+
+
+View(close_values)
 
 largevalues_without_maxima <- largevalues                  
 for (i in seq_along(largevalues_without_maxima)) {largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][!largevalues_without_maxima[[i]] %in% maxpeaks[[i]]]}
@@ -959,7 +1002,7 @@ largevalues_without_maxima <- largevalues
 for (i in seq_along(largevalues_without_maxima)) {largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][!largevalues_without_maxima[[i]] %in% neighbors.peaks[[i]]]}
 
 for (i in seq_along(largevalues_without_maxima)) {
-    largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][largevalues_without_maxima[[i]] %in% Ersatzdecreaseincrease[[i]]]
+    largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][largevalues_without_maxima[[i]] %in%  close_values[[i]]]
 }
 
 #for (i in seq_along(largevalues_without_maxima)) {largevalues_without_maxima[[i]] <- largevalues_without_maxima[[i]][!largevalues_without_maxima[[i]] %in% decreasingvalues[[i]]]}
@@ -986,7 +1029,7 @@ shoulderregion <- lapply(largevalues_without_maxima, find_consecutive_numbers)
 
 View(shoulderregion)
 View(largevalues_without_maxima)
-
+View(rnase.with.proteinnumbers)
 ```
 
 
@@ -1116,6 +1159,9 @@ for (i in 1:num_rows) {
     plots_RNase.zt[[i]] <- NULL
   }
 }
+
+
+
 
 ```
 
