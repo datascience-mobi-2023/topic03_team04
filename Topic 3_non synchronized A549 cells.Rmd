@@ -2474,3 +2474,67 @@ dot.plot +
                     ymin = -1, 
                     ymax = 8)
 ```
+
+
+```{r}
+
+peak.ctrl <- globalpeak.ctrl.zt
+peak.rnase <- globalpeak.rnase.zt
+
+as.list(globalpeak.ctrl.zt)
+neighborglobalpeak.ctrl.zt <-lapply(globalpeak.ctrl.zt, function(x) {
+  if( x > 2 & x < 24){ 
+    return(c(x-2, x-1, x, x+1, x+2))
+  }
+  else {return(NA)
+    }
+  }
+  )
+lglobalpeak.rnase.zt <-as.list(globalpeak.rnase.zt)
+neighborglobalpeak.rnase.zt <-lapply(lglobalpeak.rnase.zt, function(x) { if( x > 2 &  x < 24){ 
+    return(c((x-2), x-1, x, x+1, x+2))
+  }
+  else {
+    return(NA) # Verwende NA anstelle eines leeren Vektors
+    }
+  }
+)
+
+
+
+neighborglobalpeak.ctrl.zt_without_na <- lapply(neighborglobalpeak.ctrl.zt, function(x) ifelse(is.na(x), numeric(0), x))
+
+neighborglobalpeak.rnase.zt_without_na <- lapply(neighborglobalpeak.rnase.zt, function(x) ifelse(is.na(x), numeric(0), x))
+
+overlapneighborglobalpeak.ctrl.zt_without_na <-neighborglobalpeak.ctrl.zt_without_na 
+
+overlapneighborglobalpeak.rnase.zt_without_na <- neighborglobalpeak.rnase.zt_without_na
+
+for (i in seq_along(overlapneighborglobalpeak.rnase.zt_without_na)) {
+    overlapneighborglobalpeak.rnase.zt_without_na[[i]] <- overlapneighborglobalpeak.rnase.zt_without_na[[i]][overlapneighborglobalpeak.rnase.zt_without_na[[i]] %in%  overlapneighborglobalpeak.ctrl.zt_without_na[[i]]]
+}
+for (i in seq_along(overlapneighborglobalpeak.ctrl.zt_without_na)) {
+    overlapneighborglobalpeak.ctrl.zt_without_na[[i]] <- overlapneighborglobalpeak.ctrl.zt_without_na[[i]][overlapneighborglobalpeak.ctrl.zt_without_na[[i]] %in%  overlapneighborglobalpeak.rnase.zt_without_na[[i]]]
+}
+
+valuesneighborglobalpeak.rnase.zt_without_na <- list()
+
+
+
+  
+
+overlapvaluesneighborglobalpeak.ctrl.zt_without_na[[i]] <- row_values
+}
+
+sumoverlapvaluesneighborglobalpeak.ctrl.zt_without_na <-lapply(overlapvaluesneighborglobalpeak.ctrl.zt_without_na, function(x) sum(x))
+
+sumoverlapvaluesneighborglobalpeak.rnase.zt_without_na <-lapply(overlapvaluesneighborglobalpeak.rnase.zt_without_na, function(x) sum(x))
+
+sumvaluesneighborglobalpeak.ctrl.zt_without_na <-lapply(valuesneighborglobalpeak.ctrl.zt_without_na, function(x) sum(x))
+
+sumvaluesneighborglobalpeak.rnase.zt_without_na <-lapply(valuesneighborglobalpeak.rnase.zt_without_na, function(x) sum(x))
+
+function(x) sum(x))
+
+```
+
