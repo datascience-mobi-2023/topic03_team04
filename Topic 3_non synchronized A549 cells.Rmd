@@ -1042,6 +1042,11 @@ for (i in 1:num_rows) {
 }
 ```
 
+```{r}
+plots_ctrl_rnase.zt[[23]]
+```
+
+
 Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
 
 ```{r}
@@ -1922,6 +1927,8 @@ rnase.mms <- readRDS("Non_synchronized_A549_rnase.mms")
 
 ```{r}
 #mvm
+sd.mean.ctrl.mvm <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mvm ")
+sd.mean.rnase.mvm <- readRDS("Non_synchronized_A549_sd.mean.rnase.mvm ")
 
 globalpeak.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mvm")
 globalpeak.value.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mvm")
@@ -1946,6 +1953,8 @@ precipitated.mvm <- readRDS("Non_synchronized_A549_precipitated.mvm")
 
 ```{r}
 #zt
+sd.mean.ctrl.zt <- readRDS("Non_synchronized_A549_sd.mean.ctrl.zt ")
+sd.mean.rnase.zt <- readRDS("Non_synchronized_A549_sd.mean.rnase.zt ")
 
 globalpeak.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.ctrl.zt")
 globalpeak.value.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.zt")
@@ -1970,6 +1979,8 @@ precipitated.zt <- readRDS("Non_synchronized_A549_precipitated.zt")
 
 ```{r}
 #mms
+sd.mean.ctrl.mms <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mms")
+sd.mean.rnase.mms <- readRDS("Non_synchronized_A549_sd.mean.rnase.mms")
 
 globalpeak.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mms")
 globalpeak.value.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mms")
@@ -2166,7 +2177,7 @@ shreg.rnase.zt <- rnase.zt
 
 First, we identify fraction (regions) of proteins with high protein amount. 
 ```{r}
-largevalues.zt <- apply(shreg.rnase.zt[,2:24], 1, function(x) {
+largevalues.rnase.zt <- apply(shreg.rnase.zt[,2:24], 1, function(x) {
   largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
   peak_mean <- sapply(largevalues_indices, function(i) mean(x[(i-1):(i+1)]))
   largevalues_indices <- largevalues_indices[peak_mean > 4.5]
@@ -2200,7 +2211,7 @@ boundary25.rnase.zt <-lapply(1:nrow(shreg.rnase.zt), function(i) {
 })
 ```
 
-Now, all regions (= 3 fractions) with a sd smaller then 0.8 are selected.
+Now, all regions (= 3 fractions) with a sd smaller then the sd for our normal fluctuation used by peak identification are selected.
 ```{r}
 closereg.rnase.zt <- list()
 for (i in 1:nrow(shreg.rnase.zt)) {
@@ -2210,7 +2221,7 @@ for (i in 1:nrow(shreg.rnase.zt)) {
   for (j in 1:(ncol(shreg.rnase.zt)-2)) {
     values <- as.numeric(row[j:(j+2)])
     
-    if (sd(values) < 0.8) { 
+    if (sd(values) < sd.mean.rnase.zt) { 
       indices <- c(indices, j:(j+2))}}
  
     if (length(indices) == 0) {
@@ -2221,14 +2232,14 @@ for (i in 1:nrow(shreg.rnase.zt)) {
 
 We just want to have the large values which also occur in close value.
 ```{r}
-largevalues.closereg.rnase.zt <- largevalues.zt
+largevalues.closereg.rnase.zt <- largevalues.rnase.zt
 for (i in seq_along(largevalues.closereg.rnase.zt)) {
     largevalues.closereg.rnase.zt[[i]] <- largevalues.closereg.rnase.zt[[i]][largevalues.closereg.rnase.zt[[i]] %in% closereg.rnase.zt[[i]]]}
 ordered.largevalues.closereg.rnase.zt <- lapply(largevalues.closereg.rnase.zt,function(row){sort(row)})
 ```
 
 ```{r}
-find_consecutive_numbers <- function(x) {
+shoulderregion.rnase.zt <- lapply(ordered.largevalues.closereg.rnase.zt,function(x) {
     diffs <- c(1, diff(x))
     groups <- rle(diffs)
     shoulderregion <- which(groups$values == 1 & groups$lengths >= 2)
@@ -2238,24 +2249,107 @@ find_consecutive_numbers <- function(x) {
         shoulderregion <- mapply(function(start, end) x[start:end], starts, ends)
     }
     return(shoulderregion)
-}
-shoulderregion <- lapply(ordered.largevalues.closereg.rnase.zt, find_consecutive_numbers)
+})
+```
+Interessante Proteine: AAAT_HUMAN
+Bad Proteins: ADA10_HUMAN
 
-(shoulderregion)
-View(largevalues_without_maxima)
-View(rnase.with.proteinnumbers)
+
+We continue with the ctrl group.
+```{r}
+shreg.ctrl.zt <- ctrl.zt
+```
+
+First, we identify fraction (regions) of proteins with high protein amount. 
+```{r}
+largevalues.ctrl.zt <- apply(shreg.ctrl.zt[,2:24], 1, function(x) {
+  largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
+  peak_mean <- sapply(largevalues_indices, function(i) mean(x[(i-1):(i+1)]))
+  largevalues_indices <- largevalues_indices[peak_mean > 4.5]
+  unique(c(largevalues_indices - 1 , largevalues_indices, largevalues_indices + 1))
+})
+```
+
+Identification of regions around the peaks.
+```{r}
+neighpeaks.ctrl.zt <- apply(shreg.ctrl.zt, 1,
+            function(x) { peak_indices <- which(diff(sign(diff(x))) == -2 & x[-c(1, length(x))] > 3) + 1
+              peak_sd <- sapply(peak_indices,function(i) sd(x[(i-1):(i+1)]))
+              peak_indices <- peak_indices[peak_sd > sd.mean.ctrl.zt]
+              c(peak_indices - 1, peak_indices, peak_indices + 1)})
+```
+
+Now we identify the boundaries again, but safe them in a list.
+```{r}
+boundary1.ctrl.zt <- lapply(1:nrow(shreg.ctrl.zt), function(i) {
+  if (shreg.ctrl.zt[i, 1] > shreg.ctrl.zt[i, 2] & shreg.ctrl.zt[i, 1] > shreg.ctrl.zt[i, 3] & (shreg.ctrl.zt[i, 1] + shreg.ctrl.zt[i, 2] + shreg.ctrl.zt[i, 3]) > 10) {
+    return(c(1,2,3))} 
+    else {
+    return(numeric(0))}
+})
+
+boundary25.ctrl.zt <-lapply(1:nrow(shreg.ctrl.zt), function(i) {
+  if (shreg.ctrl.zt[i, 25] > shreg.ctrl.zt[i, 24] & shreg.ctrl.zt[i, 25] > shreg.ctrl.zt[i, 23] & (shreg.ctrl.zt[i, 25] + shreg.ctrl.zt[i, 24] + shreg.ctrl.zt[i, 23]) > 10) {
+    return(c(25,24,23))} 
+    else {
+    return(numeric(0))}
+})
+```
+
+
+```{r}
+closereg.ctrl.zt <- list()
+for (i in 1:nrow(shreg.ctrl.zt)) {
+  row <- shreg.ctrl.zt[i,]
+  indices <- c()
+  
+  for (j in 1:(ncol(shreg.ctrl.zt)-2)) {
+    values <- as.numeric(row[j:(j+2)])
+    
+    if (sd(values) < sd.mean.ctrl.zt) { 
+      indices <- c(indices, j:(j+2))}}
+ 
+    if (length(indices) == 0) {
+    closereg.ctrl.zt[[i]] <- numeric(0)}
+    
+    else {closereg.ctrl.zt[[i]] <- indices}}
+```
+
+We just want to have the large values which also occur in close value.
+```{r}
+largevalues.closereg.ctrl.zt <- largevalues.ctrl.zt
+for (i in seq_along(largevalues.closereg.ctrl.zt)) {
+    largevalues.closereg.ctrl.zt[[i]] <- largevalues.closereg.ctrl.zt[[i]][largevalues.closereg.ctrl.zt[[i]] %in% closereg.ctrl.zt[[i]]]}
+ordered.largevalues.closereg.ctrl.zt <- lapply(largevalues.closereg.ctrl.zt,function(row){sort(row)})
 ```
 
 ```{r}
-c <- c(7,13,14,15)
-cumsum(c)-
-diff(c)
-a <- rle(diff(c))
+shoulderregion.ctrl.zt <- lapply(ordered.largevalues.closereg.ctrl.zt,function(x) {
+    diffs <- c(1, diff(x))
+    groups <- rle(diffs)
+    shoulderregion <- which(groups$values == 1 & groups$lengths >= 2)
+    if (length(shoulderregion) > 0) {
+        starts <- cumsum(groups$lengths)[shoulderregion] - groups$lengths[shoulderregion] 
+        ends <- cumsum(groups$lengths)[shoulderregion]
+        shoulderregion <- mapply(function(start, end) x[start:end], starts, ends)
+    }
+    return(shoulderregion)
+})
+View(shoulderregion.zt)
+```
 
-starts <- cumsum(a$lengths)- a$lengths
-starts
-        ends <- cumsum(a$lengths)
-        ends
+Now we can find shoulderregions which only occur in one sample (ctrl or rnase).
+
+```{r}
+names(shoulderregion.ctrl.zt)
+```
+
+
+```{r}
+shoulderregion.zt <- lapply(names(shoulderregion.ctrl.zt), function(x) setdiff(shoulderregion.ctrl.zt[[x]], shoulderregion.rnase.zt[[x]]))
+names(shoulderregion.zt) <- names(shoulderregion.ctrl.zt)
+
+View(shoulderregion.zt)
 ```
 
 
