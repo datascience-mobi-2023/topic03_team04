@@ -2270,33 +2270,6 @@ largevalues.ctrl.zt <- apply(shreg.ctrl.zt[,2:24], 1, function(x) {
 })
 ```
 
-Identification of regions around the peaks.
-```{r}
-neighpeaks.ctrl.zt <- apply(shreg.ctrl.zt, 1,
-            function(x) { peak_indices <- which(diff(sign(diff(x))) == -2 & x[-c(1, length(x))] > 3) + 1
-              peak_sd <- sapply(peak_indices,function(i) sd(x[(i-1):(i+1)]))
-              peak_indices <- peak_indices[peak_sd > sd.mean.ctrl.zt]
-              c(peak_indices - 1, peak_indices, peak_indices + 1)})
-```
-
-Now we identify the boundaries again, but safe them in a list.
-```{r}
-boundary1.ctrl.zt <- lapply(1:nrow(shreg.ctrl.zt), function(i) {
-  if (shreg.ctrl.zt[i, 1] > shreg.ctrl.zt[i, 2] & shreg.ctrl.zt[i, 1] > shreg.ctrl.zt[i, 3] & (shreg.ctrl.zt[i, 1] + shreg.ctrl.zt[i, 2] + shreg.ctrl.zt[i, 3]) > 10) {
-    return(c(1,2,3))} 
-    else {
-    return(numeric(0))}
-})
-
-boundary25.ctrl.zt <-lapply(1:nrow(shreg.ctrl.zt), function(i) {
-  if (shreg.ctrl.zt[i, 25] > shreg.ctrl.zt[i, 24] & shreg.ctrl.zt[i, 25] > shreg.ctrl.zt[i, 23] & (shreg.ctrl.zt[i, 25] + shreg.ctrl.zt[i, 24] + shreg.ctrl.zt[i, 23]) > 10) {
-    return(c(25,24,23))} 
-    else {
-    return(numeric(0))}
-})
-```
-
-
 ```{r}
 closereg.ctrl.zt <- list()
 for (i in 1:nrow(shreg.ctrl.zt)) {
@@ -2335,23 +2308,22 @@ shoulderregion.ctrl.zt <- lapply(ordered.largevalues.closereg.ctrl.zt,function(x
     }
     return(shoulderregion)
 })
-View(shoulderregion.zt)
 ```
 
-Now we can find shoulderregions which only occur in one sample (ctrl or rnase).
-
-```{r}
-names(shoulderregion.ctrl.zt)
-```
-
-
+Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
 ```{r}
 shoulderregion.zt <- lapply(names(shoulderregion.ctrl.zt), function(x) setdiff(shoulderregion.ctrl.zt[[x]], shoulderregion.rnase.zt[[x]]))
 names(shoulderregion.zt) <- names(shoulderregion.ctrl.zt)
-
-View(shoulderregion.zt)
 ```
 
+At last, we only want does proteins with entries more than 2. The others have no significant difference.
+```{r}
+selec.shoulderregion.zt <- lapply(shoulderregion.zt, function(x) 
+  if (length(x) < 3) {return(numeric(0))} 
+  else {return(x)})
+
+View(selec.shoulderregion.zt)
+```
 
 ## 8. Kmeans clustering
 
