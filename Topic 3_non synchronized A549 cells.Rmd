@@ -269,7 +269,6 @@ ctrl.rep3 <- ctrl.clean[,51:75]
 rnase.rep1 <- rnase.clean[,1:25]
 rnase.rep2 <- rnase.clean[,26:50]
 rnase.rep3 <- rnase.clean[,51:75]
-
 ```
 
 ### 3.1. Mean Value Method
@@ -1043,6 +1042,11 @@ for (i in 1:num_rows) {
 }
 ```
 
+```{r}
+plots_ctrl_rnase.zt[[23]]
+```
+
+
 Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
 
 ```{r}
@@ -1458,8 +1462,16 @@ Save all relevant data:
 
 ```{r}
 # mvm
+<<<<<<< HEAD
+saveRDS(sd.mean.ctrl.mvm, file = "Non_synchronized_A549_sd.mean.ctrl.mvm ")
+saveRDS(sd.mean.rnase.mvm , file = "Non_synchronized_A549_sd.mean.rnase.mvm")
+
+saveRDS(globalpeak.ctrl.mvm, file = "Non_synchronized_A549_globalpeak.ctrl.mvm")
+saveRDS(globalpeak.value.ctrl.mvm, file = "Non_synchronized_A549_globalpeak.value.ctrl.mvm")
+=======
 saveRDS(globalpeak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mvm")
 saveRDS(globalpeak.value.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mvm")
+>>>>>>> main
 
 saveRDS(globalpeak.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mvm")
 saveRDS(globalpeak.value.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mvm")
@@ -1481,8 +1493,16 @@ saveRDS(precipitated.mvm, file = "gespeicherteDaten/Non_synchronized_A549_precip
 
 ```{r}
 # zt
+<<<<<<< HEAD
+saveRDS(sd.mean.ctrl.zt, file = "Non_synchronized_A549_sd.mean.ctrl.zt ")
+saveRDS(sd.mean.rnase.zt , file = "Non_synchronized_A549_sd.mean.rnase.zt")
+
+saveRDS(globalpeak.ctrl.zt, file = "Non_synchronized_A549_globalpeak.ctrl.zt")
+saveRDS(globalpeak.value.ctrl.zt, file = "Non_synchronized_A549_globalpeak.value.ctrl.zt")
+=======
 saveRDS(globalpeak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.zt")
 saveRDS(globalpeak.value.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.zt")
+>>>>>>> main
 
 saveRDS(globalpeak.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.zt")
 saveRDS(globalpeak.value.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.zt")
@@ -1504,8 +1524,16 @@ saveRDS(precipitated.zt, file = "gespeicherteDaten/Non_synchronized_A549_precipi
 
 ```{r}
 # mms
+<<<<<<< HEAD
+saveRDS(sd.mean.ctrl.mms, file = "Non_synchronized_A549_sd.mean.ctrl.mms ")
+saveRDS(sd.mean.rnase.mms , file = "Non_synchronized_A549_sd.mean.rnase.mms")
+
+saveRDS(globalpeak.ctrl.mms, file = "Non_synchronized_A549_globalpeak.ctrl.mms")
+saveRDS(globalpeak.value.ctrl.mms, file = "Non_synchronized_A549_globalpeak.value.ctrl.mms")
+=======
 saveRDS(globalpeak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mms")
 saveRDS(globalpeak.value.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mms")
+>>>>>>> main
 
 saveRDS(globalpeak.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mms")
 saveRDS(globalpeak.value.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mms")
@@ -1526,6 +1554,97 @@ saveRDS(precipitated.mms, file = "gespeicherteDaten/Non_synchronized_A549_precip
 ```
 
 ## 6. Gaussian fit
+
+Load the relevant data:
+
+```{r}
+ctrl.mvm <- readRDS("Non_synchronized_A549_ctrl.mvm")
+rnase.mvm <- readRDS("Non_synchronized_A549_rnase.mvm")
+
+ctrl.zt <- readRDS("Non_synchronized_A549_ctrl.zt")
+rnase.zt <- readRDS("Non_synchronized_A549_rnase.zt")
+
+ctrl.mms <- readRDS("Non_synchronized_A549_ctrl.mms")
+rnase.mms <- readRDS("Non_synchronized_A549_rnase.mms")
+```
+
+```{r}
+#mvm
+sd.mean.ctrl.mvm <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mvm ")
+sd.mean.rnase.mvm <- readRDS("Non_synchronized_A549_sd.mean.rnase.mvm ")
+
+globalpeak.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mvm")
+globalpeak.value.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mvm")
+
+globalpeak.rnase.mvm <- readRDS("Non_synchronized_A549_globalpeak.rnase.mvm")
+globalpeak.value.rnase.mvm <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.mvm")
+
+localpeaks.ctrl.mvm <- readRDS("Non_synchronized_A549_localpeaks.ctrl.mvm")
+localpeaks.values.ctrl.mvm <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.mvm")
+
+localpeaks.rnase.mvm <- readRDS("Non_synchronized_A549_localpeaks.rnase.mvm")
+localpeaks.values.rnase.mvm <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.mvm")
+
+fraction1.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+fraction25.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+
+fraction1.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+fraction25.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+
+precipitated.mvm <- readRDS("Non_synchronized_A549_precipitated.mvm")
+```
+
+```{r}
+#zt
+sd.mean.ctrl.zt <- readRDS("Non_synchronized_A549_sd.mean.ctrl.zt ")
+sd.mean.rnase.zt <- readRDS("Non_synchronized_A549_sd.mean.rnase.zt ")
+
+globalpeak.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.ctrl.zt")
+globalpeak.value.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.zt")
+
+globalpeak.rnase.zt <- readRDS("Non_synchronized_A549_globalpeak.rnase.zt")
+globalpeak.value.rnase.zt <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.zt")
+
+localpeaks.ctrl.zt <- readRDS("Non_synchronized_A549_localpeaks.ctrl.zt")
+localpeaks.values.ctrl.zt <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.zt")
+
+localpeaks.rnase.zt <- readRDS("Non_synchronized_A549_localpeaks.rnase.zt")
+localpeaks.values.rnase.zt <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.zt")
+
+fraction1.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.zt")
+fraction25.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.zt")
+
+fraction1.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.zt")
+fraction25.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.zt")
+
+precipitated.zt <- readRDS("Non_synchronized_A549_precipitated.zt")
+```
+
+```{r}
+#mms
+sd.mean.ctrl.mms <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mms")
+sd.mean.rnase.mms <- readRDS("Non_synchronized_A549_sd.mean.rnase.mms")
+
+globalpeak.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mms")
+globalpeak.value.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mms")
+
+globalpeak.rnase.mms <- readRDS("Non_synchronized_A549_globalpeak.rnase.mms")
+globalpeak.value.rnase.mms <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.mms")
+
+localpeaks.ctrl.mms <- readRDS("Non_synchronized_A549_localpeaks.ctrl.mms")
+localpeaks.values.ctrl.mms <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.mms")
+
+localpeaks.rnase.mms <- readRDS("Non_synchronized_A549_localpeaks.rnase.mms")
+localpeaks.values.rnase.mms <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.mms")
+
+fraction1.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mms")
+fraction25.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mms")
+
+fraction1.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mms")
+fraction25.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mms")
+
+precipitated.mms <- readRDS("Non_synchronized_A549_precipitated.mms")
+```
 
 ### 6.1 Gaussian fit for Mean Value Method normalized data
 
@@ -1806,7 +1925,7 @@ curve(gauss(x, a=a2, mu=mu2, sigma=sigma2), from = min(x), to = max(x), add = TR
 
 Hinweis: Um die Graphen einer anderen Normalisierungsmethode zu sehen, kann zt in mvm oder mms abgeändert werden.
 
-## 7. Shifts
+## 7. Parameters to identify RNA-dependent or RNA-binding Proteins 
 
 Load the relevant data:
 
@@ -1823,6 +1942,8 @@ rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mms")
 
 ```{r}
 #mvm
+sd.mean.ctrl.mvm <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mvm ")
+sd.mean.rnase.mvm <- readRDS("Non_synchronized_A549_sd.mean.rnase.mvm ")
 
 globalpeak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mvm")
 globalpeak.value.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mvm")
@@ -1847,6 +1968,8 @@ precipitated.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitate
 
 ```{r}
 #zt
+sd.mean.ctrl.zt <- readRDS("Non_synchronized_A549_sd.mean.ctrl.zt ")
+sd.mean.rnase.zt <- readRDS("Non_synchronized_A549_sd.mean.rnase.zt ")
 
 globalpeak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.zt")
 globalpeak.value.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.zt")
@@ -1871,6 +1994,8 @@ precipitated.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated
 
 ```{r}
 #mms
+sd.mean.ctrl.mms <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mms")
+sd.mean.rnase.mms <- readRDS("Non_synchronized_A549_sd.mean.rnase.mms")
 
 globalpeak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mms")
 globalpeak.value.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mms")
@@ -1893,7 +2018,9 @@ fraction25.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fra
 precipitated.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.mms")
 ```
 
-### 7.1. Shifts with Mean Value Method
+### 7.1. Shifts
+
+### 7.1.1. Shifts with Mean Value Method
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
@@ -1945,7 +2072,7 @@ for (i in 1:dim(ctrl.mvm)[1]){
 
 ```
 
-### 6.2. Shifts with z-Transformation
+### 7.1.2. Shifts with z-Transformation
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
@@ -1999,7 +2126,7 @@ for (i in 1:dim(ctrl.zt)[1]){
 ```
 
 
-### 6.3. Shifts with Min-Max Scaling
+### 7.1.3. Shifts with Min-Max Scaling
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
@@ -2049,6 +2176,168 @@ for (i in 1:dim(ctrl.mms)[1]){
   }
 }
 
+```
+
+### 7.2 Shoulderregions
+
+
+### 7.2.2 Shoulderregions based on z-Transformed values
+
+Proteins can also be RNA dependent even if they do not have a significant shift. The protein amount can changes significantly without an shift. One indicator could be the appearance of a shoulder regions.
+
+```{r}
+shreg.rnase.zt <- rnase.zt
+```
+
+
+First, we identify fraction (regions) of proteins with high protein amount. 
+```{r}
+largevalues.rnase.zt <- apply(shreg.rnase.zt[,2:24], 1, function(x) {
+  largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
+  peak_mean <- sapply(largevalues_indices, function(i) mean(x[(i-1):(i+1)]))
+  largevalues_indices <- largevalues_indices[peak_mean > 4.5]
+  unique(c(largevalues_indices - 1 , largevalues_indices, largevalues_indices + 1))
+})
+```
+
+Identification of regions around the peaks.
+```{r}
+neighpeaks.rnase.zt <- apply(shreg.rnase.zt, 1,
+            function(x) { peak_indices <- which(diff(sign(diff(x))) == -2 & x[-c(1, length(x))] > 3) + 1
+              peak_sd <- sapply(peak_indices,function(i) sd(x[(i-1):(i+1)]))
+              peak_indices <- peak_indices[peak_sd > sd.mean.rnase.zt]
+              c(peak_indices - 1, peak_indices, peak_indices + 1)})
+```
+
+Now we identify the boundaries again, but safe them in a list.
+```{r}
+boundary1.rnase.zt <- lapply(1:nrow(shreg.rnase.zt), function(i) {
+  if (shreg.rnase.zt[i, 1] > shreg.rnase.zt[i, 2] & shreg.rnase.zt[i, 1] > shreg.rnase.zt[i, 3] & (shreg.rnase.zt[i, 1] + shreg.rnase.zt[i, 2] + shreg.rnase.zt[i, 3]) > 10) {
+    return(c(1,2,3))} 
+    else {
+    return(numeric(0))}
+})
+
+boundary25.rnase.zt <-lapply(1:nrow(shreg.rnase.zt), function(i) {
+  if (shreg.rnase.zt[i, 25] > shreg.rnase.zt[i, 24] & shreg.rnase.zt[i, 25] > shreg.rnase.zt[i, 23] & (shreg.rnase.zt[i, 25] + shreg.rnase.zt[i, 24] + shreg.rnase.zt[i, 23]) > 10) {
+    return(c(25,24,23))} 
+    else {
+    return(numeric(0))}
+})
+```
+
+Now, all regions (= 3 fractions) with a sd smaller then the sd for our normal fluctuation used by peak identification are selected.
+```{r}
+closereg.rnase.zt <- list()
+for (i in 1:nrow(shreg.rnase.zt)) {
+  row <- shreg.rnase.zt[i,]
+  indices <- c()
+  
+  for (j in 1:(ncol(shreg.rnase.zt)-2)) {
+    values <- as.numeric(row[j:(j+2)])
+    
+    if (sd(values) < sd.mean.rnase.zt) { 
+      indices <- c(indices, j:(j+2))}}
+ 
+    if (length(indices) == 0) {
+    closereg.rnase.zt[[i]] <- numeric(0)}
+    
+    else {closereg.rnase.zt[[i]] <- indices}}
+```
+
+We just want to have the large values which also occur in close value.
+```{r}
+largevalues.closereg.rnase.zt <- largevalues.rnase.zt
+for (i in seq_along(largevalues.closereg.rnase.zt)) {
+    largevalues.closereg.rnase.zt[[i]] <- largevalues.closereg.rnase.zt[[i]][largevalues.closereg.rnase.zt[[i]] %in% closereg.rnase.zt[[i]]]}
+ordered.largevalues.closereg.rnase.zt <- lapply(largevalues.closereg.rnase.zt,function(row){sort(row)})
+```
+
+```{r}
+shoulderregion.rnase.zt <- lapply(ordered.largevalues.closereg.rnase.zt,function(x) {
+    diffs <- c(1, diff(x))
+    groups <- rle(diffs)
+    shoulderregion <- which(groups$values == 1 & groups$lengths >= 2)
+    if (length(shoulderregion) > 0) {
+        starts <- cumsum(groups$lengths)[shoulderregion] - groups$lengths[shoulderregion] 
+        ends <- cumsum(groups$lengths)[shoulderregion]
+        shoulderregion <- mapply(function(start, end) x[start:end], starts, ends)
+    }
+    return(shoulderregion)
+})
+```
+Interessante Proteine: AAAT_HUMAN
+Bad Proteins: ADA10_HUMAN
+
+
+We continue with the ctrl group.
+```{r}
+shreg.ctrl.zt <- ctrl.zt
+```
+
+First, we identify fraction (regions) of proteins with high protein amount. 
+```{r}
+largevalues.ctrl.zt <- apply(shreg.ctrl.zt[,2:24], 1, function(x) {
+  largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
+  peak_mean <- sapply(largevalues_indices, function(i) mean(x[(i-1):(i+1)]))
+  largevalues_indices <- largevalues_indices[peak_mean > 4.5]
+  unique(c(largevalues_indices - 1 , largevalues_indices, largevalues_indices + 1))
+})
+```
+
+```{r}
+closereg.ctrl.zt <- list()
+for (i in 1:nrow(shreg.ctrl.zt)) {
+  row <- shreg.ctrl.zt[i,]
+  indices <- c()
+  
+  for (j in 1:(ncol(shreg.ctrl.zt)-2)) {
+    values <- as.numeric(row[j:(j+2)])
+    
+    if (sd(values) < sd.mean.ctrl.zt) { 
+      indices <- c(indices, j:(j+2))}}
+ 
+    if (length(indices) == 0) {
+    closereg.ctrl.zt[[i]] <- numeric(0)}
+    
+    else {closereg.ctrl.zt[[i]] <- indices}}
+```
+
+We just want to have the large values which also occur in close value.
+```{r}
+largevalues.closereg.ctrl.zt <- largevalues.ctrl.zt
+for (i in seq_along(largevalues.closereg.ctrl.zt)) {
+    largevalues.closereg.ctrl.zt[[i]] <- largevalues.closereg.ctrl.zt[[i]][largevalues.closereg.ctrl.zt[[i]] %in% closereg.ctrl.zt[[i]]]}
+ordered.largevalues.closereg.ctrl.zt <- lapply(largevalues.closereg.ctrl.zt,function(row){sort(row)})
+```
+
+```{r}
+shoulderregion.ctrl.zt <- lapply(ordered.largevalues.closereg.ctrl.zt,function(x) {
+    diffs <- c(1, diff(x))
+    groups <- rle(diffs)
+    shoulderregion <- which(groups$values == 1 & groups$lengths >= 2)
+    if (length(shoulderregion) > 0) {
+        starts <- cumsum(groups$lengths)[shoulderregion] - groups$lengths[shoulderregion] 
+        ends <- cumsum(groups$lengths)[shoulderregion]
+        shoulderregion <- mapply(function(start, end) x[start:end], starts, ends)
+    }
+    return(shoulderregion)
+})
+```
+
+Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
+```{r}
+shoulderregion.zt <- lapply(names(shoulderregion.ctrl.zt), function(x) setdiff(shoulderregion.ctrl.zt[[x]], shoulderregion.rnase.zt[[x]]))
+names(shoulderregion.zt) <- names(shoulderregion.ctrl.zt)
+```
+
+At last, we only want does proteins with entries more than 2. The others have no significant difference.
+```{r}
+selec.shoulderregion.zt <- lapply(shoulderregion.zt, function(x) 
+  if (length(x) < 3) {return(numeric(0))} 
+  else {return(x)})
+
+View(selec.shoulderregion.zt)
 ```
 
 ## 8. Kmeans clustering
@@ -2474,3 +2763,134 @@ dot.plot +
                     ymin = -1, 
                     ymax = 8)
 ```
+
+
+```{r}
+as.list(globalpeak.ctrl.zt)
+neighborglobalpeak.ctrl.zt <-lapply(globalpeak.ctrl.zt, function(x) {
+  if( x > 2 & x < 24){ 
+    return(c(x-2, x-1, x, x+1, x+2))
+  }
+  else {return(numeric(0))
+    }
+  }
+  )
+lglobalpeak.rnase.zt <-as.list(globalpeak.rnase.zt)
+neighborglobalpeak.rnase.zt <-lapply(lglobalpeak.rnase.zt, function(x) { if( x > 2 &  x < 24){ 
+    return(c((x-2), x-1, x, x+1, x+2))
+  }
+  else {
+    return(numeric(0)) # Verwende NA anstelle eines leeren Vektors
+    }
+  }
+)
+
+neighborglobalpeak.ctrl.zt_without_na <- lapply(neighborglobalpeak.ctrl.zt, function(x) ifelse(is.na(x), numeric(0), x))
+neighborglobalpeak.rnase.zt_without_na <- lapply(neighborglobalpeak.rnase.zt, function(x) ifelse(is.na(x), numeric(0), x))
+overlapneighborglobalpeak.ctrl.zt_without_na <-neighborglobalpeak.ctrl.zt_without_na
+overlapneighborglobalpeak.rnase.zt_without_na <- neighborglobalpeak.rnase.zt_without_na
+for (i in seq_along(overlapneighborglobalpeak.rnase.zt_without_na)) {
+overlapneighborglobalpeak.rnase.zt_without_na[[i]] <- overlapneighborglobalpeak.rnase.zt_without_na[[i]][overlapneighborglobalpeak.rnase.zt_without_na[[i]] %in%  overlapneighborglobalpeak.ctrl.zt_without_na[[i]]]
+}
+for (i in seq_along(overlapneighborglobalpeak.ctrl.zt_without_na)) {
+overlapneighborglobalpeak.ctrl.zt_without_na[[i]] <- overlapneighborglobalpeak.ctrl.zt_without_na[[i]][overlapneighborglobalpeak.ctrl.zt_without_na[[i]] %in%  overlapneighborglobalpeak.rnase.zt_without_na[[i]]]
+}
+valuesneighborglobalpeak.rnase.zt_without_na <- list()
+for (i in seq_along(neighborglobalpeak.rnase.zt_without_na)) {
+row_values <- c()
+for (j in neighborglobalpeak.rnase.zt_without_na[[i]]) {
+value <- rnase.zt[i,j]
+row_values <- c(row_values, value)
+}
+valuesneighborglobalpeak.rnase.zt_without_na[[i]] <- row_values
+}
+valuesneighborglobalpeak.rnase.zt_without_na
+valuesneighborglobalpeak.ctrl.zt_without_na <- list()
+for (i in seq_along(neighborglobalpeak.ctrl.zt_without_na)) {
+row_values <- c()
+for (j in neighborglobalpeak.ctrl.zt_without_na[[i]]) {
+value <- rnase.zt[i,j]
+row_values <- c(row_values, value)
+}
+valuesneighborglobalpeak.ctrl.zt_without_na[[i]] <- row_values
+}
+overlapvaluesneighborglobalpeak.rnase.zt_without_na <- list()
+for (i in seq_along(overlapneighborglobalpeak.rnase.zt_without_na)) {
+row_values <- c()
+for (j in overlapneighborglobalpeak.rnase.zt_without_na[[i]]) {
+value <- rnase.zt[i,j]
+row_values <- c(row_values, value)
+}
+overlapvaluesneighborglobalpeak.rnase.zt_without_na[[i]] <- row_values
+}
+overlapvaluesneighborglobalpeak.rnase.zt_without_na
+overlapvaluesneighborglobalpeak.ctrl.zt_without_na <- list()
+for (i in seq_along(overlapneighborglobalpeak.ctrl.zt_without_na)) {
+row_values <- c()
+for (j in overlapneighborglobalpeak.ctrl.zt_without_na[[i]]) {
+value <- rnase.zt[i,j]
+row_values <- c(row_values, value)
+}
+overlapvaluesneighborglobalpeak.ctrl.zt_without_na[[i]] <- row_values
+}
+sumoverlapvaluesneighborglobalpeak.ctrl.zt_without_na <-lapply(overlapvaluesneighborglobalpeak.ctrl.zt_without_na, function(x) sum(x))
+sumoverlapvaluesneighborglobalpeak.rnase.zt_without_na <-lapply(overlapvaluesneighborglobalpeak.rnase.zt_without_na, function(x) sum(x))
+sumvaluesneighborglobalpeak.ctrl.zt_without_na <-lapply(valuesneighborglobalpeak.ctrl.zt_without_na, function(x) sum(x))
+sumvaluesneighborglobalpeak.rnase.zt_without_na <-lapply(valuesneighborglobalpeak.rnase.zt_without_na, function(x) sum(x))
+```
+
+```{r}
+neighborglobalpeak.ctrl.zt_without_na <- lapply(neighborglobalpeak.ctrl.zt, function(x) ifelse(is.na(x), numeric(0), x))
+neighborglobalpeak.rnase.zt_without_na <- lapply(neighborglobalpeak.rnase.zt, function(x) ifelse(is.na(x), numeric(0), x))
+overlapneighborglobalpeak.ctrl.zt_without_na <-neighborglobalpeak.ctrl.zt_without_na
+overlapneighborglobalpeak.rnase.zt_without_na <- neighborglobalpeak.rnase.zt_without_na
+for (i in seq_along(overlapneighborglobalpeak.rnase.zt_without_na)) {
+overlapneighborglobalpeak.rnase.zt_without_na[[i]] <- overlapneighborglobalpeak.rnase.zt_without_na[[i]][overlapneighborglobalpeak.rnase.zt_without_na[[i]] %in%  overlapneighborglobalpeak.ctrl.zt_without_na[[i]]]
+}
+for (i in seq_along(overlapneighborglobalpeak.ctrl.zt_without_na)) {
+overlapneighborglobalpeak.ctrl.zt_without_na[[i]] <- overlapneighborglobalpeak.ctrl.zt_without_na[[i]][overlapneighborglobalpeak.ctrl.zt_without_na[[i]] %in%  overlapneighborglobalpeak.rnase.zt_without_na[[i]]]
+}
+valuesneighborglobalpeak.rnase.zt_without_na <- list()
+for (i in seq_along(neighborglobalpeak.rnase.zt_without_na)) {
+row_values <- c()
+for (j in neighborglobalpeak.rnase.zt_without_na[[i]]) {
+value <- rnase.zt[i,j]
+row_values <- c(row_values, value)
+}
+valuesneighborglobalpeak.rnase.zt_without_na[[i]] <- row_values
+}
+valuesneighborglobalpeak.rnase.zt_without_na
+valuesneighborglobalpeak.ctrl.zt_without_na <- list()
+for (i in seq_along(neighborglobalpeak.ctrl.zt_without_na)) {
+row_values <- c()
+for (j in neighborglobalpeak.ctrl.zt_without_na[[i]]) {
+value <- rnase.zt[i,j]
+row_values <- c(row_values, value)
+}
+valuesneighborglobalpeak.ctrl.zt_without_na[[i]] <- row_values
+}
+overlapvaluesneighborglobalpeak.rnase.zt_without_na <- list()
+for (i in seq_along(overlapneighborglobalpeak.rnase.zt_without_na)) {
+row_values <- c()
+for (j in overlapneighborglobalpeak.rnase.zt_without_na[[i]]) {
+value <- rnase.zt[i,j]
+row_values <- c(row_values, value)
+}
+overlapvaluesneighborglobalpeak.rnase.zt_without_na[[i]] <- row_values
+}
+overlapvaluesneighborglobalpeak.rnase.zt_without_na
+overlapvaluesneighborglobalpeak.ctrl.zt_without_na <- list()
+for (i in seq_along(overlapneighborglobalpeak.ctrl.zt_without_na)) {
+row_values <- c()
+for (j in overlapneighborglobalpeak.ctrl.zt_without_na[[i]]) {
+value <- rnase.zt[i,j]
+row_values <- c(row_values, value)
+}
+overlapvaluesneighborglobalpeak.ctrl.zt_without_na[[i]] <- row_values
+}
+sumoverlapvaluesneighborglobalpeak.ctrl.zt_without_na <-lapply(overlapvaluesneighborglobalpeak.ctrl.zt_without_na, function(x) sum(x))
+sumoverlapvaluesneighborglobalpeak.rnase.zt_without_na <-lapply(overlapvaluesneighborglobalpeak.rnase.zt_without_na, function(x) sum(x))
+sumvaluesneighborglobalpeak.ctrl.zt_without_na <-lapply(valuesneighborglobalpeak.ctrl.zt_without_na, function(x) sum(x))
+sumvaluesneighborglobalpeak.rnase.zt_without_na <-lapply(valuesneighborglobalpeak.rnase.zt_without_na, function(x) sum(x))
+```
+
