@@ -799,27 +799,27 @@ The result of this part are three times (Methods) two (Ctrl and RNase) normalize
 Safe the normalized data:
 
 ```{r}
-saveRDS(ctrl.mvm, file = "Non_synchronized_A549_ctrl.mvm")
-saveRDS(rnase.mvm, file = "Non_synchronized_A549_rnase.mvm")
+saveRDS(ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_ctrl.mvm")
+saveRDS(rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_rnase.mvm")
 
-saveRDS(ctrl.zt, file = "Non_synchronized_A549_ctrl.zt")
-saveRDS(rnase.zt, file = "Non_synchronized_A549_rnase.zt")
+saveRDS(ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_ctrl.zt")
+saveRDS(rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_rnase.zt")
 
-saveRDS(ctrl.mms, file = "Non_synchronized_A549_ctrl.mms")
-saveRDS(rnase.mms, file = "Non_synchronized_A549_rnase.mms")
+saveRDS(ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_ctrl.mms")
+saveRDS(rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_rnase.mms")
 ```
 
 ## 4. Line Graph
 
 ```{r}
-ctrl.mvm <- readRDS("Non_synchronized_A549_ctrl.mvm")
-rnase.mvm <- readRDS("Non_synchronized_A549_rnase.mvm")
+ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mvm")
+rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mvm")
 
-ctrl.zt <- readRDS("Non_synchronized_A549_ctrl.zt")
-rnase.zt <- readRDS("Non_synchronized_A549_rnase.zt")
+ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.zt")
+rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.zt")
 
-ctrl.mms <- readRDS("Non_synchronized_A549_ctrl.mms")
-rnase.mms <- readRDS("Non_synchronized_A549_rnase.mms")
+ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mms")
+rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mms")
 ```
 
 ### 4.1. Line Graphs for the mean value method - normalization
@@ -1166,14 +1166,14 @@ Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu gelade
 ## 5. Peak Identification
 
 ```{r}
-ctrl.mvm <- readRDS("Non_synchronized_A549_ctrl.mvm")
-rnase.mvm <- readRDS("Non_synchronized_A549_rnase.mvm")
+ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mvm")
+rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mvm")
 
-ctrl.zt <- readRDS("Non_synchronized_A549_ctrl.zt")
-rnase.zt <- readRDS("Non_synchronized_A549_rnase.zt")
+ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.zt")
+rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.zt")
 
-ctrl.mms <- readRDS("Non_synchronized_A549_ctrl.mms")
-rnase.mms <- readRDS("Non_synchronized_A549_rnase.mms")
+ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mms")
+rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mms")
 ```
 
 ### 5.1. Peaks for data set with mean value method - normalization
@@ -1462,80 +1462,95 @@ Save all relevant data:
 
 ```{r}
 # mvm
+<<<<<<< HEAD
 saveRDS(sd.mean.ctrl.mvm, file = "Non_synchronized_A549_sd.mean.ctrl.mvm ")
 saveRDS(sd.mean.rnase.mvm , file = "Non_synchronized_A549_sd.mean.rnase.mvm")
 
 saveRDS(globalpeak.ctrl.mvm, file = "Non_synchronized_A549_globalpeak.ctrl.mvm")
 saveRDS(globalpeak.value.ctrl.mvm, file = "Non_synchronized_A549_globalpeak.value.ctrl.mvm")
+=======
+saveRDS(globalpeak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mvm")
+saveRDS(globalpeak.value.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mvm")
+>>>>>>> main
 
-saveRDS(globalpeak.rnase.mvm, file = "Non_synchronized_A549_globalpeak.rnase.mvm")
-saveRDS(globalpeak.value.rnase.mvm, file = "Non_synchronized_A549_globalpeak.value.rnase.mvm")
+saveRDS(globalpeak.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mvm")
+saveRDS(globalpeak.value.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mvm")
 
-saveRDS(localpeaks.ctrl.mvm, file = "Non_synchronized_A549_localpeaks.ctrl.mvm")
-saveRDS(localpeaks.values.ctrl.mvm, file = "Non_synchronized_A549_localpeaks.values.ctrl.mvm")
+saveRDS(localpeaks.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mvm")
+saveRDS(localpeaks.values.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mvm")
 
-saveRDS(localpeaks.rnase.mvm, file = "Non_synchronized_A549_localpeaks.rnase.mvm")
-saveRDS(localpeaks.values.rnase.mvm, file = "Non_synchronized_A549_localpeaks.values.rnase.mvm")
+saveRDS(localpeaks.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mvm")
+saveRDS(localpeaks.values.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mvm")
 
-saveRDS(fraction1.peak.ctrl.mvm, file = "Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-saveRDS(fraction25.peak.ctrl.mvm, file = "Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+saveRDS(fraction1.peak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+saveRDS(fraction25.peak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
 
-saveRDS(fraction1.peak.ctrl.mvm, file = "Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-saveRDS(fraction25.peak.ctrl.mvm, file = "Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+saveRDS(fraction1.peak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+saveRDS(fraction25.peak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
 
-saveRDS(precipitated.mvm, file = "Non_synchronized_A549_precipitated.mvm")
+saveRDS(precipitated.mvm, file = "gespeicherteDaten/Non_synchronized_A549_precipitated.mvm")
 ```
 
 ```{r}
 # zt
+<<<<<<< HEAD
 saveRDS(sd.mean.ctrl.zt, file = "Non_synchronized_A549_sd.mean.ctrl.zt ")
 saveRDS(sd.mean.rnase.zt , file = "Non_synchronized_A549_sd.mean.rnase.zt")
 
 saveRDS(globalpeak.ctrl.zt, file = "Non_synchronized_A549_globalpeak.ctrl.zt")
 saveRDS(globalpeak.value.ctrl.zt, file = "Non_synchronized_A549_globalpeak.value.ctrl.zt")
+=======
+saveRDS(globalpeak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.zt")
+saveRDS(globalpeak.value.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.zt")
+>>>>>>> main
 
-saveRDS(globalpeak.rnase.zt, file = "Non_synchronized_A549_globalpeak.rnase.zt")
-saveRDS(globalpeak.value.rnase.zt, file = "Non_synchronized_A549_globalpeak.value.rnase.zt")
+saveRDS(globalpeak.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.zt")
+saveRDS(globalpeak.value.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.zt")
 
-saveRDS(localpeaks.ctrl.zt, file = "Non_synchronized_A549_localpeaks.ctrl.zt")
-saveRDS(localpeaks.values.ctrl.zt, file = "Non_synchronized_A549_localpeaks.values.ctrl.zt")
+saveRDS(localpeaks.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.zt")
+saveRDS(localpeaks.values.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.zt")
 
-saveRDS(localpeaks.rnase.zt, file = "Non_synchronized_A549_localpeaks.rnase.zt")
-saveRDS(localpeaks.values.rnase.zt, file = "Non_synchronized_A549_localpeaks.values.rnase.zt")
+saveRDS(localpeaks.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.zt")
+saveRDS(localpeaks.values.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.zt")
 
-saveRDS(fraction1.peak.ctrl.zt, file = "Non_synchronized_A549_fraction1.peak.ctrl.zt")
-saveRDS(fraction25.peak.ctrl.zt, file = "Non_synchronized_A549_fraction25.peak.ctrl.zt")
+saveRDS(fraction1.peak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
+saveRDS(fraction25.peak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
 
-saveRDS(fraction1.peak.ctrl.zt, file = "Non_synchronized_A549_fraction1.peak.ctrl.zt")
-saveRDS(fraction25.peak.ctrl.zt, file = "Non_synchronized_A549_fraction25.peak.ctrl.zt")
+saveRDS(fraction1.peak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
+saveRDS(fraction25.peak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
 
-saveRDS(precipitated.zt, file = "Non_synchronized_A549_precipitated.zt")
+saveRDS(precipitated.zt, file = "gespeicherteDaten/Non_synchronized_A549_precipitated.zt")
 ```
 
 ```{r}
 # mms
+<<<<<<< HEAD
 saveRDS(sd.mean.ctrl.mms, file = "Non_synchronized_A549_sd.mean.ctrl.mms ")
 saveRDS(sd.mean.rnase.mms , file = "Non_synchronized_A549_sd.mean.rnase.mms")
 
 saveRDS(globalpeak.ctrl.mms, file = "Non_synchronized_A549_globalpeak.ctrl.mms")
 saveRDS(globalpeak.value.ctrl.mms, file = "Non_synchronized_A549_globalpeak.value.ctrl.mms")
+=======
+saveRDS(globalpeak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mms")
+saveRDS(globalpeak.value.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mms")
+>>>>>>> main
 
-saveRDS(globalpeak.rnase.mms, file = "Non_synchronized_A549_globalpeak.rnase.mms")
-saveRDS(globalpeak.value.rnase.mms, file = "Non_synchronized_A549_globalpeak.value.rnase.mms")
+saveRDS(globalpeak.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mms")
+saveRDS(globalpeak.value.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mms")
 
-saveRDS(localpeaks.ctrl.mms, file = "Non_synchronized_A549_localpeaks.ctrl.mms")
-saveRDS(localpeaks.values.ctrl.mms, file = "Non_synchronized_A549_localpeaks.values.ctrl.mms")
+saveRDS(localpeaks.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mms")
+saveRDS(localpeaks.values.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mms")
 
-saveRDS(localpeaks.rnase.mms, file = "Non_synchronized_A549_localpeaks.rnase.mms")
-saveRDS(localpeaks.values.rnase.mms, file = "Non_synchronized_A549_localpeaks.values.rnase.mms")
+saveRDS(localpeaks.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mms")
+saveRDS(localpeaks.values.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mms")
 
-saveRDS(fraction1.peak.ctrl.mms, file = "Non_synchronized_A549_fraction1.peak.ctrl.mms")
-saveRDS(fraction25.peak.ctrl.mms, file = "Non_synchronized_A549_fraction25.peak.ctrl.mms")
+saveRDS(fraction1.peak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
+saveRDS(fraction25.peak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
 
-saveRDS(fraction1.peak.ctrl.mms, file = "Non_synchronized_A549_fraction1.peak.ctrl.mms")
-saveRDS(fraction25.peak.ctrl.mms, file = "Non_synchronized_A549_fraction25.peak.ctrl.mms")
+saveRDS(fraction1.peak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
+saveRDS(fraction25.peak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
 
-saveRDS(precipitated.mms, file = "Non_synchronized_A549_precipitated.mms")
+saveRDS(precipitated.mms, file = "gespeicherteDaten/Non_synchronized_A549_precipitated.mms")
 ```
 
 ## 6. Gaussian fit
@@ -1915,14 +1930,14 @@ Hinweis: Um die Graphen einer anderen Normalisierungsmethode zu sehen, kann zt i
 Load the relevant data:
 
 ```{r}
-ctrl.mvm <- readRDS("Non_synchronized_A549_ctrl.mvm")
-rnase.mvm <- readRDS("Non_synchronized_A549_rnase.mvm")
+ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mvm")
+rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mvm")
 
-ctrl.zt <- readRDS("Non_synchronized_A549_ctrl.zt")
-rnase.zt <- readRDS("Non_synchronized_A549_rnase.zt")
+ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.zt")
+rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.zt")
 
-ctrl.mms <- readRDS("Non_synchronized_A549_ctrl.mms")
-rnase.mms <- readRDS("Non_synchronized_A549_rnase.mms")
+ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mms")
+rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mms")
 ```
 
 ```{r}
@@ -1930,25 +1945,25 @@ rnase.mms <- readRDS("Non_synchronized_A549_rnase.mms")
 sd.mean.ctrl.mvm <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mvm ")
 sd.mean.rnase.mvm <- readRDS("Non_synchronized_A549_sd.mean.rnase.mvm ")
 
-globalpeak.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mvm")
-globalpeak.value.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mvm")
+globalpeak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mvm")
+globalpeak.value.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mvm")
 
-globalpeak.rnase.mvm <- readRDS("Non_synchronized_A549_globalpeak.rnase.mvm")
-globalpeak.value.rnase.mvm <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.mvm")
+globalpeak.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mvm")
+globalpeak.value.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mvm")
 
-localpeaks.ctrl.mvm <- readRDS("Non_synchronized_A549_localpeaks.ctrl.mvm")
-localpeaks.values.ctrl.mvm <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.mvm")
+localpeaks.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mvm")
+localpeaks.values.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mvm")
 
-localpeaks.rnase.mvm <- readRDS("Non_synchronized_A549_localpeaks.rnase.mvm")
-localpeaks.values.rnase.mvm <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.mvm")
+localpeaks.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mvm")
+localpeaks.values.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mvm")
 
-fraction1.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-fraction25.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+fraction1.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+fraction25.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
 
-fraction1.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-fraction25.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+fraction1.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+fraction25.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
 
-precipitated.mvm <- readRDS("Non_synchronized_A549_precipitated.mvm")
+precipitated.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.mvm")
 ```
 
 ```{r}
@@ -1956,25 +1971,25 @@ precipitated.mvm <- readRDS("Non_synchronized_A549_precipitated.mvm")
 sd.mean.ctrl.zt <- readRDS("Non_synchronized_A549_sd.mean.ctrl.zt ")
 sd.mean.rnase.zt <- readRDS("Non_synchronized_A549_sd.mean.rnase.zt ")
 
-globalpeak.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.ctrl.zt")
-globalpeak.value.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.zt")
+globalpeak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.zt")
+globalpeak.value.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.zt")
 
-globalpeak.rnase.zt <- readRDS("Non_synchronized_A549_globalpeak.rnase.zt")
-globalpeak.value.rnase.zt <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.zt")
+globalpeak.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.zt")
+globalpeak.value.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.zt")
 
-localpeaks.ctrl.zt <- readRDS("Non_synchronized_A549_localpeaks.ctrl.zt")
-localpeaks.values.ctrl.zt <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.zt")
+localpeaks.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.zt")
+localpeaks.values.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.zt")
 
-localpeaks.rnase.zt <- readRDS("Non_synchronized_A549_localpeaks.rnase.zt")
-localpeaks.values.rnase.zt <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.zt")
+localpeaks.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.zt")
+localpeaks.values.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.zt")
 
-fraction1.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.zt")
-fraction25.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.zt")
+fraction1.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
+fraction25.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
 
-fraction1.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.zt")
-fraction25.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.zt")
+fraction1.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
+fraction25.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
 
-precipitated.zt <- readRDS("Non_synchronized_A549_precipitated.zt")
+precipitated.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.zt")
 ```
 
 ```{r}
@@ -1982,25 +1997,25 @@ precipitated.zt <- readRDS("Non_synchronized_A549_precipitated.zt")
 sd.mean.ctrl.mms <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mms")
 sd.mean.rnase.mms <- readRDS("Non_synchronized_A549_sd.mean.rnase.mms")
 
-globalpeak.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mms")
-globalpeak.value.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mms")
+globalpeak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mms")
+globalpeak.value.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mms")
 
-globalpeak.rnase.mms <- readRDS("Non_synchronized_A549_globalpeak.rnase.mms")
-globalpeak.value.rnase.mms <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.mms")
+globalpeak.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mms")
+globalpeak.value.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mms")
 
-localpeaks.ctrl.mms <- readRDS("Non_synchronized_A549_localpeaks.ctrl.mms")
-localpeaks.values.ctrl.mms <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.mms")
+localpeaks.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mms")
+localpeaks.values.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mms")
 
-localpeaks.rnase.mms <- readRDS("Non_synchronized_A549_localpeaks.rnase.mms")
-localpeaks.values.rnase.mms <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.mms")
+localpeaks.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mms")
+localpeaks.values.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mms")
 
-fraction1.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mms")
-fraction25.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mms")
+fraction1.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
+fraction25.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
 
-fraction1.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mms")
-fraction25.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mms")
+fraction1.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
+fraction25.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
 
-precipitated.mms <- readRDS("Non_synchronized_A549_precipitated.mms")
+precipitated.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.mms")
 ```
 
 ### 7.1. Shifts
