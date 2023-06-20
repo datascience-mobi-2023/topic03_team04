@@ -2327,43 +2327,59 @@ shoulderregion.ctrl.zt <- lapply(ordered.largevalues.closereg.ctrl.zt,function(x
 
 Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
 ```{r}
-shoulderregion.zt <- lapply(names(shoulderregion.ctrl.zt), function(x) setdiff(shoulderregion.ctrl.zt[[x]], shoulderregion.rnase.zt[[x]]))
-names(shoulderregion.zt) <- names(shoulderregion.ctrl.zt)
+shoulderregion.1.zt <- lapply(names(shoulderregion.ctrl.zt), function(x) setdiff(shoulderregion.ctrl.zt[[x]], shoulderregion.rnase.zt[[x]]))
+names(shoulderregion.1.zt) <- names(shoulderregion.ctrl.zt)
+
+shoulderregion.2.zt <- lapply(names(shoulderregion.ctrl.zt), function(x) setdiff(shoulderregion.rnase.zt[[x]], shoulderregion.ctrl.zt[[x]]))
+names(shoulderregion.2.zt) <- names(shoulderregion.ctrl.zt)
 ```
 
 At last, we only want does proteins with entries more than 2. The others have no significant difference.
 ```{r}
-selec.shoulderregion.zt <- lapply(shoulderregion.zt, function(x) 
+selec.shoulderregion.1.zt <- lapply(shoulderregion.1.zt, function(x) 
   if (length(x) < 3) {return(numeric(0))} 
   else {return(x)})
 
-View(selec.shoulderregion.zt)
+selec.shoulderregion.2.zt <- lapply(shoulderregion.2.zt, function(x) 
+  if (length(x) < 3) {return(numeric(0))} 
+  else {return(x)})
 ```
+
+Finally, both list have to be combined. (KLAPPT NICHT!!)
+```{r}
+shoulderregion.zt <- list()
+for (i in seq_along(selec.shoulderregion.1.zt)){combined <- c(selec.shoulderregion.1.zt,selec.shoulderregion.2.zt)
+shoulderregion.zt <- combined}
+
+View(shoulderregion.zt)
+```
+
 
 ### 7.3 Protein amout under global and local peaks
 
-```{r}
-as.list(globalpeak.ctrl.zt)
-neighborglobalpeak.ctrl.zt <-lapply(globalpeak.ctrl.zt, function(x) {
-  if( x > 2 & x < 24){ 
-    return(c(x-2, x-1, x, x+1, x+2))
-  }
-  else {return(numeric(0))
-    }
-  }
-  )
-lglobalpeak.rnase.zt <-as.list(globalpeak.rnase.zt)
-neighborglobalpeak.rnase.zt <-lapply(lglobalpeak.rnase.zt, function(x) { if( x > 2 &  x < 24){ 
-    return(c((x-2), x-1, x, x+1, x+2))
-  }
-  else {
-    return(numeric(0)) # Verwende NA anstelle eines leeren Vektors
-    }
-  }
-)
+#### 7.3.1. Global peak
 
-neighborglobalpeak.ctrl.zt_without_na <- lapply(neighborglobalpeak.ctrl.zt, function(x) ifelse(is.na(x), numeric(0), x))
-neighborglobalpeak.rnase.zt_without_na <- lapply(neighborglobalpeak.rnase.zt, function(x) ifelse(is.na(x), numeric(0), x))
+Similiar to the principal with the shoulderregions, we continue with the protein amount under the global peak. If the protein amount for one protein differs significantly between the Ctrl or RNase sample, we see it as a criteria for a RNA dependent protein.
+
+Regions around global region:
+```{r}
+neighborglobalpeak.rnase.zt <-lapply(globalpeak.rnase.zt, function(x) {
+  if(x > 2 & x < 24){return(c(x-2, x-1, x, x+1, x+2))}
+  else {return(numeric(0))}})
+
+neighborglobalpeak.ctrl.zt <-lapply(globalpeak.ctrl.zt, function(x) {
+  if(x > 2 & x < 24){return(c(x-2, x-1, x, x+1, x+2))}
+  else {return(numeric(0))}})
+```
+
+```{r}
+lap.globalpeak.zt <- for (i in seq_along(neighborglobalpeak.rnase.zt)) {
+  neighborglobalpeak.rnase.zt[[i]] <- neighborglobalpeak.rnase.zt[[i]][neighborglobalpeak.rnase.zt[[i]] %in% neighborglobalpeak.ctrl.zt[[i]]]}
+View(lap.globalpeak.zt)
+```
+
+
+```{r}
 overlapneighborglobalpeak.ctrl.zt_without_na <-neighborglobalpeak.ctrl.zt_without_na
 overlapneighborglobalpeak.rnase.zt_without_na <- neighborglobalpeak.rnase.zt_without_na
 for (i in seq_along(overlapneighborglobalpeak.rnase.zt_without_na)) {
