@@ -263,12 +263,12 @@ We now have clean data, with proteins that have reproducible data we can use for
 For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.
 
 ```{r}
-ctrl.rep1 <- ctrl.clean[,1:25]
-ctrl.rep2 <- ctrl.clean[,26:50]
-ctrl.rep3 <- ctrl.clean[,51:75]
-rnase.rep1 <- rnase.clean[,1:25]
-rnase.rep2 <- rnase.clean[,26:50]
-rnase.rep3 <- rnase.clean[,51:75]
+ctrl.rep1 <- ctrl.rep[,1:25]
+ctrl.rep2 <- ctrl.rep[,26:50]
+ctrl.rep3 <- ctrl.rep[,51:75]
+rnase.rep1 <- rnase.rep[,1:25]
+rnase.rep2 <- rnase.rep[,26:50]
+rnase.rep3 <- rnase.rep[,51:75]
 ```
 
 ### 3.1. Mean Value Method
@@ -754,11 +754,11 @@ Those have to be scaled again:
 
 ```{r}
 ctrl.mms.scaled <- t(apply(ctrl.mms.reduced, 1, function(x) {
-  normalized <- (x-min(x))/(max(x)-min(x))
+  normalized <- ((x-min(x))/(max(x)-min(x)))*100
 }))
 
 rnase.mms.scaled <- t(apply(rnase.mms.reduced, 1, function(x){
-  normalized <- (x-min(x))/(max(x)-min(x))
+  normalized <- ((x-min(x))/(max(x)-min(x)))*100
 }))
 ```
 
