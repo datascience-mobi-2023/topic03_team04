@@ -2340,9 +2340,43 @@ selec.shoulderregion.zt <- lapply(shoulderregion.zt, function(x)
 View(selec.shoulderregion.zt)
 ```
 
-### 7.3 protein amount under local peaks shift 
+### 7.3 protein amount under global peaks shift 
 
-#### 7.3.1 protein amount under local peaks shift based on MVM
+#### 7.3.1 protein amount under global peaks shift based on MVM
+We can test for proteins with a significant higher protein amount under the global peaks in the RNase group.
+```{r}
+signifikante_reihen_global_mvm <- which(globalpeak.value.rnase.mvm > 1.3 * globalpeak.value.ctrl.mvm)
+
+#print(signifikante_reihen_global_mvm)
+length(signifikante_reihen_global_mvm)
+
+```
+
+
+#### 7.3.2 protein amount under global peaks shift based on z-Transformation
+
+```{r}
+signifikante_reihen_global_zt <- which(globalpeak.value.rnase.zt > 1.3 * globalpeak.value.ctrl.zt)
+
+#print(signifikante_reihen_global_zt)
+length(signifikante_reihen_global_zt)
+```
+
+
+#### 7.3.3 protein amount under global peaks shift based on MMS
+
+```{r}
+signifikante_reihen_global_mms <- which(globalpeak.value.rnase.mms > 1.3 * globalpeak.value.ctrl.mms)
+
+#print(signifikante_reihen_global_mms)
+length(signifikante_reihen_global_mms)
+```
+With this method we can´t find any Rdeeps for the mms normalized data because all under all global peeks of the control and the RNase group the protein amount is 1. 
+
+
+### 7.4 protein amount under local peaks shift 
+
+#### 7.4.1 protein amount under local peaks shift based on MVM
 
 First we have to sum up the protein amount under all local peaks - for the control group 
 ```{r}
@@ -2372,14 +2406,14 @@ for (i in seq_along(localpeaks.values.rnase.mvm)) {
 Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
 Option 1: selbst festgelegter threshould 
 ```{r}
-signifikante_reihen_mvm <- which(localpeaks.sumvalues.rnase.mvm > 1.5* localpeaks.sumvalues.ctrl.mvm)
+signifikante_reihen_local_mvm <- which(localpeaks.sumvalues.rnase.mvm > 1.5* localpeaks.sumvalues.ctrl.mvm)
 
-#print(signifikante_reihen_mvm)
-length(signifikante_reihen_mvm)
+#print(signifikante_reihen_local_mvm)
+length(signifikante_reihen_local_mvm)
 
 ```
 
-#### 7.3.2 protein amount under local peaks shift based on z-Transformation
+#### 7.4.2 protein amount under local peaks shift based on z-Transformation
 ```{r}
 localpeaks.sumvalues.ctrl.zt <- data.frame(Summed_Values = numeric(length(localpeaks.values.ctrl.zt)))
 
@@ -2403,14 +2437,14 @@ for (i in seq_along(localpeaks.values.rnase.zt)) {
 ```
 
 ```{r}
-signifikante_reihen_zt <- which(localpeaks.sumvalues.rnase.zt > 1.5* localpeaks.sumvalues.ctrl.zt)
+signifikante_reihen_local_zt <- which(localpeaks.sumvalues.rnase.zt > 1.5* localpeaks.sumvalues.ctrl.zt)
 
-#print(signifikante_reihen_zt)
-length(signifikante_reihen_zt)
+#print(signifikante_reihen_local_zt)
+length(signifikante_reihen_local_zt)
 
 ```
 
-#### 7.3.3 protein amount under local peaks shift based on MMS
+#### 7.4.3 protein amount under local peaks shift based on MMS
 ```{r}
 localpeaks.sumvalues.ctrl.mms <- data.frame(Summed_Values = numeric(length(localpeaks.values.ctrl.mms)))
 
@@ -2435,10 +2469,10 @@ for (i in seq_along(localpeaks.values.rnase.mms)) {
 ```
 
 ```{r}
-signifikante_reihen_mms <- which(localpeaks.sumvalues.rnase.mms> 1.5* localpeaks.sumvalues.ctrl.mms)
+signifikante_reihen_local_mms <- which(localpeaks.sumvalues.rnase.mms> 1.5* localpeaks.sumvalues.ctrl.mms)
 
-#print(signifikante_reihen_mms)
-length(signifikante_reihen_mms)
+#print(signifikante_reihen_local_mms)
+length(signifikante_reihen_local_mms)
 
 ```
 
