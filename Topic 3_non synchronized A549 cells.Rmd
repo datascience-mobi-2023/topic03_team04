@@ -2340,6 +2340,114 @@ selec.shoulderregion.zt <- lapply(shoulderregion.zt, function(x)
 View(selec.shoulderregion.zt)
 ```
 
+### 7.3 protein amount under local peaks shift 
+
+#### 7.3.1 protein amount under local peaks shift based on MVM
+
+First we have to sum up the protein amount under all local peaks - for the control group 
+```{r}
+# Neue Tabelle zur Speicherung der aufsummierten Werte erstellen
+localpeaks.sumvalues.ctrl.mvm <- data.frame(Summed_Values = numeric(length(localpeaks.values.ctrl.mvm)))
+
+# Aufsummieren der Werte für jede Reihe
+for (i in seq_along(localpeaks.values.ctrl.mvm)) {
+  summed_values <- sum(localpeaks.values.ctrl.mvm[[i]])
+  localpeaks.sumvalues.ctrl.mvm[i, "Summed_Values"] <- summed_values
+}
+
+#View(localpeaks.sumvalues.ctrl.mvm)
+```
+
+First we have to sum up the protein amount under all local peaks - for the RNase group 
+```{r}
+localpeaks.sumvalues.rnase.mvm <- data.frame(Summed_Values = numeric(length(localpeaks.values.rnase.mvm)))
+
+for (i in seq_along(localpeaks.values.rnase.mvm)) {
+  summed_values <- sum(localpeaks.values.rnase.mvm[[i]])
+  localpeaks.sumvalues.rnase.mvm[i, "Summed_Values"] <- summed_values
+}
+
+#View(localpeaks.sumvalues.rnase.mvm)
+```
+Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
+Option 1: selbst festgelegter threshould 
+```{r}
+localpeaks.sumvalues.ctrl.mvm <- apply(ctrl.mvm, 1, function(x) max(x))
+localpeaks.sumvalues.rnase.mvm <- apply(rnase.mvm, 1, function(x) max(x))
+
+signifikante_reihen <- which(localpeaks.sumvalues.rnase.mvm > 1.2* localpeaks.sumvalues.ctrl.mvm)
+
+#View(signifikante_reihen)
+#length(signifikante_reihen)
+
+```
+Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
+Option 2: Testen der Signifikanz mit T-Test (funktioniert noch nicht perfekt)
+```{r}
+localpeaks.sumvalues.ctrl.mvm <- apply(ctrl.mvm, 1, function(x) max(x))
+localpeaks.sumvalues.rnase.mvm <- apply(rnase.mvm, 1, function(x) max(x))
+
+# Signifikanzniveau festlegen
+signifikanzniveau <- 0.05
+
+signifikante_reihen <- which(localpeaks.sumvalues.rnase.mvm > localpeaks.sumvalues.ctrl.mvm)
+
+# Berechnung der p-Werte mit einem statistischen Test (z. B. t-Test)
+p_values <- numeric(length(localpeaks.sumvalues.ctrl.mvm))
+for (i in 1:length(localpeaks.sumvalues.ctrl.mvm)) {
+  p_values[i] <- t.test(ctrl.mvm[i,], rnase.mvm[i,])$p.value
+}
+signifikante_reihen <- signifikante_reihen[p_values[signifikante_reihen] < signifikanzniveau]
+
+#View(signifikante_reihen)
+```
+
+#### 7.3.2 protein amount under local peaks shift based on z-Transformation
+```{r}
+localpeaks.sumvalues.ctrl.zt <- data.frame(Summed_Values = numeric(length(localpeaks.values.ctrl.zt)))
+
+for (i in seq_along(localpeaks.values.ctrl.zt)) {
+  summed_values <- sum(localpeaks.values.ctrl.zt[[i]])
+  localpeaks.sumvalues.ctrl.zt[i, "Summed_Values"] <- summed_values
+}
+
+#View(localpeaks.sumvalues.ctrl.zt)
+```
+
+```{r}
+localpeaks.sumvalues.rnase.zt <- data.frame(Summed_Values = numeric(length(localpeaks.values.rnase.zt)))
+
+for (i in seq_along(localpeaks.values.rnase.zt)) {
+  summed_values <- sum(localpeaks.values.rnase.zt[[i]])
+  localpeaks.sumvalues.rnase.zt[i, "Summed_Values"] <- summed_values
+}
+
+#View(localpeaks.sumvalues.rnase.zt)
+```
+
+#### 7.3.3 protein amount under local peaks shift based on MMS
+```{r}
+localpeaks.sumvalues.ctrl.mms <- data.frame(Summed_Values = numeric(length(localpeaks.values.ctrl.mms)))
+
+for (i in seq_along(localpeaks.values.ctrl.mms)) {
+  summed_values <- sum(localpeaks.values.ctrl.mms[[i]])
+  localpeaks.sumvalues.ctrl.mms[i, "Summed_Values"] <- summed_values
+}
+
+#View(localpeaks.sumvalues.ctrl.mms)
+```
+
+```{r}
+localpeaks.sumvalues.rnase.mms <- data.frame(Summed_Values = numeric(length(localpeaks.values.rnase.mms)))
+
+for (i in seq_along(localpeaks.values.rnase.mms)) {
+  summed_values <- sum(localpeaks.values.rnase.mms[[i]])
+  localpeaks.sumvalues.rnase.mms[i, "Summed_Values"] <- summed_values
+}
+
+#View(localpeaks.sumvalues.rnase.mms)
+```
+
 ## 8. Kmeans clustering
 
 ### 8.1. MVM
