@@ -1426,6 +1426,7 @@ for (i in seq_along(localpeaks.rnase.mms)) {localpeaks.rnase.mms[[i]] <- localpe
 localpeaks.values.rnase.mms <- lapply(seq_along(localpeaks.rnase.mms), function(i) peakidentif.rnase.mms[i, localpeaks.rnase.mms[[i]]])
 ```
 
+
 #### 5.3.3. Boundaries
 
 Futhermore, we have to look if there are peaks in fraction 1 or fraction 25. Again, we start with the identification of the boundaries for the control group.
@@ -2345,10 +2346,12 @@ View(selec.shoulderregion.zt)
 #### 7.3.1 protein amount under global peaks shift based on MVM
 We can test for proteins with a significant higher protein amount under the global peaks in the RNase group.
 ```{r}
-signifikante_reihen_global_mvm <- which(globalpeak.value.rnase.mvm > 1.3 * globalpeak.value.ctrl.mvm)
+signifikante_reihen_global_mvm <- data.frame(Zustimmung_global = ifelse(globalpeak.value.rnase.mvm > 1.5 * globalpeak.value.ctrl.mvm | globalpeak.value.ctrl.mvm > 1.5 * globalpeak.value.rnase.mvm, 1, 0))
 
-#print(signifikante_reihen_global_mvm)
-length(signifikante_reihen_global_mvm)
+rownames(signifikante_reihen_global_mvm) <- rownames(rnase.mvm)
+
+#View(signifikante_reihen_global_mvm)
+#dim(signifikante_reihen_global_mvm)
 
 ```
 
@@ -2356,20 +2359,26 @@ length(signifikante_reihen_global_mvm)
 #### 7.3.2 protein amount under global peaks shift based on z-Transformation
 
 ```{r}
-signifikante_reihen_global_zt <- which(globalpeak.value.rnase.zt > 1.3 * globalpeak.value.ctrl.zt)
+signifikante_reihen_global_zt <- data.frame(Zustimmung_global = ifelse(globalpeak.value.rnase.zt > 1.5 * globalpeak.value.ctrl.zt | globalpeak.value.ctrl.zt > 1.5 * globalpeak.value.rnase.zt, 1, 0))
 
-#print(signifikante_reihen_global_zt)
-length(signifikante_reihen_global_zt)
+rownames(signifikante_reihen_global_zt) <- rownames(rnase.zt)
+
+#View(signifikante_reihen_global_zt)
+#dim(signifikante_reihen_global_zt)
 ```
+
+
 
 
 #### 7.3.3 protein amount under global peaks shift based on MMS
 
 ```{r}
-signifikante_reihen_global_mms <- which(globalpeak.value.rnase.mms > 1.3 * globalpeak.value.ctrl.mms)
+signifikante_reihen_global_mms <- data.frame(Zustimmung_global = ifelse(globalpeak.value.rnase.mms > 1.5 * globalpeak.value.ctrl.mms | globalpeak.value.ctrl.mms > 1.5 * globalpeak.value.rnase.mms, 1, 0))
 
-#print(signifikante_reihen_global_mms)
-length(signifikante_reihen_global_mms)
+rownames(signifikante_reihen_global_mms) <- rownames(rnase.mms)
+
+#View(signifikante_reihen_global_mms)
+#dim(signifikante_reihen_global_mms)
 ```
 With this method we can´t find any Rdeeps for the mms normalized data because all under all global peeks of the control and the RNase group the protein amount is 1. 
 
@@ -2404,14 +2413,24 @@ for (i in seq_along(localpeaks.values.rnase.mvm)) {
 #View(localpeaks.sumvalues.rnase.mvm)  
 ```
 Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
-Option 1: selbst festgelegter threshould 
+selbst festgelegter Grenzwert 
+
 ```{r}
-signifikante_reihen_local_mvm <- which(localpeaks.sumvalues.rnase.mvm > 1.5* localpeaks.sumvalues.ctrl.mvm)
+signifikante_reihen_local_mvm <- data.frame(Zustimmung_local = rep(0, nrow(localpeaks.sumvalues.rnase.mvm)))
 
-#print(signifikante_reihen_local_mvm)
-length(signifikante_reihen_local_mvm)
+for (i in 1:nrow(localpeaks.sumvalues.rnase.mvm)) {
+  if (abs(localpeaks.sumvalues.rnase.mvm$Summed_Values[i] - localpeaks.sumvalues.ctrl.mvm$Summed_Values[i]) > 7.5)
+  {
+    signifikante_reihen_local_mvm$Zustimmung_local[i] <- 1
+  }
+}
 
+rownames(signifikante_reihen_local_mvm) <- rownames(rnase.mvm)
+
+#View(signifikante_reihen_local_mvm)
+#dim(signifikante_reihen_local_mvm)
 ```
+
 
 #### 7.4.2 protein amount under local peaks shift based on z-Transformation
 ```{r}
@@ -2437,11 +2456,20 @@ for (i in seq_along(localpeaks.values.rnase.zt)) {
 ```
 
 ```{r}
-signifikante_reihen_local_zt <- which(localpeaks.sumvalues.rnase.zt > 1.5* localpeaks.sumvalues.ctrl.zt)
+signifikante_reihen_local_zt <- data.frame(Zustimmung_local = rep(0, nrow(localpeaks.sumvalues.rnase.zt)))
 
-#print(signifikante_reihen_local_zt)
-length(signifikante_reihen_local_zt)
+for (i in 1:nrow(localpeaks.sumvalues.rnase.zt)) {
+  if (abs(localpeaks.sumvalues.rnase.zt$Summed_Values[i] - localpeaks.sumvalues.ctrl.zt$Summed_Values[i]) > 7.5)
+  {
+    signifikante_reihen_local_zt$Zustimmung_local[i] <- 1
+  }
+}
 
+rownames(signifikante_reihen_local_zt) <- rownames(rnase.zt)
+
+
+#View(signifikante_reihen_local_zt)
+#dim(signifikante_reihen_local_zt)
 ```
 
 #### 7.4.3 protein amount under local peaks shift based on MMS
@@ -2465,16 +2493,37 @@ for (i in seq_along(localpeaks.values.rnase.mms)) {
 }
 
 #View(localpeaks.sumvalues.rnase.mms)
-
 ```
 
 ```{r}
-signifikante_reihen_local_mms <- which(localpeaks.sumvalues.rnase.mms> 1.5* localpeaks.sumvalues.ctrl.mms)
+signifikante_reihen_local_mms <- data.frame(Zustimmung_local = rep(0, nrow(localpeaks.sumvalues.rnase.mms)))
 
-#print(signifikante_reihen_local_mms)
-length(signifikante_reihen_local_mms)
+for (i in 1:nrow(localpeaks.sumvalues.rnase.mms)) {
+  if (abs(localpeaks.sumvalues.rnase.mms$Summed_Values[i] - localpeaks.sumvalues.ctrl.mms$Summed_Values[i]) > 7.5)
+  {
+    signifikante_reihen_local_mms$Zustimmung_local[i] <- 1
+  }
+}
 
+rownames(signifikante_reihen_local_mms) <- rownames(rnase.mms)
+
+#View(signifikante_reihen_local_mms)
+#dim(signifikante_reihen_local_mms)
 ```
+```{r}
+View(localpeaks.values.rnase.mms)
+```
+
+### 7.5 dataframe with all parameters
+
+```{r}
+parameters_mvm <- cbind(signifikante_reihen_global_mvm, signifikante_reihen_local_mvm, shift_mvm_named)
+
+parameters_zt <- cbind(signifikante_reihen_global_zt, signifikante_reihen_local_zt, shift_zt_named)
+
+parameters_mms <- cbind(signifikante_reihen_global_mms, signifikante_reihen_local_mms, shift_mms_named)
+```
+
 
 ## 8. Kmeans clustering
 
