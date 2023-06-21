@@ -934,7 +934,7 @@ for (i in 1:num_rows) {
 Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
 
 ```{r}
-# print( plots_ctrl_rnase.mvm[[6]])
+#print( plots_ctrl_rnase.mvm[[6]])
 ```
 
 ### 4.2. Line Graphs for the z_transformation - normalization
@@ -2367,39 +2367,16 @@ for (i in seq_along(localpeaks.values.rnase.mvm)) {
   localpeaks.sumvalues.rnase.mvm[i, "Summed_Values"] <- summed_values
 }
 
-#View(localpeaks.sumvalues.rnase.mvm)
+#View(localpeaks.sumvalues.rnase.mvm)  
 ```
 Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
 Option 1: selbst festgelegter threshould 
 ```{r}
-localpeaks.sumvalues.ctrl.mvm <- apply(ctrl.mvm, 1, function(x) max(x))
-localpeaks.sumvalues.rnase.mvm <- apply(rnase.mvm, 1, function(x) max(x))
+signifikante_reihen_mvm <- which(localpeaks.sumvalues.rnase.mvm > 1.5* localpeaks.sumvalues.ctrl.mvm)
 
-signifikante_reihen <- which(localpeaks.sumvalues.rnase.mvm > 1.2* localpeaks.sumvalues.ctrl.mvm)
+#print(signifikante_reihen_mvm)
+length(signifikante_reihen_mvm)
 
-#View(signifikante_reihen)
-#length(signifikante_reihen)
-
-```
-Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
-Option 2: Testen der Signifikanz mit T-Test (funktioniert noch nicht perfekt)
-```{r}
-localpeaks.sumvalues.ctrl.mvm <- apply(ctrl.mvm, 1, function(x) max(x))
-localpeaks.sumvalues.rnase.mvm <- apply(rnase.mvm, 1, function(x) max(x))
-
-# Signifikanzniveau festlegen
-signifikanzniveau <- 0.05
-
-signifikante_reihen <- which(localpeaks.sumvalues.rnase.mvm > localpeaks.sumvalues.ctrl.mvm)
-
-# Berechnung der p-Werte mit einem statistischen Test (z. B. t-Test)
-p_values <- numeric(length(localpeaks.sumvalues.ctrl.mvm))
-for (i in 1:length(localpeaks.sumvalues.ctrl.mvm)) {
-  p_values[i] <- t.test(ctrl.mvm[i,], rnase.mvm[i,])$p.value
-}
-signifikante_reihen <- signifikante_reihen[p_values[signifikante_reihen] < signifikanzniveau]
-
-#View(signifikante_reihen)
 ```
 
 #### 7.3.2 protein amount under local peaks shift based on z-Transformation
@@ -2425,6 +2402,14 @@ for (i in seq_along(localpeaks.values.rnase.zt)) {
 #View(localpeaks.sumvalues.rnase.zt)
 ```
 
+```{r}
+signifikante_reihen_zt <- which(localpeaks.sumvalues.rnase.zt > 1.5* localpeaks.sumvalues.ctrl.zt)
+
+#print(signifikante_reihen_zt)
+length(signifikante_reihen_zt)
+
+```
+
 #### 7.3.3 protein amount under local peaks shift based on MMS
 ```{r}
 localpeaks.sumvalues.ctrl.mms <- data.frame(Summed_Values = numeric(length(localpeaks.values.ctrl.mms)))
@@ -2446,6 +2431,15 @@ for (i in seq_along(localpeaks.values.rnase.mms)) {
 }
 
 #View(localpeaks.sumvalues.rnase.mms)
+
+```
+
+```{r}
+signifikante_reihen_mms <- which(localpeaks.sumvalues.rnase.mms> 1.5* localpeaks.sumvalues.ctrl.mms)
+
+#print(signifikante_reihen_mms)
+length(signifikante_reihen_mms)
+
 ```
 
 ## 8. Kmeans clustering
@@ -2457,7 +2451,7 @@ Nur temporär das kmeans funktioniert
 
 ```{r}
 #shift of local maxima
-lshift.mvm <- sample(1:100, length(shift.mms), replace = TRUE)
+lshift.mvm <- sample(1:100, length(precipitated.mvm), replace = TRUE)
 
 ```
 
@@ -2465,7 +2459,7 @@ lshift.mvm <- sample(1:100, length(shift.mms), replace = TRUE)
 
 gshift <- shift_mvm_global
 lshift <- lshift.mvm
-precipitated <- precipitated.mvm.v
+precipitated <- precipitated.mvm
 
 w.gshift <- 1
 w.lshift <- 0
@@ -2591,11 +2585,11 @@ First we will set the variables:
 
 gshift <- shift_zt_global
 lshift <- lshift.mvm
-precipitated <- precipitated.zt.v
+precipitated <- precipitated.zt
 
 w.gshift <- 1
 w.lshift <- 0
-w.precipitated <- 5
+w.precipitated <- 0
 
 peak.ctrl <- globalpeak.ctrl.zt
 peak.rnase <- globalpeak.rnase.zt
