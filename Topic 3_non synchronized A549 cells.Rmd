@@ -260,15 +260,20 @@ We now have clean data, with proteins that have reproducible data we can use for
 
 ## 3. Scaled and Reduced Dataset
 
+```{r}
+View(ctrl.rep)
+```
+
+
 For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.
 
 ```{r}
-ctrl.rep1 <- ctrl.clean[,1:25]
-ctrl.rep2 <- ctrl.clean[,26:50]
-ctrl.rep3 <- ctrl.clean[,51:75]
-rnase.rep1 <- rnase.clean[,1:25]
-rnase.rep2 <- rnase.clean[,26:50]
-rnase.rep3 <- rnase.clean[,51:75]
+ctrl.rep1 <- ctrl.rep[,1:25]
+ctrl.rep2 <- ctrl.rep[,26:50]
+ctrl.rep3 <- ctrl.rep[,51:75]
+rnase.rep1 <- rnase.rep[,1:25]
+rnase.rep2 <- rnase.rep[,26:50]
+rnase.rep3 <- rnase.rep[,51:75]
 ```
 
 ### 3.1. Mean Value Method
@@ -370,7 +375,7 @@ r3r0[is.na(r3r)] <- 0
 rnase.mvm.reduced <-  (r1r0 + r2r0 + r3r0)/(3 - ((sum(is.na(r1r[x,]) + is.na(r2r[x,]) + is.na(r3r[x,])))/25))
                         
 
-#View(rnase.mvm.reduced)
+View(rnase.mvm.reduced)
 ```
 
 #### 3.1.3. Scaling
@@ -399,7 +404,6 @@ Because scaling back to 100 is necessary, we do it for the RNase too:
 ```{r}
 rnase.mvm.scaled = 
   sweep(rnase.mvm.reduced,1,100/rowSums(rnase.mvm.reduced),'*')
-
 ```
 
 Now we have normalized our data using the mean-value-method, and scaled it to 100. The two variables that will be used later on either contain the normalized (mvm) and scaled data of the control: **ctrl.mvm** or the normalized (mvm) and scaled data of the rnase: **rnase.mvm**
@@ -754,11 +758,11 @@ Those have to be scaled again:
 
 ```{r}
 ctrl.mms.scaled <- t(apply(ctrl.mms.reduced, 1, function(x) {
-  normalized <- (x-min(x))/(max(x)-min(x))
+  normalized <- ((x-min(x))/(max(x)-min(x)))*100
 }))
 
 rnase.mms.scaled <- t(apply(rnase.mms.reduced, 1, function(x){
-  normalized <- (x-min(x))/(max(x)-min(x))
+  normalized <- ((x-min(x))/(max(x)-min(x)))*100
 }))
 ```
 
@@ -789,9 +793,6 @@ ctrl.mms <- ctrl.mms.scaled
 colnames(ctrl.mms) <- new.colnames.ctrl
 rnase.mms <- rnase.mms.scaled
 colnames(rnase.mms) <- new.colnames.rnase
-
-# View(ctrl.mms)
-# View(rnase.mms)
 ```
 
 The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames: **ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
@@ -934,7 +935,7 @@ for (i in 1:num_rows) {
 Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
 
 ```{r}
-# print( plots_ctrl_rnase.mvm[[6]])
+print( plots_ctrl_rnase.mvm[[4]])
 ```
 
 ### 4.2. Line Graphs for the z_transformation - normalization
@@ -1409,6 +1410,7 @@ for (i in seq_along(localpeaks.ctrl.mms)) {localpeaks.ctrl.mms[[i]] <- localpeak
 
 localpeaks.values.ctrl.mms <- lapply(seq_along(localpeaks.ctrl.mms), function(i) peakidentif.ctrl.mms[i, localpeaks.ctrl.mms[[i]]])
 ```
+
 
 ```{r}
 colnames(peakidentif.rnase.mms) <- paste0("Rnase_Fraction", seq_along(colnames(peakidentif.rnase.mms)) - 1)
@@ -2025,7 +2027,12 @@ precipitated.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitate
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
 ```{r}
-n = 2
+View(shift_mvm_named)
+```
+
+
+```{r}
+n = 1
 shift_mvm_global <- globalpeak.rnase.mvm - globalpeak.ctrl.mvm
 
 shift_mvm_named <- shift_mvm_global
@@ -2344,6 +2351,12 @@ View(selec.shoulderregion.zt)
 
 #### 7.3.1 protein amount under local peaks shift based on MVM
 
+```{r}
+View(localpeaks.values.ctrl.mvm)
+View(localpeaks.ctrl.mvm)
+```
+
+
 First we have to sum up the protein amount under all local peaks - for the control group 
 ```{r}
 # Neue Tabelle zur Speicherung der aufsummierten Werte erstellen
@@ -2355,7 +2368,7 @@ for (i in seq_along(localpeaks.values.ctrl.mvm)) {
   localpeaks.sumvalues.ctrl.mvm[i, "Summed_Values"] <- summed_values
 }
 
-#View(localpeaks.sumvalues.ctrl.mvm)
+View(localpeaks.sumvalues.ctrl.mvm)
 ```
 
 First we have to sum up the protein amount under all local peaks - for the RNase group 
@@ -2370,6 +2383,7 @@ for (i in seq_along(localpeaks.values.rnase.mvm)) {
 #View(localpeaks.sumvalues.rnase.mvm)  
 ```
 Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
+
 Option 1: selbst festgelegter threshould 
 ```{r}
 localpeaks.sumvalues.ctrl.mvm <- apply(ctrl.mvm, 1, function(x) max(x))
@@ -2382,6 +2396,15 @@ signifikante_reihen <- which(localpeaks.sumvalues.rnase.mvm > 1.2* localpeaks.su
 
 ```
 Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
+
+t-test:
+```{r}
+View(localpeaks.sumvalues.rnase.mvm)
+dim(localpeaks.sumvalues.ctrl.mvm)
+```
+
+
+
 Option 2: Testen der Signifikanz mit T-Test (funktioniert noch nicht perfekt)
 ```{r}
 localpeaks.sumvalues.ctrl.mvm <- apply(ctrl.mvm, 1, function(x) max(x))
