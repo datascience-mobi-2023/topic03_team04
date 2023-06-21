@@ -934,7 +934,7 @@ for (i in 1:num_rows) {
 Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
 
 ```{r}
-#print( plots_ctrl_rnase.mvm[[6]])
+print( plots_ctrl_rnase.mvm[[116]])
 ```
 
 ### 4.2. Line Graphs for the z_transformation - normalization
@@ -1043,14 +1043,14 @@ for (i in 1:num_rows) {
 ```
 
 ```{r}
-plots_ctrl_rnase.zt[[23]]
+plots_ctrl_rnase.zt[[5]]
 ```
 
 
 Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
 
 ```{r}
-# print(plots_ctrl_rnase.zt[[7]])
+print(plots_ctrl_rnase.zt[[116]])
 ```
 
 ### 4.3. Line Graphs for the min - max - scaling
@@ -1463,16 +1463,14 @@ Save all relevant data:
 
 ```{r}
 # mvm
-<<<<<<< HEAD
 saveRDS(sd.mean.ctrl.mvm, file = "Non_synchronized_A549_sd.mean.ctrl.mvm ")
 saveRDS(sd.mean.rnase.mvm , file = "Non_synchronized_A549_sd.mean.rnase.mvm")
 
 saveRDS(globalpeak.ctrl.mvm, file = "Non_synchronized_A549_globalpeak.ctrl.mvm")
 saveRDS(globalpeak.value.ctrl.mvm, file = "Non_synchronized_A549_globalpeak.value.ctrl.mvm")
-=======
+
 saveRDS(globalpeak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mvm")
 saveRDS(globalpeak.value.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mvm")
->>>>>>> main
 
 saveRDS(globalpeak.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mvm")
 saveRDS(globalpeak.value.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mvm")
@@ -1494,16 +1492,14 @@ saveRDS(precipitated.mvm, file = "gespeicherteDaten/Non_synchronized_A549_precip
 
 ```{r}
 # zt
-<<<<<<< HEAD
 saveRDS(sd.mean.ctrl.zt, file = "Non_synchronized_A549_sd.mean.ctrl.zt ")
 saveRDS(sd.mean.rnase.zt , file = "Non_synchronized_A549_sd.mean.rnase.zt")
 
 saveRDS(globalpeak.ctrl.zt, file = "Non_synchronized_A549_globalpeak.ctrl.zt")
 saveRDS(globalpeak.value.ctrl.zt, file = "Non_synchronized_A549_globalpeak.value.ctrl.zt")
-=======
+
 saveRDS(globalpeak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.zt")
 saveRDS(globalpeak.value.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.zt")
->>>>>>> main
 
 saveRDS(globalpeak.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.zt")
 saveRDS(globalpeak.value.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.zt")
@@ -1525,16 +1521,15 @@ saveRDS(precipitated.zt, file = "gespeicherteDaten/Non_synchronized_A549_precipi
 
 ```{r}
 # mms
-<<<<<<< HEAD
+
 saveRDS(sd.mean.ctrl.mms, file = "Non_synchronized_A549_sd.mean.ctrl.mms ")
 saveRDS(sd.mean.rnase.mms , file = "Non_synchronized_A549_sd.mean.rnase.mms")
 
 saveRDS(globalpeak.ctrl.mms, file = "Non_synchronized_A549_globalpeak.ctrl.mms")
 saveRDS(globalpeak.value.ctrl.mms, file = "Non_synchronized_A549_globalpeak.value.ctrl.mms")
-=======
+
 saveRDS(globalpeak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mms")
 saveRDS(globalpeak.value.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mms")
->>>>>>> main
 
 saveRDS(globalpeak.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mms")
 saveRDS(globalpeak.value.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mms")
@@ -2181,6 +2176,162 @@ for (i in 1:dim(ctrl.mms)[1]){
 
 ### 7.2 Shoulderregions
 
+### 7.2.1 Shoulderregions based on Mean-Value-Method
+
+Proteins can also be RNA dependent even if they do not have a significant shift. The protein amount can changes significantly without an shift. One indicator could be the appearance of a shoulder regions.
+
+```{r}
+shreg.rnase.mvm <- rnase.mvm
+```
+
+
+First, we identify fraction (regions) of proteins with high protein amount. 
+```{r}
+largevalues.rnase.mvm <- apply(shreg.rnase.mvm[,2:24], 1, function(x) {
+  largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
+  peak_mean <- sapply(largevalues_indices, function(i) mean(x[(i-1):(i+1)]))
+  largevalues_indices <- largevalues_indices[peak_mean > 4.5]
+  unique(c(largevalues_indices - 1 , largevalues_indices, largevalues_indices + 1))
+})
+```
+
+Now, all regions (= 3 fractions) with a sd smaller then the sd for our normal fluctuation used by peak identification are selected.
+```{r}
+closereg.rnase.mvm <- list()
+for (i in 1:nrow(shreg.rnase.mvm)) {
+  row <- shreg.rnase.mvm[i,]
+  indices <- c()
+  
+  for (j in 1:(ncol(shreg.rnase.mvm)-2)) {
+    values <- as.numeric(row[j:(j+2)])
+    
+    if (sd(values) < sd.mean.rnase.mvm) { 
+      indices <- c(indices, j:(j+2))}}
+ 
+    if (length(indices) == 0) {
+    closereg.rnase.mvm[[i]] <- numeric(0)}
+    
+    else {closereg.rnase.mvm[[i]] <- indices}}
+```
+
+We just want to have the large values which also occur in close value.
+```{r}
+largevalues.closereg.rnase.mvm <- largevalues.rnase.mvm
+for (i in seq_along(largevalues.closereg.rnase.mvm)) {
+    largevalues.closereg.rnase.mvm[[i]] <- largevalues.closereg.rnase.mvm[[i]][largevalues.closereg.rnase.mvm[[i]] %in% closereg.rnase.mvm[[i]]]}
+ordered.largevalues.closereg.rnase.mvm <- lapply(largevalues.closereg.rnase.mvm,function(row){sort(row)})
+```
+
+```{r}
+shoulderregion.rnase.mvm <- lapply(ordered.largevalues.closereg.rnase.mvm,function(x) {
+    diffs <- c(1, diff(x))
+    groups <- rle(diffs)
+    shoulderregion <- which(groups$values == 1 & groups$lengths >= 2)
+    if (length(shoulderregion) > 0) {
+        starts <- cumsum(groups$lengths)[shoulderregion] - groups$lengths[shoulderregion] 
+        ends <- cumsum(groups$lengths)[shoulderregion]
+        shoulderregion <- mapply(function(start, end) x[start:end], starts, ends)
+    }
+    return(shoulderregion)
+})
+```
+
+We continue with the ctrl group.
+```{r}
+shreg.ctrl.mvm <- ctrl.mvm
+```
+
+First, we identify fraction (regions) of proteins with high protein amount. 
+```{r}
+largevalues.ctrl.mvm <- apply(shreg.ctrl.mvm[,2:24], 1, function(x) {
+  largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
+  peak_mean <- sapply(largevalues_indices, function(i) mean(x[(i-1):(i+1)]))
+  largevalues_indices <- largevalues_indices[peak_mean > 4.5]
+  unique(c(largevalues_indices - 1 , largevalues_indices, largevalues_indices + 1))
+})
+```
+
+```{r}
+closereg.ctrl.mvm <- list()
+for (i in 1:nrow(shreg.ctrl.mvm)) {
+  row <- shreg.ctrl.mvm[i,]
+  indices <- c()
+  
+  for (j in 1:(ncol(shreg.ctrl.mvm)-2)) {
+    values <- as.numeric(row[j:(j+2)])
+    
+    if (sd(values) < sd.mean.ctrl.mvm) { 
+      indices <- c(indices, j:(j+2))}}
+ 
+    if (length(indices) == 0) {
+    closereg.ctrl.mvm[[i]] <- numeric(0)}
+    
+    else {closereg.ctrl.mvm[[i]] <- indices}}
+```
+
+We just want to have the large values which also occur in close value.
+```{r}
+largevalues.closereg.ctrl.mvm <- largevalues.ctrl.mvm
+for (i in seq_along(largevalues.closereg.ctrl.mvm)) {
+    largevalues.closereg.ctrl.mvm[[i]] <- largevalues.closereg.ctrl.mvm[[i]][largevalues.closereg.ctrl.mvm[[i]] %in% closereg.ctrl.mvm[[i]]]}
+ordered.largevalues.closereg.ctrl.mvm <- lapply(largevalues.closereg.ctrl.mvm,function(row){sort(row)})
+```
+
+```{r}
+shoulderregion.ctrl.mvm <- lapply(ordered.largevalues.closereg.ctrl.mvm,function(x) {
+    diffs <- c(1, diff(x))
+    groups <- rle(diffs)
+    shoulderregion <- which(groups$values == 1 & groups$lengths >= 2)
+    if (length(shoulderregion) > 0) {
+        starts <- cumsum(groups$lengths)[shoulderregion] - groups$lengths[shoulderregion] 
+        ends <- cumsum(groups$lengths)[shoulderregion]
+        shoulderregion <- mapply(function(start, end) x[start:end], starts, ends)
+    }
+    return(shoulderregion)
+})
+```
+
+Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
+```{r}
+shoulderregion.a.mvm <- lapply(names(shoulderregion.ctrl.mvm), function(x) setdiff(shoulderregion.ctrl.mvm[[x]], shoulderregion.rnase.mvm[[x]]))
+names(shoulderregion.a.mvm) <- names(shoulderregion.ctrl.mvm)
+
+shoulderregion.b.mvm <- lapply(names(shoulderregion.rnase.mvm), function(x) setdiff(shoulderregion.rnase.mvm[[x]], shoulderregion.ctrl.mvm[[x]]))
+names(shoulderregion.b.mvm) <- names(shoulderregion.rnase.mvm)
+```
+
+At last, we only want does proteins with entries more than 2. The others have no significant difference.
+```{r}
+selec.shoulderregion.a.mvm <- lapply(shoulderregion.a.mvm, function(x) 
+  if (length(x) < 3) {return(numeric(0))} 
+  else {return(x)})
+
+selec.shoulderregion.b.mvm <- lapply(shoulderregion.b.mvm, function(x) 
+  if (length(x) < 3) {return(numeric(0))} 
+  else {return(x)})
+```
+
+To include the shoulder regions into the dataframe with parameters, we create a new dataframe with 0 for shoulderregion and 1 with shoulderregion.
+```{r}
+selec.shoulderregion.a.1.mvm <- lapply(shoulderregion.a.mvm, function(x) 
+  if (length(x) > 2) {return (1)} 
+  else {return(0)})
+
+selec.shoulderregion.b.1.mvm <- lapply(shoulderregion.b.mvm, function(x) 
+  if (length(x) > 2) {return (1)} 
+  else {return(0)})
+
+shoulderregion.mvm.1.nt <- as.data.frame(selec.shoulderregion.a.1.mvm)
+shoulderregion.mvm.2.nt <- as.data.frame(selec.shoulderregion.b.1.mvm)
+
+shoulderregion.mvm.nt <- shoulderregion.mvm.1.nt + shoulderregion.mvm.2.nt
+
+shoulderregion.mvm.nt.nt <- data.frame(lapply(shoulderregion.mvm.nt, function(x) ifelse(x == 2, 1, x)))
+
+ShoulderRegion_mvm <- t(shoulderregion.mvm.nt.nt)
+
+# View(ShoulderRegion_mvm)
+```
 
 ### 7.2.2 Shoulderregions based on z-Transformed values
 
@@ -2328,109 +2479,284 @@ shoulderregion.ctrl.zt <- lapply(ordered.largevalues.closereg.ctrl.zt,function(x
 
 Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
 ```{r}
-shoulderregion.zt <- lapply(names(shoulderregion.ctrl.zt), function(x) setdiff(shoulderregion.ctrl.zt[[x]], shoulderregion.rnase.zt[[x]]))
-names(shoulderregion.zt) <- names(shoulderregion.ctrl.zt)
+shoulderregion.a.zt <- lapply(names(shoulderregion.ctrl.zt), function(x) setdiff(shoulderregion.ctrl.zt[[x]], shoulderregion.rnase.zt[[x]]))
+names(shoulderregion.a.zt) <- names(shoulderregion.ctrl.zt)
+
+shoulderregion.b.zt <- lapply(names(shoulderregion.rnase.zt), function(x) setdiff(shoulderregion.rnase.zt[[x]], shoulderregion.ctrl.zt[[x]]))
+names(shoulderregion.b.zt) <- names(shoulderregion.rnase.zt)
 ```
 
 At last, we only want does proteins with entries more than 2. The others have no significant difference.
 ```{r}
-selec.shoulderregion.zt <- lapply(shoulderregion.zt, function(x) 
+selec.shoulderregion.a.zt <- lapply(shoulderregion.a.zt, function(x) 
   if (length(x) < 3) {return(numeric(0))} 
   else {return(x)})
 
-View(selec.shoulderregion.zt)
+selec.shoulderregion.b.zt <- lapply(shoulderregion.b.zt, function(x) 
+  if (length(x) < 3) {return(numeric(0))} 
+  else {return(x)})
 ```
 
-### 7.3 protein amount under global peaks shift 
-
-#### 7.3.1 protein amount under global peaks shift based on MVM
-We can test for proteins with a significant higher protein amount under the global peaks in the RNase group.
+To include the shoulder regions into the dataframe with parameters, we create a new dataframe with 0 for shoulderregion and 1 with shoulderregion.
 ```{r}
-signifikante_reihen_global_mvm <- data.frame(Zustimmung_global = ifelse(globalpeak.value.rnase.mvm > 1.5 * globalpeak.value.ctrl.mvm | globalpeak.value.ctrl.mvm > 1.5 * globalpeak.value.rnase.mvm, 1, 0))
+selec.shoulderregion.a.1.zt <- lapply(shoulderregion.a.zt, function(x) 
+  if (length(x) > 2) {return (1)} 
+  else {return(0)})
 
-rownames(signifikante_reihen_global_mvm) <- rownames(rnase.mvm)
+selec.shoulderregion.b.1.zt <- lapply(shoulderregion.b.zt, function(x) 
+  if (length(x) > 2) {return (1)} 
+  else {return(0)})
 
-#View(signifikante_reihen_global_mvm)
-#dim(signifikante_reihen_global_mvm)
+shoulderregion.zt.1.nt <- as.data.frame(selec.shoulderregion.a.1.zt)
+shoulderregion.zt.2.nt <- as.data.frame(selec.shoulderregion.b.1.zt)
 
+shoulderregion.zt.nt <- shoulderregion.zt.1.nt + shoulderregion.zt.2.nt
+
+shoulderregion.zt.nt.nt <- data.frame(lapply(shoulderregion.zt.nt, function(x) ifelse(x == 2, 1, x)))
+
+ShoulderRegion_zt <- t(shoulderregion.zt.nt.nt)
+
+# View(ShoulderRegion_zt)
+```
+
+### 7.2.3 Shoulderregions based on Min-Max-Scaling
+
+Proteins can also be RNA dependent even if they do not have a significant shift. The protein amount can changes significantly without an shift. One indicator could be the appearance of a shoulder regions.
+
+```{r}
+shreg.rnase.mms <- rnase.mms
 ```
 
 
+First, we identify fraction (regions) of proteins with high protein amount. 
+```{r}
+largevalues.rnase.mms <- apply(shreg.rnase.mms[,2:24], 1, function(x) {
+  largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
+  peak_mean <- sapply(largevalues_indices, function(i) mean(x[(i-1):(i+1)]))
+  largevalues_indices <- largevalues_indices[peak_mean > 4.5]
+  unique(c(largevalues_indices - 1 , largevalues_indices, largevalues_indices + 1))
+})
+```
+
+Now, all regions (= 3 fractions) with a sd smaller then the sd for our normal fluctuation used by peak identification are selected.
+```{r}
+closereg.rnase.mms <- list()
+for (i in 1:nrow(shreg.rnase.mms)) {
+  row <- shreg.rnase.mms[i,]
+  indices <- c()
+  
+  for (j in 1:(ncol(shreg.rnase.mms)-2)) {
+    values <- as.numeric(row[j:(j+2)])
+    
+    if (sd(values) < sd.mean.rnase.mms) { 
+      indices <- c(indices, j:(j+2))}}
+ 
+    if (length(indices) == 0) {
+    closereg.rnase.mms[[i]] <- numeric(0)}
+    
+    else {closereg.rnase.mms[[i]] <- indices}}
+```
+
+We just want to have the large values which also occur in close value.
+```{r}
+largevalues.closereg.rnase.mms <- largevalues.rnase.mms
+for (i in seq_along(largevalues.closereg.rnase.mms)) {
+    largevalues.closereg.rnase.mms[[i]] <- largevalues.closereg.rnase.mms[[i]][largevalues.closereg.rnase.mms[[i]] %in% closereg.rnase.mms[[i]]]}
+ordered.largevalues.closereg.rnase.mms <- lapply(largevalues.closereg.rnase.mms,function(row){sort(row)})
+```
+
+```{r}
+shoulderregion.rnase.mms <- lapply(ordered.largevalues.closereg.rnase.mms,function(x) {
+    diffs <- c(1, diff(x))
+    groups <- rle(diffs)
+    shoulderregion <- which(groups$values == 1 & groups$lengths >= 2)
+    if (length(shoulderregion) > 0) {
+        starts <- cumsum(groups$lengths)[shoulderregion] - groups$lengths[shoulderregion] 
+        ends <- cumsum(groups$lengths)[shoulderregion]
+        shoulderregion <- mapply(function(start, end) x[start:end], starts, ends)
+    }
+    return(shoulderregion)
+})
+```
+
+We continue with the ctrl group.
+```{r}
+shreg.ctrl.mms <- ctrl.mms
+```
+
+First, we identify fraction (regions) of proteins with high protein amount. 
+```{r}
+largevalues.ctrl.mms <- apply(shreg.ctrl.mms[,2:24], 1, function(x) {
+  largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
+  peak_mean <- sapply(largevalues_indices, function(i) mean(x[(i-1):(i+1)]))
+  largevalues_indices <- largevalues_indices[peak_mean > 4.5]
+  unique(c(largevalues_indices - 1 , largevalues_indices, largevalues_indices + 1))
+})
+```
+
+```{r}
+closereg.ctrl.mms <- list()
+for (i in 1:nrow(shreg.ctrl.mms)) {
+  row <- shreg.ctrl.mms[i,]
+  indices <- c()
+  
+  for (j in 1:(ncol(shreg.ctrl.mms)-2)) {
+    values <- as.numeric(row[j:(j+2)])
+    
+    if (sd(values) < sd.mean.ctrl.mms) { 
+      indices <- c(indices, j:(j+2))}}
+ 
+    if (length(indices) == 0) {
+    closereg.ctrl.mms[[i]] <- numeric(0)}
+    
+    else {closereg.ctrl.mms[[i]] <- indices}}
+```
+
+We just want to have the large values which also occur in close value.
+```{r}
+largevalues.closereg.ctrl.mms <- largevalues.ctrl.mms
+for (i in seq_along(largevalues.closereg.ctrl.mms)) {
+    largevalues.closereg.ctrl.mms[[i]] <- largevalues.closereg.ctrl.mms[[i]][largevalues.closereg.ctrl.mms[[i]] %in% closereg.ctrl.mms[[i]]]}
+ordered.largevalues.closereg.ctrl.mms <- lapply(largevalues.closereg.ctrl.mms,function(row){sort(row)})
+```
+
+```{r}
+shoulderregion.ctrl.mms <- lapply(ordered.largevalues.closereg.ctrl.mms,function(x) {
+    diffs <- c(1, diff(x))
+    groups <- rle(diffs)
+    shoulderregion <- which(groups$values == 1 & groups$lengths >= 2)
+    if (length(shoulderregion) > 0) {
+        starts <- cumsum(groups$lengths)[shoulderregion] - groups$lengths[shoulderregion] 
+        ends <- cumsum(groups$lengths)[shoulderregion]
+        shoulderregion <- mapply(function(start, end) x[start:end], starts, ends)
+    }
+    return(shoulderregion)
+})
+```
+
+Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
+```{r}
+shoulderregion.a.mms <- lapply(names(shoulderregion.ctrl.mms), function(x) setdiff(shoulderregion.ctrl.mms[[x]], shoulderregion.rnase.mms[[x]]))
+names(shoulderregion.a.mms) <- names(shoulderregion.ctrl.mms)
+
+shoulderregion.b.mms <- lapply(names(shoulderregion.rnase.mms), function(x) setdiff(shoulderregion.rnase.mms[[x]], shoulderregion.ctrl.mms[[x]]))
+names(shoulderregion.b.mms) <- names(shoulderregion.rnase.mms)
+```
+
+At last, we only want does proteins with entries more than 2. The others have no significant difference.
+```{r}
+selec.shoulderregion.a.mms <- lapply(shoulderregion.a.mms, function(x) 
+  if (length(x) < 3) {return(numeric(0))} 
+  else {return(x)})
+
+selec.shoulderregion.b.mms <- lapply(shoulderregion.b.mms, function(x) 
+  if (length(x) < 3) {return(numeric(0))} 
+  else {return(x)})
+```
+
+To include the shoulder regions into the dataframe with parameters, we create a new dataframe with 0 for shoulderregion and 1 with shoulderregion.
+```{r}
+selec.shoulderregion.a.1.mms <- lapply(shoulderregion.a.mvm, function(x) 
+  if (length(x) > 2) {return (1)} 
+  else {return(0)})
+
+selec.shoulderregion.b.1.mms <- lapply(shoulderregion.b.mms, function(x) 
+  if (length(x) > 2) {return (1)} 
+  else {return(0)})
+
+shoulderregion.mms.1.nt <- as.data.frame(selec.shoulderregion.a.1.mms)
+shoulderregion.mms.2.nt <- as.data.frame(selec.shoulderregion.b.1.mms)
+
+shoulderregion.mms.nt <- shoulderregion.mms.1.nt + shoulderregion.mms.2.nt
+
+shoulderregion.mms.nt.nt <- data.frame(lapply(shoulderregion.mms.nt, function(x) ifelse(x == 2, 1, x)))
+
+ShoulderRegion_mms <- t(shoulderregion.mms.nt.nt)
+
+# View(ShoulderRegion_mms)
+```
+
+### 7.3 Protein amount under global peak
+
+#### 7.3.1 protein amount under global peak based on Mean-Value-Methode
+We can test for proteins with a significant higher protein amount under the global peaks in the RNase group.
+
+```{r}
+signi.global.pa.mvm <- data.frame(PA_global = ifelse(globalpeak.value.rnase.mvm > 1.7 * globalpeak.value.ctrl.mvm | globalpeak.value.ctrl.mvm > 1.7 * globalpeak.value.rnase.mvm, 1, 0))
+
+rownames(signi.global.pa.mvm) <- rownames(rnase.mvm)
+
+View(signi.global.pa.mvm)
+# dim(signi.global.pa.mvm)
+
+length(which(signi.global.pa.mvm==1))
+```
 #### 7.3.2 protein amount under global peaks shift based on z-Transformation
 
 ```{r}
-signifikante_reihen_global_zt <- data.frame(Zustimmung_global = ifelse(globalpeak.value.rnase.zt > 1.5 * globalpeak.value.ctrl.zt | globalpeak.value.ctrl.zt > 1.5 * globalpeak.value.rnase.zt, 1, 0))
-
-rownames(signifikante_reihen_global_zt) <- rownames(rnase.zt)
-
-#View(signifikante_reihen_global_zt)
-#dim(signifikante_reihen_global_zt)
+Nr <- c(1:dim(rnase.rep.zt.scaled)[1])
+rnase.zt.nr <- cbind(Nr,rnase.zt)
 ```
 
-
-
-
-#### 7.3.3 protein amount under global peaks shift based on MMS
-
 ```{r}
-signifikante_reihen_global_mms <- data.frame(Zustimmung_global = ifelse(globalpeak.value.rnase.mms > 1.5 * globalpeak.value.ctrl.mms | globalpeak.value.ctrl.mms > 1.5 * globalpeak.value.rnase.mms, 1, 0))
+signi.global.pa.zt <- data.frame(PA_global = ifelse(globalpeak.value.rnase.zt > 1.7 * globalpeak.value.ctrl.zt | globalpeak.value.ctrl.zt > 1.7 * globalpeak.value.rnase.zt, 1, 0))
 
-rownames(signifikante_reihen_global_mms) <- rownames(rnase.mms)
+rownames(signi.global.pa.zt) <- rownames(rnase.zt)
 
-#View(signifikante_reihen_global_mms)
-#dim(signifikante_reihen_global_mms)
+View(signi.global.pa.zt)
+
+length(which(signi.global.pa.zt==1))
 ```
-With this method we can´t find any Rdeeps for the mms normalized data because all under all global peeks of the control and the RNase group the protein amount is 1. 
+
+#### 7.3.3 protein amount under global peaks shift based on Min-Max-Scaling
+
+With this method we can´t find any Rdeeps for the mms normalized data because all protein amount under the global peaks of the control and the RNase group are 100. 
 
 
-### 7.4 protein amount under local peaks shift 
+### 7.4 Protein amount under local peaks shift 
 
-#### 7.4.1 protein amount under local peaks shift based on MVM
+#### 7.4.1 Protein amount under local peaks shift based on Mean-Value-Method
 
-First we have to sum up the protein amount under all local peaks - for the control group 
+First we have to sum up the protein amount under all local peaks - for the control group.
 ```{r}
-# Neue Tabelle zur Speicherung der aufsummierten Werte erstellen
-localpeaks.sumvalues.ctrl.mvm <- data.frame(Summed_Values = numeric(length(localpeaks.values.ctrl.mvm)))
+localpeaks.sumvalues.ctrl.mvm <- data.frame(sum_values = numeric(length(localpeaks.values.ctrl.mvm)))
 
-# Aufsummieren der Werte für jede Reihe
 for (i in seq_along(localpeaks.values.ctrl.mvm)) {
-  summed_values <- sum(localpeaks.values.ctrl.mvm[[i]])
-  localpeaks.sumvalues.ctrl.mvm[i, "Summed_Values"] <- summed_values
-}
+  sum_values <- sum(localpeaks.values.ctrl.mvm[[i]])
+  localpeaks.sumvalues.ctrl.mvm[i, "sum_values"] <- sum_values}
 
-#View(localpeaks.sumvalues.ctrl.mvm)
+# View(localpeaks.sumvalues.ctrl.mvm)
 ```
 
-First we have to sum up the protein amount under all local peaks - for the RNase group 
+Protein amount under all local peaks - for the RNase group 
 ```{r}
-localpeaks.sumvalues.rnase.mvm <- data.frame(Summed_Values = numeric(length(localpeaks.values.rnase.mvm)))
+localpeaks.sumvalues.rnase.mvm <- data.frame(sum_values = numeric(length(localpeaks.values.rnase.mvm)))
 
 for (i in seq_along(localpeaks.values.rnase.mvm)) {
-  summed_values <- sum(localpeaks.values.rnase.mvm[[i]])
-  localpeaks.sumvalues.rnase.mvm[i, "Summed_Values"] <- summed_values
-}
+  sum_values <- sum(localpeaks.values.rnase.mvm[[i]])
+  localpeaks.sumvalues.rnase.mvm[i, "sum_values"] <- sum_values}
 
 #View(localpeaks.sumvalues.rnase.mvm)  
 ```
+
 Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
-selbst festgelegter Grenzwert 
 
 ```{r}
-signifikante_reihen_local_mvm <- data.frame(Zustimmung_local = rep(0, nrow(localpeaks.sumvalues.rnase.mvm)))
+signi.local.pa.mvm <- data.frame(PA_local = rep(0, nrow(localpeaks.sumvalues.rnase.mvm)))
 
 for (i in 1:nrow(localpeaks.sumvalues.rnase.mvm)) {
-  if (abs(localpeaks.sumvalues.rnase.mvm$Summed_Values[i] - localpeaks.sumvalues.ctrl.mvm$Summed_Values[i]) > 7.5)
+  if (abs(localpeaks.sumvalues.rnase.mvm$sum_values[i] - localpeaks.sumvalues.ctrl.mvm$sum_values[i]) > 7.5)
   {
-    signifikante_reihen_local_mvm$Zustimmung_local[i] <- 1
+    signi.local.pa.mvm$PA_local[i] <- 1
   }
 }
 
-rownames(signifikante_reihen_local_mvm) <- rownames(rnase.mvm)
+rownames(signi.local.pa.mvm) <- rownames(rnase.mvm)
 
-#View(signifikante_reihen_local_mvm)
-#dim(signifikante_reihen_local_mvm)
+length(which(signi.local.pa.mvm==1))
+#View(signi.local.pa.mvm)
+#dim(signi.local.pa.mvm)
 ```
-
 
 #### 7.4.2 protein amount under local peaks shift based on z-Transformation
 ```{r}
@@ -2467,6 +2793,7 @@ for (i in 1:nrow(localpeaks.sumvalues.rnase.zt)) {
 
 rownames(signifikante_reihen_local_zt) <- rownames(rnase.zt)
 
+length(which(signifikante_reihen_local_zt==1))
 
 #View(signifikante_reihen_local_zt)
 #dim(signifikante_reihen_local_zt)
@@ -2510,18 +2837,19 @@ rownames(signifikante_reihen_local_mms) <- rownames(rnase.mms)
 #View(signifikante_reihen_local_mms)
 #dim(signifikante_reihen_local_mms)
 ```
+
+### 7.5 Dataframe with all parameters
+
 ```{r}
-View(localpeaks.values.rnase.mms)
+parameters.mvm <- cbind(signi.global.pa.mvm, signi.local.pa.mvm, shift_mvm_named, ShoulderRegion_mvm)
+
+parameters.zt <- cbind(signi.global.pa.zt, signifikante_reihen_local_zt, shift_zt_named, ShoulderRegion_zt)
+
+parameters.mms <- cbind(signi.global.pa.mms, signifikante_reihen_local_mms, shift_mms_named, ShoulderRegion_mms)
 ```
 
-### 7.5 dataframe with all parameters
-
 ```{r}
-parameters_mvm <- cbind(signifikante_reihen_global_mvm, signifikante_reihen_local_mvm, shift_mvm_named)
-
-parameters_zt <- cbind(signifikante_reihen_global_zt, signifikante_reihen_local_zt, shift_zt_named)
-
-parameters_mms <- cbind(signifikante_reihen_global_mms, signifikante_reihen_local_mms, shift_mms_named)
+# View(parameters.mvm)
 ```
 
 
