@@ -2016,7 +2016,7 @@ precipitated.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitate
 
 ### 7.1. Shifts
 
-### 7.1.1. Shifts with Mean Value Method
+#### 7.1.1. Shifts with Mean Value Method
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
@@ -2068,7 +2068,7 @@ for (i in 1:dim(ctrl.mvm)[1]){
 
 ```
 
-### 7.1.2. Shifts with z-Transformation
+#### 7.1.2. Shifts with z-Transformation
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
@@ -2122,7 +2122,7 @@ for (i in 1:dim(ctrl.zt)[1]){
 ```
 
 
-### 7.1.3. Shifts with Min-Max Scaling
+#### 7.1.3. Shifts with Min-Max Scaling
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
@@ -2176,7 +2176,7 @@ for (i in 1:dim(ctrl.mms)[1]){
 
 ### 7.2 Shoulderregions
 
-### 7.2.1 Shoulderregions based on Mean-Value-Method
+#### 7.2.1 Shoulderregions based on Mean-Value-Method
 
 Proteins can also be RNA dependent even if they do not have a significant shift. The protein amount can changes significantly without an shift. One indicator could be the appearance of a shoulder regions.
 
@@ -2333,7 +2333,7 @@ ShoulderRegion_mvm <- t(shoulderregion.mvm.nt.nt)
 # View(ShoulderRegion_mvm)
 ```
 
-### 7.2.2 Shoulderregions based on z-Transformed values
+#### 7.2.2 Shoulderregions based on z-Transformed values
 
 Proteins can also be RNA dependent even if they do not have a significant shift. The protein amount can changes significantly without an shift. One indicator could be the appearance of a shoulder regions.
 
@@ -2519,7 +2519,7 @@ ShoulderRegion_zt <- t(shoulderregion.zt.nt.nt)
 # View(ShoulderRegion_zt)
 ```
 
-### 7.2.3 Shoulderregions based on Min-Max-Scaling
+#### 7.2.3 Shoulderregions based on Min-Max-Scaling
 
 Proteins can also be RNA dependent even if they do not have a significant shift. The protein amount can changes significantly without an shift. One indicator could be the appearance of a shoulder regions.
 
@@ -2686,7 +2686,7 @@ signi.global.pa.mvm <- data.frame(PA_global = ifelse(globalpeak.value.rnase.mvm 
 
 rownames(signi.global.pa.mvm) <- rownames(rnase.mvm)
 
-View(signi.global.pa.mvm)
+#View(signi.global.pa.mvm)
 # dim(signi.global.pa.mvm)
 
 length(which(signi.global.pa.mvm==1))
@@ -2846,6 +2846,8 @@ parameters.mvm <- cbind(signi.global.pa.mvm, signi.local.pa.mvm, shift_mvm_named
 parameters.zt <- cbind(signi.global.pa.zt, signifikante_reihen_local_zt, shift_zt_named, ShoulderRegion_zt)
 
 parameters.mms <- cbind(signi.global.pa.mms, signifikante_reihen_local_mms, shift_mms_named, ShoulderRegion_mms)
+
+View(parameters.mvm)
 ```
 
 ```{r}
@@ -2923,6 +2925,45 @@ print(plot_RBP[[x]])
 }
 
 #print(plot_RBP[[1]])
+
+```
+
+
+
+This barplot shows us how many proteins are RNA associated according to how many parameters:
+
+```{r}
+library(ggplot2)
+install.packages("ggforce")
+library(ggpubr)
+
+parameters <- parameters.zt
+#parameters <- list(parameters.mvm, parameters.zt) #parameters.mms fehlt noch, ist aber noch nicht definiert
+#für alles eine lapply
+#set the third column (shifttype) to 1 and 0:
+for (y in 1:dim(parameters)[1]){
+  if (parameters[y,3] == "no shift"){
+    parameters[y,3] <- 0
+  } else{parameters[y,3] <- 1}
+}
+parameters.m <- as.matrix(parameters)
+sum_parameters <- apply(parameters.m, 1, function(x){
+  sum(as.numeric(x))})
+
+df <- as.data.frame(sum_parameters)
+
+ggplot(df, aes(factor(sum_parameters)))+
+  geom_bar(colour = "darkblue", fill="skyblue")+
+  geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5)+
+  labs(x = "number of parameters pro shift", y = "number of proteins", title = "How many parameters support the proteins?")+
+  annotate("brace", x = 2.5, 
+           y = max(df$count) + 1, 
+           xend = 3.5, 
+           yend = max(df$count) + 1,
+           label = "Shared\nProperty", label.position = "top",
+           label.hjust = 0.5,
+           color = "red", size = 1.5
+           )
 
 ```
 
