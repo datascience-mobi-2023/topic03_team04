@@ -2862,7 +2862,6 @@ With the previously identified parameters we can identify which proteins are RNA
 The following plots visualize our results. (Only considerung the global shifts):
 
 ```{r, warning = False}
-
 shift_named <- cbind(shift_mvm_named, shift_zt_named, shift_mms_named)
 plots_RBP <- list()
 
@@ -2870,7 +2869,7 @@ library("ggplot2")
 
 for (x in 1:3){
 
-if (x == 3){
+if (x == 0){
   col <- c("springgreen", "cyan", "orange")
   vjust <- c(-0.5, 1, -0.5)
   labels <- c("left shift", "no shift", "right shift")
@@ -2934,8 +2933,9 @@ This barplot shows us how many proteins are RNA associated according to how many
 
 ```{r}
 library(ggplot2)
-install.packages("ggforce")
 library(ggpubr)
+
+View(parameters)
 
 parameters <- parameters.zt
 #parameters <- list(parameters.mvm, parameters.zt) #parameters.mms fehlt noch, ist aber noch nicht definiert
@@ -2954,18 +2954,76 @@ df <- as.data.frame(sum_parameters)
 
 ggplot(df, aes(factor(sum_parameters)))+
   geom_bar(colour = "darkblue", fill="skyblue")+
-  geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5)+
-  labs(x = "number of parameters pro shift", y = "number of proteins", title = "How many parameters support the proteins?")+
-  annotate("brace", x = 2.5, 
-           y = max(df$count) + 1, 
-           xend = 3.5, 
-           yend = max(df$count) + 1,
-           label = "Shared\nProperty", label.position = "top",
-           label.hjust = 0.5,
-           color = "red", size = 1.5
-           )
+  geom_text(stat = 'count', aes(label = after_stat(count)), vjust = -0.5)+
+  labs(x = "number of parameters pro shift", y = "number of proteins", title = "How many parameters support the proteins?")
+
+View(sum_parameters)
+```
+
+```{r}
+#library(ggplot2)
+#library(ggpubr)
+
+
+parameters <- parameters.zt
+#parameters <- list(parameters.mvm, parameters.zt) #parameters.mms fehlt noch, ist aber noch nicht definiert
+#für alles eine lapply
+#set the third column (shifttype) to 1 and 0:
+for (y in 1:dim(parameters)[1]){
+  if (parameters[y,3] == "no shift"){
+    parameters[y,3] <- 0
+  } else{parameters[y,3] <- 1}
+}
+parameters.m <- as.matrix(parameters)
+sum_parameters <- apply(parameters.m, 1, function(x){
+  sum(as.numeric(x))})
+
+df <- as.data.frame(sum_parameters)
+
+df.glob <- as.data.frame(parameters[,1])
+df.glob.sum <- as.data.frame(c(0,1,2,3,4))
+for (x in 0:4){
+  df.glob.sum[x+1,2] <- sum(df.glob[which(sum_parameters == x),])}
+
+df.loc <- as.data.frame(parameters[,2])
+df.loc.sum <- as.data.frame(c(0,1,2,3,4))
+for (x in 0:4){
+  df.loc.sum[x+1,2] <- sum(df.loc[which(sum_parameters == x),])}
+
+df.shift <- as.data.frame(parameters[,3])
+df.shift.sum <- as.data.frame(c(0,1,2,3,4))
+for (x in 0:4){
+  df.shift.sum[x+1,2] <- sum(as.numeric(df.shift[which(sum_parameters == x),]))} 
+
+df.shoulder <- as.data.frame(parameters[,4])
+df.shoulder.sum <- as.data.frame(c(0,1,2,3,4))
+for (x in 0:4){
+  df.shoulder.sum[x+1,2] <- sum(df.shoulder[which(sum_parameters == x),])}
+
+df.sum <- as.data.frame(sum_parameters)
+df.sum.sum <- as.data.frame(c(0,1,2,3,4))
+for (x in 0:4){
+  df.sum.sum[x+1,2] <- sum(sum_parameters == x)}
+
+
+df2 <- data.frame(category = c(df.glob.sum[,1], df.loc.sum[,1], df.shift.sum[,1], df.shoulder.sum[,1], df.sum.sum[,1]), 
+                  value = c(df.glob.sum[,2], df.loc.sum[,2], df.shift.sum[,2], df.shoulder.sum[,2], df.sum.sum[,2]),
+                  group = c(rep(c("glob", "loc", "shift", "shoulder", "sum"), each = 5))
+                  )
+
+ggplot(df2, aes(x = category, y = value, fill = group))+
+         geom_bar(stat = "identity", position = "dodge")+
+  geom_text(aes(label = value), 
+            vjust = -0.5, 
+            position = position_dodge(width = 0.9), 
+            size = 2)+
+  labs(x = "number of parameters pro shift", y = "number of proteins", title = "How many parameters support the proteins?")
+
+
+View(df2)
 
 ```
+
 
 
 ## 9. Kmeans clustering
