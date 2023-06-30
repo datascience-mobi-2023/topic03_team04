@@ -1554,14 +1554,14 @@ saveRDS(precipitated.mms, file = "gespeicherteDaten/Non_synchronized_A549_precip
 Load the relevant data:
 
 ```{r}
-ctrl.mvm <- readRDS("Non_synchronized_A549_ctrl.mvm")
-rnase.mvm <- readRDS("Non_synchronized_A549_rnase.mvm")
+ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mvm")
+rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mvm")
 
-ctrl.zt <- readRDS("Non_synchronized_A549_ctrl.zt")
-rnase.zt <- readRDS("Non_synchronized_A549_rnase.zt")
+ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.zt")
+rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.zt")
 
-ctrl.mms <- readRDS("Non_synchronized_A549_ctrl.mms")
-rnase.mms <- readRDS("Non_synchronized_A549_rnase.mms")
+ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mms")
+rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mms")
 ```
 
 ```{r}
@@ -1572,22 +1572,22 @@ sd.mean.rnase.mvm <- readRDS("Non_synchronized_A549_sd.mean.rnase.mvm ")
 globalpeak.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mvm")
 globalpeak.value.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mvm")
 
-globalpeak.rnase.mvm <- readRDS("Non_synchronized_A549_globalpeak.rnase.mvm")
-globalpeak.value.rnase.mvm <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.mvm")
+globalpeak.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mvm")
+globalpeak.value.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mvm")
 
-localpeaks.ctrl.mvm <- readRDS("Non_synchronized_A549_localpeaks.ctrl.mvm")
-localpeaks.values.ctrl.mvm <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.mvm")
+localpeaks.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mvm")
+localpeaks.values.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mvm")
 
-localpeaks.rnase.mvm <- readRDS("Non_synchronized_A549_localpeaks.rnase.mvm")
-localpeaks.values.rnase.mvm <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.mvm")
+localpeaks.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mvm")
+localpeaks.values.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mvm")
 
-fraction1.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-fraction25.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+fraction1.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+fraction25.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
 
-fraction1.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-fraction25.peak.ctrl.mvm <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mvm")
+fraction1.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
+fraction25.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
 
-precipitated.mvm <- readRDS("Non_synchronized_A549_precipitated.mvm")
+precipitated.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.mvm")
 ```
 
 ```{r}
@@ -1598,22 +1598,22 @@ sd.mean.rnase.zt <- readRDS("Non_synchronized_A549_sd.mean.rnase.zt ")
 globalpeak.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.ctrl.zt")
 globalpeak.value.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.zt")
 
-globalpeak.rnase.zt <- readRDS("Non_synchronized_A549_globalpeak.rnase.zt")
-globalpeak.value.rnase.zt <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.zt")
+globalpeak.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.zt")
+globalpeak.value.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.zt")
 
-localpeaks.ctrl.zt <- readRDS("Non_synchronized_A549_localpeaks.ctrl.zt")
-localpeaks.values.ctrl.zt <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.zt")
+localpeaks.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.zt")
+localpeaks.values.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.zt")
 
-localpeaks.rnase.zt <- readRDS("Non_synchronized_A549_localpeaks.rnase.zt")
-localpeaks.values.rnase.zt <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.zt")
+localpeaks.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.zt")
+localpeaks.values.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.zt")
 
-fraction1.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.zt")
-fraction25.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.zt")
+fraction1.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
+fraction25.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
 
-fraction1.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.zt")
-fraction25.peak.ctrl.zt <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.zt")
+fraction1.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
+fraction25.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
 
-precipitated.zt <- readRDS("Non_synchronized_A549_precipitated.zt")
+precipitated.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.zt")
 ```
 
 ```{r}
@@ -1624,22 +1624,22 @@ sd.mean.rnase.mms <- readRDS("Non_synchronized_A549_sd.mean.rnase.mms")
 globalpeak.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mms")
 globalpeak.value.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mms")
 
-globalpeak.rnase.mms <- readRDS("Non_synchronized_A549_globalpeak.rnase.mms")
-globalpeak.value.rnase.mms <- readRDS("Non_synchronized_A549_globalpeak.value.rnase.mms")
+globalpeak.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mms")
+globalpeak.value.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mms")
 
-localpeaks.ctrl.mms <- readRDS("Non_synchronized_A549_localpeaks.ctrl.mms")
-localpeaks.values.ctrl.mms <- readRDS("Non_synchronized_A549_localpeaks.values.ctrl.mms")
+localpeaks.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mms")
+localpeaks.values.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mms")
 
-localpeaks.rnase.mms <- readRDS("Non_synchronized_A549_localpeaks.rnase.mms")
-localpeaks.values.rnase.mms <- readRDS("Non_synchronized_A549_localpeaks.values.rnase.mms")
+localpeaks.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mms")
+localpeaks.values.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mms")
 
-fraction1.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mms")
-fraction25.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mms")
+fraction1.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
+fraction25.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
 
-fraction1.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction1.peak.ctrl.mms")
-fraction25.peak.ctrl.mms <- readRDS("Non_synchronized_A549_fraction25.peak.ctrl.mms")
+fraction1.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
+fraction25.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
 
-precipitated.mms <- readRDS("Non_synchronized_A549_precipitated.mms")
+precipitated.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.mms")
 ```
 
 ### 6.1 Gaussian fit for Mean Value Method normalized data
@@ -2016,7 +2016,7 @@ precipitated.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitate
 
 ### 7.1. Shifts
 
-### 7.1.1. Shifts with Mean Value Method
+#### 7.1.1. Shifts with Mean Value Method
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
@@ -2068,7 +2068,7 @@ for (i in 1:dim(ctrl.mvm)[1]){
 
 ```
 
-### 7.1.2. Shifts with z-Transformation
+#### 7.1.2. Shifts with z-Transformation
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
@@ -2122,7 +2122,7 @@ for (i in 1:dim(ctrl.zt)[1]){
 ```
 
 
-### 7.1.3. Shifts with Min-Max Scaling
+#### 7.1.3. Shifts with Min-Max Scaling
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
@@ -2176,7 +2176,7 @@ for (i in 1:dim(ctrl.mms)[1]){
 
 ### 7.2 Shoulderregions
 
-### 7.2.1 Shoulderregions based on Mean-Value-Method
+#### 7.2.1 Shoulderregions based on Mean-Value-Method
 
 Proteins can also be RNA dependent even if they do not have a significant shift. The protein amount can changes significantly without an shift. One indicator could be the appearance of a shoulder regions.
 
@@ -2333,7 +2333,7 @@ ShoulderRegion_mvm <- t(shoulderregion.mvm.nt.nt)
 # View(ShoulderRegion_mvm)
 ```
 
-### 7.2.2 Shoulderregions based on z-Transformed values
+#### 7.2.2 Shoulderregions based on z-Transformed values
 
 Proteins can also be RNA dependent even if they do not have a significant shift. The protein amount can changes significantly without an shift. One indicator could be the appearance of a shoulder regions.
 
@@ -2519,7 +2519,7 @@ ShoulderRegion_zt <- t(shoulderregion.zt.nt.nt)
 # View(ShoulderRegion_zt)
 ```
 
-### 7.2.3 Shoulderregions based on Min-Max-Scaling
+#### 7.2.3 Shoulderregions based on Min-Max-Scaling
 
 Proteins can also be RNA dependent even if they do not have a significant shift. The protein amount can changes significantly without an shift. One indicator could be the appearance of a shoulder regions.
 
@@ -2686,7 +2686,7 @@ signi.global.pa.mvm <- data.frame(PA_global = ifelse(globalpeak.value.rnase.mvm 
 
 rownames(signi.global.pa.mvm) <- rownames(rnase.mvm)
 
-View(signi.global.pa.mvm)
+#View(signi.global.pa.mvm)
 # dim(signi.global.pa.mvm)
 
 length(which(signi.global.pa.mvm==1))
@@ -2845,7 +2845,9 @@ parameters.mvm <- cbind(signi.global.pa.mvm, signi.local.pa.mvm, shift_mvm_named
 
 parameters.zt <- cbind(signi.global.pa.zt, signifikante_reihen_local_zt, shift_zt_named, ShoulderRegion_zt)
 
-parameters.mms <- cbind(signi.global.pa.mms, signifikante_reihen_local_mms, shift_mms_named, ShoulderRegion_mms)
+parameters.mms <- cbind(signifikante_reihen_local_mms, shift_mms_named, ShoulderRegion_mms)
+
+View(parameters.mms)
 ```
 
 ```{r}
@@ -2860,7 +2862,6 @@ With the previously identified parameters we can identify which proteins are RNA
 The following plots visualize our results. (Only considerung the global shifts):
 
 ```{r, warning = False}
-
 shift_named <- cbind(shift_mvm_named, shift_zt_named, shift_mms_named)
 plots_RBP <- list()
 
@@ -2868,15 +2869,10 @@ library("ggplot2")
 
 for (x in 1:3){
 
-if (x == 3){
-  col <- c("springgreen", "cyan", "orange")
-  vjust <- c(-0.5, 1, -0.5)
-  labels <- c("left shift", "no shift", "right shift")
-} else {
-  col <- c("springgreen", "cyan", "violetred1", "orange")
-  vjust <- c(-0.5, 1, -0.5, -0.5)
-  labels <- c("left shift", "no shift", "precipitated", "right shift")
-}
+col <- c("springgreen", "cyan", "violetred1", "orange")
+vjust <- c(-0.5, 1, -0.5, -0.5)
+labels <- c("left shift", "no shift", "precipitated", "right shift")
+
 title <- c("Shifttypes Mean Value Method", "Shifttypes z-Transformation", "Shifttypes Min-Max-Scaling")
 
 
@@ -2925,6 +2921,156 @@ print(plot_RBP[[x]])
 #print(plot_RBP[[1]])
 
 ```
+
+
+
+This barplot shows us how many proteins are RNA associated according to how many parameters:
+
+```{r}
+library(ggplot2)
+library(ggpubr)
+
+
+parameters.all <- list(parameters.mvm, parameters.zt, parameters.mms) #parameters.mms fehlt
+plot.parameters <- list()
+
+for (z in 1:3){
+  parameters <- parameters.all[[z]]
+  
+  if (z == 3){
+    g <- 2
+  }else{g <- 3}
+  
+  for (y in 1:dim(parameters)[1]){
+    if (parameters[y,g] == "no shift"){
+      parameters[y,g] <- 0
+    } else{parameters[y,g] <- 1}
+  }
+
+  parameters.m <- as.matrix(parameters)
+  sum_parameters <- apply(parameters.m, 1, function(x){
+    sum(as.numeric(x))})
+  
+  df <- as.data.frame(sum_parameters)
+  title <- c("How many parameters support the proteins? MVM", 
+             "How many parameters support the proteins? z-Transformation", 
+             "How many parameters support the proteins? MMS")
+  
+  plot.parameters[[z]]<- ggplot(df, aes(factor(sum_parameters)))+
+    geom_bar(colour = "darkblue", fill="skyblue")+
+    geom_text(stat = 'count', 
+              aes(label = after_stat(count)), 
+              vjust = -0.25)+
+    labs(x = "number of parameters pro shift", 
+         y = "number of proteins", 
+         title = title[z])
+  
+  print(plot.parameters[[z]])
+}
+
+```
+
+```{r}
+#library(ggplot2)
+#library(ggpubr)
+
+
+
+parameters.all <- list(parameters.mvm, parameters.zt, parameters.mms)
+plot.parameters.detail <- list()
+
+for (z in 1:3){
+  parameters <- parameters.all[[z]]
+  
+  if(z == 3){
+    g <- 2
+  }else{g <- 3}
+  for (y in 1:dim(parameters)[1]){
+    if (parameters[y,g] == "no shift"){
+      parameters[y,g] <- 0
+    } else{parameters[y,g] <- 1}
+  }
+  parameters.m <- as.matrix(parameters)
+  sum_parameters <- apply(parameters.m, 1, function(x){
+    sum(as.numeric(x))})
+  
+  df <- as.data.frame(sum_parameters)
+  title <- c("How many parameters support the proteins? MVM", 
+             "How many parameters support the proteins? z-Transformation",
+             "How many parameters support the proteins? MMS")
+
+  if(z == 3){
+    c <- c(0,1,2,3)
+  }else{c<- c(0,1,2,3,4)}
+  
+  if(z == 3){
+    d <- 0
+  }
+  else {d <- 1}
+    
+  if (z != 3){
+    df.glob <- as.data.frame(parameters[,d])
+    df.glob.sum <- as.data.frame(c)
+    for (x in 0:4){
+      df.glob.sum[x+1,2] <- sum(df.glob[which(sum_parameters == x),])}}
+  
+  df.loc <- as.data.frame(parameters[,d+1])
+  df.loc.sum <- as.data.frame(c)
+  for (x in 0:(d+3)){
+    df.loc.sum[x+1,2] <- 
+      sum(as.numeric(df.loc[which(sum_parameters == x),]))}
+  
+  df.shift <- as.data.frame(parameters[,d+2])
+  df.shift.sum <- as.data.frame(c)
+  for (x in 0:(d+3)){
+    df.shift.sum[x+1,2] <- 
+      sum(as.numeric(df.shift[which(sum_parameters == x),]))} 
+  
+  df.shoulder <- as.data.frame(parameters[,d+3])
+  df.shoulder.sum <- as.data.frame(c)
+  for (x in 0:(d+3)){
+    df.shoulder.sum[x+1,2] <- 
+      sum(df.shoulder[which(sum_parameters == x),])}
+  
+  df.sum <- as.data.frame(sum_parameters)
+  df.sum.sum <- as.data.frame(c)
+  for (x in 0:(d+3)){
+    df.sum.sum[x+1,2] <- sum(sum_parameters == x)}
+  
+  if (z != 3){
+    df2 <- data.frame(category = c(df.glob.sum[,1], df.loc.sum[,1], 
+                                   df.shift.sum[,1], df.shoulder.sum[,1], 
+                                   df.sum.sum[,1]), 
+                      value = c(df.glob.sum[,2], df.loc.sum[,2], 
+                                df.shift.sum[,2], df.shoulder.sum[,2], 
+                                df.sum.sum[,2]),
+                      parameters = c(rep(c("glob", "loc", "shift", 
+                                           "shoulder", "sum"), 
+                                         each = 5)))
+  }else{
+    df2 <- data.frame(category = c(df.loc.sum[,1], df.shift.sum[,1], 
+                                   df.shoulder.sum[,1],df.sum.sum[,1]), 
+                      value = c(df.loc.sum[,2], df.shift.sum[,2], 
+                                df.shoulder.sum[,2], df.sum.sum[,2]),
+                      parameters = c(rep(c("loc", "shift", "shoulder", 
+                                           "sum"), each = 4)))
+  }
+  
+  plot.parameters.detail[[z]] <- 
+    ggplot(df2, aes(x = category, y = value, fill = parameters))+
+    geom_bar(stat = "identity", position = position_dodge(width = 0.9))+
+    geom_text(aes(label = value), 
+              vjust = -0.5, 
+              position = position_dodge(width = 0.9), 
+              size = 2)+
+    labs(x = "number of parameters pro shift", 
+         y = "number of proteins", 
+         title = title[[z]])
+  
+  print(plot.parameters.detail[[z]])
+}
+```
+
 
 
 ## 9. Kmeans clustering
@@ -3014,22 +3160,37 @@ Here we cluster the precipitation.
 library("ggpubr")
 library("factoextra")
 library("ggplot2")
+install.packages("caret")
+library("caret")
 
-df <- data.frame(cbind(precipitated.mvm.v, precipitated.mvm.v))
+df.precipitation <- data.frame(cbind(precipitated.mvm.v, precipitated.mvm.v, precipitated.zt.v, precipitated.zt.v, precipitated.mms.v, precipitated.mms.v))
 
-res.km <- kmeans(scale(df[, -5]), 2, nstart = 25, algorithm = "Hartigan-Wong")
+plot.cluster.precipitated <- list()
 
-g <- fviz_cluster(res.km, data = df,
-                  geom = "point",
-                  xlab = "Precipitation",
-                  ylab = "Precipitation",
-                  main = "Clusters of Precipitation",
-                  ggtheme = theme_bw(),)
+for (x in 1:3){
+  df <- df.precipitation[,(2*x-1):(2*x)]
+  
+  res.km <- 
+    kmeans(scale(df[, -5]), 2, nstart = 25, algorithm = "Hartigan-Wong")
+  
+  title <- c("Clusters of Precipitation calculated after MVM", 
+             "Clusters of Precipitation calculated after z-Transformation",
+             "Clusters of Precipitation calculated after MMS")
+  
+  g <- fviz_cluster(res.km, data = df,
+                    geom = "point",
+                    xlab = "Precipitation",
+                    ylab = "Precipitation",
+                    main = title[x],
+                    ggtheme = theme_bw(),)
+  
+plot.cluster.precipitated[[x]]<-
+  g #+ theme(axis.text.x = element_blank(),
+    #        axis.text.y = element_blank(),
+     #       axis.ticks = element_blank()) 
 
-g + theme(axis.text.x = element_blank(),
-          axis.text.y = element_blank(),
-          axis.ticks = element_blank()) 
-
+print(plot.cluster.precipitated[[x]])
+}
 ```
 
 
@@ -3046,9 +3207,9 @@ res.km <- kmeans(scale(df[, -5]), 3, nstart = 25, algorithm = "Hartigan-Wong")
 
 g <- fviz_cluster(res.km, data = df,
                   geom = "point",
-                  xlab = "Precipitation",
-                  ylab = "Precipitation",
-                  main = "Clusters of Precipitation",
+                  xlab = "Shoulderregion",
+                  ylab = "Shoulderregion",
+                  main = "Clusters of Shoulderregions",
                   ggtheme = theme_bw(),)
 
 g + theme(axis.text.x = element_blank(),
