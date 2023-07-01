@@ -1897,7 +1897,7 @@ for (i in 1:num_rows) {
  #   plots_gaussian_ctrl.zt[[i]] <- NULL
 #  }
 
-#}
+}
 ```
 
 ####6.4.2 example how to plot the Control and RNase curve of one specific protein
@@ -3219,11 +3219,11 @@ g + theme(axis.text.x = element_blank(),
 ```
 
 
-## 9. Regression analysis 
+## 10. Regression analysis 
 
-### 9.1 Regression analysis MVM 
+### 10.1 Regression analysis MVM 
 
-#### 9.1.1 Regression analysis only using global shift 
+#### 10.1.1 Regression analysis only using global shift 
 
 zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um 
 ```{r}
@@ -3273,9 +3273,9 @@ print(summary(model_mvm))
 Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
 
 
-### 9.2 Regression analysis z-Transformation
+### 10.2 Regression analysis z-Transformation
 
-#### 9.2.1 Regression analysis only using global shift 
+#### 10.2.1 Regression analysis only using global shift 
 
 zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um 
 ```{r}
@@ -3316,9 +3316,9 @@ print(summary(model_zt))
 
 Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
 
-### 9.3 Regression analysis MMS 
+### 10.3 Regression analysis MMS 
 
-#### 9.3.1 Regression analysis only using global shift 
+#### 10.3.1 Regression analysis only using global shift 
 
 zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um 
 ```{r}
@@ -3357,3 +3357,56 @@ print(summary(model_mms))
 ```
 
 Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
+
+##11. t-test
+
+test significance of Correlation values 
+```{r}
+# Perform t-test on correlation values
+t_test_mvm <- t.test(correlation.mvm, mu = 0)
+t_test_mms <- t.test(correlation.mms, mu = 0)
+
+print(t_test_mvm)
+print(t_test_mms)
+
+```
+
+
+t-test der prüft, ob unterschiede in protein amount zwischen ctrl und rnase signifikant 
+```{r}
+num_rows <- nrow(ctrl.mvm)
+p_values_mvm <- numeric(num_rows)
+
+for (i in 1:num_rows) {
+  t_test_result_mvm <- t.test(ctrl.mvm[i, ], rnase.mvm[i, ])
+  p_values_mvm[i] <- t_test_result$p.value
+}
+
+print(p_values_mvm)
+
+
+num_rows <- nrow(ctrl.zt)
+p_values_zt <- numeric(num_rows)
+
+for (i in 1:num_rows) {
+  t_test_result_zt <- t.test(ctrl.zt[i, ], rnase.zt[i, ])
+  p_values_zt[i] <- t_test_result$p.value
+}
+
+print(p_values_zt)
+
+
+num_rows <- nrow(ctrl.mms)
+p_values_mms <- numeric(num_rows)
+
+for (i in 1:num_rows) {
+  t_test_result_mms <- t.test(ctrl.mms[i, ], rnase.mms[i, ])
+  p_values_mms[i] <- t_test_result$p.value
+}
+
+print(p_values_mms)
+
+```
+-> Ergebnis ist immer 1 -> RNA dependent proteins müssen auf anderem Wege gefunden werden 
+
+
