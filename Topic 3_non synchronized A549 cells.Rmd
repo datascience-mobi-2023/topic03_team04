@@ -1871,33 +1871,33 @@ for (i in 1:num_rows) {
 ####6.4.1 example of how to plot the curves for all proteins of the Control group
 
 ```{r}
-num_rows <- nrow(parameter_gaussian_ctrl.zt_table)
-plots_gaussian_ctrl.zt <- list()
-x <- c(1:25)
-for (i in 1:num_rows) {
-  a <- parameter_gaussian_ctrl.zt_table[i, 1]
-  mu <- parameter_gaussian_ctrl.zt_table[i, 2]
-  sigma <- parameter_gaussian_ctrl.zt_table[i, 3]
-  row_data_gaussian_ctrl.zt <- parameter_gaussian_ctrl.zt_table[i, ]
+#num_rows <- nrow(parameter_gaussian_ctrl.zt_table)
+#plots_gaussian_ctrl.zt <- list()
+#x <- c(1:25)
+#for (i in 1:num_rows) {
+  #a <- parameter_gaussian_ctrl.zt_table[i, 1]
+  #mu <- parameter_gaussian_ctrl.zt_table[i, 2]
+  #sigma <- parameter_gaussian_ctrl.zt_table[i, 3]
+  #row_data_gaussian_ctrl.zt <- parameter_gaussian_ctrl.zt_table[i, ]
 
-  if (sum(!is.na(row_data_gaussian_ctrl.zt)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_gaussian_ctrl.zt), y = as.numeric(row_data_gaussian_ctrl.zt))
+  #if (sum(!is.na(row_data_gaussian_ctrl.zt)) >= 2) {
+   # df <- data.frame(x = 1:length(row_data_gaussian_ctrl.zt), y = as.numeric(row_data_gaussian_ctrl.zt))
 
     # Erstellen eines neuen leeren Plots
-    plot_new <- plot(NULL, xlim = c(min(x), max(x)), ylim = c(min(df$y), max(df$y)), 
-                     xlab = "Fraction", ylab = "Protein amount", col = "palegreen2", lwd = 2)
+    #plot_new <- plot(NULL, xlim = c(min(x), max(x)), ylim = c(min(df$y), max(df$y)), 
+                    # xlab = "Fraction", ylab = "Protein amount", col = "palegreen2", lwd = 2)
 
     # Zeichnen der Kurve auf dem neuen Plot
-    curve(gauss(x, a, mu, sigma), from = min(x), to = max(x), add = TRUE, col = "palegreen2", lwd = 2)
+    #curve(gauss(x, a, mu, sigma), from = min(x), to = max(x), add = TRUE, col = "palegreen2", lwd = 2)
 
     # Speichern des neuen Plots in der Liste
-    plots_gaussian_ctrl.zt[[i]] <- plot_new
+   # plots_gaussian_ctrl.zt[[i]] <- plot_new
     
-  } else {
-    plots_gaussian_ctrl.zt[[i]] <- NULL
-  }
+ # } else {
+ #   plots_gaussian_ctrl.zt[[i]] <- NULL
+#  }
 
-}
+#}
 ```
 
 ####6.4.2 example how to plot the Control and RNase curve of one specific protein
@@ -3217,3 +3217,143 @@ g + theme(axis.text.x = element_blank(),
           axis.ticks = element_blank()) 
 
 ```
+
+
+## 9. Regression analysis 
+
+### 9.1 Regression analysis MVM 
+
+#### 9.1.1 Regression analysis only using global shift 
+
+zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um 
+```{r}
+library(dplyr)
+
+shift_mvm_named <- as.data.frame(shift_mvm_named) %>%
+  mutate(Shift = recode(shift_mvm_named, "left shift" = 1, "right shift" = 2, "no shift" = 0, .default = 0))
+
+```
+
+anschließend berechnen wir die Korrelation der Proteinmengen in Control und RNase für jedes Protein
+```{r}
+correlation.mvm <-as.data.frame( sapply(1:nrow(ctrl.mvm), function(i) cor(ctrl.mvm[i, ], rnase.mvm[i, ])))
+rownames(correlation.mvm) <- rownames(rnase.mvm)
+
+
+#print(correlation.mvm)
+
+```
+
+Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die ersten 2500 Proteine werden genutzt, um das Model zu trainieren. Auf die restlichen wird dann die Vorhersage angewendet 
+
+```{r}
+# Trainingssatz (Zeilen 1 bis 2500)
+train_mvm <- data.frame(Korrelation = correlation.mvm[1:2500, ], Shift = shift_mvm_named[1:2500, 2])
+
+# Lineares Regressionsmodell
+model_mvm <- lm(Shift ~ Korrelation, data = train_mvm)
+
+# Testdaten (Zeilen 2501 bis 3074)
+test_mvm <- data.frame(Korrelation = correlation.mvm[2501:3074, ])
+
+# Vorhersagen machen
+predictions_mvm <- predict(model_mvm, newdata = test_mvm)
+
+# Vorhersagen auf diskrete Werte abrunden
+rounded_predictions_mvm <- round(predictions_mvm)
+
+
+
+print(summary(model_mvm))
+
+#print(rounded_predictions_mvm)
+
+```
+
+Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
+
+
+### 9.2 Regression analysis z-Transformation
+
+#### 9.2.1 Regression analysis only using global shift 
+
+zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um 
+```{r}
+library(dplyr)
+
+shift_zt_named <- as.data.frame(shift_zt_named) %>%
+  mutate(Shift = recode(shift_zt_named, "left shift" = 1, "right shift" = 2, "no shift" = 0, .default = 0))
+
+```
+
+
+anschließend berechnen wir die Korrelation der Proteinmengen in Control und RNase für jedes Protein
+```{r}
+correlation.zt <-as.data.frame( sapply(1:nrow(ctrl.zt), function(i) cor(ctrl.zt[i, ], rnase.zt[i, ])))
+rownames(correlation.zt) <- rownames(rnase.zt)
+
+
+#print(correlation.zt)
+
+```
+
+Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die ersten 2500 Proteine werden genutzt, um das Model zu trainieren. Auf die restlichen wird dann die Vorhersage angewendet 
+
+```{r}
+train_zt <- data.frame(Korrelation_zt = correlation.zt[1:2500, ], Shift = shift_zt_named[1:2500, 2])
+
+model_zt <- lm(Shift ~ Korrelation_zt, data = train_zt)
+
+test_zt <- data.frame(Korrelation_zt = correlation.zt[2501:3074, ])
+
+predictions_zt <- predict(model_zt, newdata = test_zt)
+rounded_predictions_zt <- round(predictions_zt)
+
+print(summary(model_zt))
+#print(rounded_predictions_zt)
+
+```
+
+Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
+
+### 9.3 Regression analysis MMS 
+
+#### 9.3.1 Regression analysis only using global shift 
+
+zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um 
+```{r}
+library(dplyr)
+
+shift_mms_named <- as.data.frame(shift_mms_named) %>%
+  mutate(Shift = recode(shift_mms_named, "left shift" = 1, "right shift" = 2, "no shift" = 0, .default = 0))
+
+```
+
+anschließend berechnen wir die Korrelation der Proteinmengen in Control und RNase für jedes Protein
+```{r}
+correlation.mms <-as.data.frame( sapply(1:nrow(ctrl.mvm), function(i) cor(ctrl.mvm[i, ], rnase.mvm[i, ])))
+rownames(correlation.mms) <- rownames(rnase.mms)
+
+
+#print(correlation.mms)
+
+```
+
+Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die ersten 2500 Proteine werden genutzt, um das Model zu trainieren. Auf die restlichen wird dann die Vorhersage angewendet 
+
+```{r}
+train_mms <- data.frame(Korrelation = correlation.mms[1:2500, ], Shift = shift_mms_named[1:2500, 2])
+
+model_mms <- lm(Shift ~ Korrelation, data = train_mms)
+
+test_mms <- data.frame(Korrelation = correlation.mms[2501:3074, ])
+
+predictions_mms <- predict(model_mms, newdata = test_mms)
+rounded_predictions_mms <- round(predictions_mms)
+
+print(summary(model_mms))
+#print(rounded_predictions_mms)
+
+```
+
+Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
