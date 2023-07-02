@@ -1,13 +1,24 @@
+---
+title: |
+  | \Huge\ **Final Report:** Proteome-wide Screen for RNA-dependent Proteins
+  | *non-synchronized A549 cells*
+author: "Anastasia Möller, Johannes Schadt, Sylviane Verschaeve, Tine Limberg"
+date: "17.07.2023"
+output:
+  pdf_document: 
+    latex_engine: xelatex
+    toc: yes
+header-includes:
+  - \usepackage{fontspec}
+  - \setmainfont{Timenewroman}
+  - \usepackage{setspace}
+  - \setstretch{1.25}
+  
+fontsize: 12pt
+---
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE) 
-```
-
-# Proteome-wide Screen for RNA-dependent Proteins: *non-synchronized A549 cells*
-
-Zum PDF exportieren
-
-```{r}
-#tinytex::install_tinytex()
+knitr::opts_chunk$set(echo = FALSE, results='hide') 
 ```
 
 Loading the data:
@@ -16,15 +27,77 @@ Loading the data:
 MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.csv?dl=1', header=TRUE, row.names=1, sep = ";")
 ```
 
-## 0. Data description
+## 1. Introduction
 
-```{r}
-dim(MS_Table)
-head(rownames(MS_Table))
-head(colnames(MS_Table))
-```
+### 1.1. Importance of RNA-binding proteins
 
-## 1. Preparing data for analysis
+### 1.2. Experimental Setup
+
+It should be noted that the protein amount is represented by the y-value, and fraction x-value
+
+## 2. Methods
+
+### 2.1. Data cleanup
+
+### 2.2. Normalization methods
+
+### 2.3. Reproducibility and Batch Effect
+
+### 2.4. Scaling and Reduction of Dataset
+
+from now on we work with the reduced dataset
+
+### 2.5. Our limitations with Gaussian fit
+
+description of problem with local peaks and inaccuracy of overlap
+
+Alternatively, we ...
+
+### 2.6. Data description via Parameters
+
+To identify whether a Protein is RNA dependent or not each protein is tested on 4 parameters. The goal of those 4 parameters is the identification of significant differences between the Control and RNase sample. In the following sections the parameters will be elaborated.
+
+#### 2.6.1. Parameter 1: Significant change of protein amount under global peak
+
+The first parameter identifies a significant change of the protein amount under the global peak for each protein. The global maximum represents the fraction of the sucrose gradient containing the highest protein amount. It is determined by using the *which.max()* function for each protein. If the Protein amount of the global peak fraction is either in the Control or RNase sample 1.7 times higher than the other sample, we defined it as a significant change.
+
+#### 2.6.2. Parameter 2: Significant change of protein amount under local peaks
+
+The next parameter recognizes a significant change in the total protein amount under the local peaks between the Control and RNase sample for each protein. New local peaks can occur if after RNase treatment the protein either dissociates or gains new interaction partners. To detect a significant change the local peaks have to be identified. To be defined as a local peak four criteria have to be fulfilled. First, the y-value of the local peak fraction has to be higher than the y-value of its neighbor fractions. Afterwards we checked if the sd of the local peak's y-value and its neighbors is higher than the sd of the y-values which contain less than 8 % of the total protein amount (*sd.threshold*). The aim is to sort out small fluctuation between the y-values. The third criteria selects the relevant local peaks by sorting those out which have a smaller protein amount than 3 % of the total protein amount. Most of the already mentioned criteria fit to the global peaks as well and thus global maxima have to be removed. The total protein amount under the local peaks for each protein in the Control and RNase sample is of interest. If it differs more than 7.5 from each other a significant change of the protein amount under the local peak is present.
+
+#### 2.6.3. Parameter 3: Significant fraction-shift of global peak
+
+The third parameter focuses on the x-axis depicting the fractions. If the fraction of the global peak in either the Control or RNase sample differs more than two fractions in the positive or negative x-direction compared to the other sample, the protein is defined as RNA-dependent. It lost or gained an interaction partner due to the RNase treatment.
+
+#### 2.6.4. Parameter 4: Significant difference in position of shoulderregions
+
+At last it is observed if shoulderregions occur or disappear after the RNase treatment. A shoulderregion contains more than 2 consecutive fractions with a sd less than the *sd.threshold*. On the contrary to the local peak identification the fractions with small fluctuations are sorted. Of interest are those fractions belonging to shoulderregions which either occur in the Control or RNase sample but not in both. Often parts of the shoulderregions are overlapping, resulting in shoulderregions of interest with less than 3 consecutive fractions. So, a shoulderregion of interest is only significant if it has three or more consecutive fractions.
+
+#### 2.6.5. Boundaries and Precipitated proteins
+
+The four parameters can not be transferred to the recipitated proteins
+
+### 2.7. K-means clustering
+
+### 2.8. Regression analysis
+
+### 3. Results
+
+### 3.1. Cleaned Dataset
+
+### 3.2. RNA-dependent Proteins
+
+### 3.3. Comparison of the normalization methods
+
+### 3.3. K-means clustering
+
+### 3.4. Regression analysis
+
+### 3.5. Comparison with Database
+
+## 4. Discussion
+
+## 5. Literature
 
 ### 1.1. Check for missing values
 
@@ -420,7 +493,7 @@ colnames(rnase.mvm) <- new.colnames.rnase
 
 #### 3.2.1. Normalization
 
-The z-Transformation does not work with df that have NA-values. This means we cannot use the ctrl.clean and rnase.clean df. We have to use the old ctrl.rep or the MS.Table.naremoved[-non.reproducible,1:75] dfs. On these we first perform z-Transformation and then we use the same algorithms as before to reduce the dataset in regards to reproducibility. (boah mein Elglisch)
+The z-Transformation does not work with df that have NA-values. This means we cannot use the ctrl.clean and rnase.clean df. We have to use the old ctrl.rep or the MS.Table.naremoved[-non.reproducible,1:75] dfs. On these we first perform z-Transformation and then we use the same algorithms as before to reduce the dataset in regards to reproducibility.
 
 ```{r}
 ctrl.rep.zt <- MS.Table.naremoved[-non.reproducible,1:75]
@@ -1046,7 +1119,6 @@ for (i in 1:num_rows) {
 plots_ctrl_rnase.zt[[5]]
 ```
 
-
 Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
 
 ```{r}
@@ -1425,7 +1497,6 @@ for (i in seq_along(localpeaks.rnase.mms)) {localpeaks.rnase.mms[[i]] <- localpe
 
 localpeaks.values.rnase.mms <- lapply(seq_along(localpeaks.rnase.mms), function(i) peakidentif.rnase.mms[i, localpeaks.rnase.mms[[i]]])
 ```
-
 
 #### 5.3.3. Boundaries
 
@@ -1921,7 +1992,7 @@ curve(gauss(x, a=a2, mu=mu2, sigma=sigma2), from = min(x), to = max(x), add = TR
 
 Hinweis: Um die Graphen einer anderen Normalisierungsmethode zu sehen, kann zt in mvm oder mms abgeändert werden.
 
-## 7. Parameters to identify RNA-dependent or RNA-binding Proteins 
+## 7. Parameters to identify RNA-dependent or RNA-binding Proteins
 
 Load the relevant data:
 
@@ -2050,8 +2121,9 @@ length(shift_mvm_named[shift_mvm_named == "left shift"])
 ```{r}
 length(shift_mvm_named[shift_mvm_named == "precipitated"])
 ```
- 
+
 To be able to use the data whether a protein is clustered or not, we need to put it in a vector
+
 ```{r}
 precipitated.mvm
 
@@ -2071,7 +2143,6 @@ for (i in 1:dim(ctrl.mvm)[1]){
 #### 7.1.2. Shifts with z-Transformation
 
 In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
-
 
 ```{r}
 n = 2
@@ -2104,8 +2175,8 @@ length(shift_zt_named[shift_zt_named == "left shift"])
 length(shift_zt_named[shift_zt_named == "precipitated"])
 ```
 
-
 To be able to use the data whether a protein is clustered or not, we need to put it in a vector
+
 ```{r}
 precipitated.zt
 
@@ -2120,7 +2191,6 @@ for (i in 1:dim(ctrl.zt)[1]){
   }
 }
 ```
-
 
 #### 7.1.3. Shifts with Min-Max Scaling
 
@@ -2158,6 +2228,7 @@ length(shift_mms_named[shift_mms_named == "precipitated"])
 ```
 
 To be able to use the data whether a protein is clustered or not, we need to put it in a vector
+
 ```{r}
 precipitated.mms
 
@@ -2184,8 +2255,8 @@ Proteins can also be RNA dependent even if they do not have a significant shift.
 shreg.rnase.mvm <- rnase.mvm
 ```
 
+First, we identify fraction (regions) of proteins with high protein amount.
 
-First, we identify fraction (regions) of proteins with high protein amount. 
 ```{r}
 largevalues.rnase.mvm <- apply(shreg.rnase.mvm[,2:24], 1, function(x) {
   largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
@@ -2196,6 +2267,7 @@ largevalues.rnase.mvm <- apply(shreg.rnase.mvm[,2:24], 1, function(x) {
 ```
 
 Now, all regions (= 3 fractions) with a sd smaller then the sd for our normal fluctuation used by peak identification are selected.
+
 ```{r}
 closereg.rnase.mvm <- list()
 for (i in 1:nrow(shreg.rnase.mvm)) {
@@ -2215,6 +2287,7 @@ for (i in 1:nrow(shreg.rnase.mvm)) {
 ```
 
 We just want to have the large values which also occur in close value.
+
 ```{r}
 largevalues.closereg.rnase.mvm <- largevalues.rnase.mvm
 for (i in seq_along(largevalues.closereg.rnase.mvm)) {
@@ -2237,11 +2310,13 @@ shoulderregion.rnase.mvm <- lapply(ordered.largevalues.closereg.rnase.mvm,functi
 ```
 
 We continue with the ctrl group.
+
 ```{r}
 shreg.ctrl.mvm <- ctrl.mvm
 ```
 
-First, we identify fraction (regions) of proteins with high protein amount. 
+First, we identify fraction (regions) of proteins with high protein amount.
+
 ```{r}
 largevalues.ctrl.mvm <- apply(shreg.ctrl.mvm[,2:24], 1, function(x) {
   largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
@@ -2270,6 +2345,7 @@ for (i in 1:nrow(shreg.ctrl.mvm)) {
 ```
 
 We just want to have the large values which also occur in close value.
+
 ```{r}
 largevalues.closereg.ctrl.mvm <- largevalues.ctrl.mvm
 for (i in seq_along(largevalues.closereg.ctrl.mvm)) {
@@ -2291,7 +2367,8 @@ shoulderregion.ctrl.mvm <- lapply(ordered.largevalues.closereg.ctrl.mvm,function
 })
 ```
 
-Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
+Now we can find shoulderregions which only occur in one sample (ctrl or rnase).
+
 ```{r}
 shoulderregion.a.mvm <- lapply(names(shoulderregion.ctrl.mvm), function(x) setdiff(shoulderregion.ctrl.mvm[[x]], shoulderregion.rnase.mvm[[x]]))
 names(shoulderregion.a.mvm) <- names(shoulderregion.ctrl.mvm)
@@ -2301,6 +2378,7 @@ names(shoulderregion.b.mvm) <- names(shoulderregion.rnase.mvm)
 ```
 
 At last, we only want does proteins with entries more than 2. The others have no significant difference.
+
 ```{r}
 selec.shoulderregion.a.mvm <- lapply(shoulderregion.a.mvm, function(x) 
   if (length(x) < 3) {return(numeric(0))} 
@@ -2312,6 +2390,7 @@ selec.shoulderregion.b.mvm <- lapply(shoulderregion.b.mvm, function(x)
 ```
 
 To include the shoulder regions into the dataframe with parameters, we create a new dataframe with 0 for shoulderregion and 1 with shoulderregion.
+
 ```{r}
 selec.shoulderregion.a.1.mvm <- lapply(shoulderregion.a.mvm, function(x) 
   if (length(x) > 2) {return (1)} 
@@ -2341,8 +2420,8 @@ Proteins can also be RNA dependent even if they do not have a significant shift.
 shreg.rnase.zt <- rnase.zt
 ```
 
+First, we identify fraction (regions) of proteins with high protein amount.
 
-First, we identify fraction (regions) of proteins with high protein amount. 
 ```{r}
 largevalues.rnase.zt <- apply(shreg.rnase.zt[,2:24], 1, function(x) {
   largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
@@ -2353,6 +2432,7 @@ largevalues.rnase.zt <- apply(shreg.rnase.zt[,2:24], 1, function(x) {
 ```
 
 Identification of regions around the peaks.
+
 ```{r}
 neighpeaks.rnase.zt <- apply(shreg.rnase.zt, 1,
             function(x) { peak_indices <- which(diff(sign(diff(x))) == -2 & x[-c(1, length(x))] > 3) + 1
@@ -2362,6 +2442,7 @@ neighpeaks.rnase.zt <- apply(shreg.rnase.zt, 1,
 ```
 
 Now we identify the boundaries again, but safe them in a list.
+
 ```{r}
 boundary1.rnase.zt <- lapply(1:nrow(shreg.rnase.zt), function(i) {
   if (shreg.rnase.zt[i, 1] > shreg.rnase.zt[i, 2] & shreg.rnase.zt[i, 1] > shreg.rnase.zt[i, 3] & (shreg.rnase.zt[i, 1] + shreg.rnase.zt[i, 2] + shreg.rnase.zt[i, 3]) > 10) {
@@ -2379,6 +2460,7 @@ boundary25.rnase.zt <-lapply(1:nrow(shreg.rnase.zt), function(i) {
 ```
 
 Now, all regions (= 3 fractions) with a sd smaller then the sd for our normal fluctuation used by peak identification are selected.
+
 ```{r}
 closereg.rnase.zt <- list()
 for (i in 1:nrow(shreg.rnase.zt)) {
@@ -2398,6 +2480,7 @@ for (i in 1:nrow(shreg.rnase.zt)) {
 ```
 
 We just want to have the large values which also occur in close value.
+
 ```{r}
 largevalues.closereg.rnase.zt <- largevalues.rnase.zt
 for (i in seq_along(largevalues.closereg.rnase.zt)) {
@@ -2418,16 +2501,17 @@ shoulderregion.rnase.zt <- lapply(ordered.largevalues.closereg.rnase.zt,function
     return(shoulderregion)
 })
 ```
-Interessante Proteine: AAAT_HUMAN
-Bad Proteins: ADA10_HUMAN
 
+Interessante Proteine: AAAT_HUMAN Bad Proteins: ADA10_HUMAN
 
 We continue with the ctrl group.
+
 ```{r}
 shreg.ctrl.zt <- ctrl.zt
 ```
 
-First, we identify fraction (regions) of proteins with high protein amount. 
+First, we identify fraction (regions) of proteins with high protein amount.
+
 ```{r}
 largevalues.ctrl.zt <- apply(shreg.ctrl.zt[,2:24], 1, function(x) {
   largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
@@ -2456,6 +2540,7 @@ for (i in 1:nrow(shreg.ctrl.zt)) {
 ```
 
 We just want to have the large values which also occur in close value.
+
 ```{r}
 largevalues.closereg.ctrl.zt <- largevalues.ctrl.zt
 for (i in seq_along(largevalues.closereg.ctrl.zt)) {
@@ -2477,7 +2562,8 @@ shoulderregion.ctrl.zt <- lapply(ordered.largevalues.closereg.ctrl.zt,function(x
 })
 ```
 
-Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
+Now we can find shoulderregions which only occur in one sample (ctrl or rnase).
+
 ```{r}
 shoulderregion.a.zt <- lapply(names(shoulderregion.ctrl.zt), function(x) setdiff(shoulderregion.ctrl.zt[[x]], shoulderregion.rnase.zt[[x]]))
 names(shoulderregion.a.zt) <- names(shoulderregion.ctrl.zt)
@@ -2487,6 +2573,7 @@ names(shoulderregion.b.zt) <- names(shoulderregion.rnase.zt)
 ```
 
 At last, we only want does proteins with entries more than 2. The others have no significant difference.
+
 ```{r}
 selec.shoulderregion.a.zt <- lapply(shoulderregion.a.zt, function(x) 
   if (length(x) < 3) {return(numeric(0))} 
@@ -2498,6 +2585,7 @@ selec.shoulderregion.b.zt <- lapply(shoulderregion.b.zt, function(x)
 ```
 
 To include the shoulder regions into the dataframe with parameters, we create a new dataframe with 0 for shoulderregion and 1 with shoulderregion.
+
 ```{r}
 selec.shoulderregion.a.1.zt <- lapply(shoulderregion.a.zt, function(x) 
   if (length(x) > 2) {return (1)} 
@@ -2527,8 +2615,8 @@ Proteins can also be RNA dependent even if they do not have a significant shift.
 shreg.rnase.mms <- rnase.mms
 ```
 
+First, we identify fraction (regions) of proteins with high protein amount.
 
-First, we identify fraction (regions) of proteins with high protein amount. 
 ```{r}
 largevalues.rnase.mms <- apply(shreg.rnase.mms[,2:24], 1, function(x) {
   largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
@@ -2539,6 +2627,7 @@ largevalues.rnase.mms <- apply(shreg.rnase.mms[,2:24], 1, function(x) {
 ```
 
 Now, all regions (= 3 fractions) with a sd smaller then the sd for our normal fluctuation used by peak identification are selected.
+
 ```{r}
 closereg.rnase.mms <- list()
 for (i in 1:nrow(shreg.rnase.mms)) {
@@ -2558,6 +2647,7 @@ for (i in 1:nrow(shreg.rnase.mms)) {
 ```
 
 We just want to have the large values which also occur in close value.
+
 ```{r}
 largevalues.closereg.rnase.mms <- largevalues.rnase.mms
 for (i in seq_along(largevalues.closereg.rnase.mms)) {
@@ -2580,11 +2670,13 @@ shoulderregion.rnase.mms <- lapply(ordered.largevalues.closereg.rnase.mms,functi
 ```
 
 We continue with the ctrl group.
+
 ```{r}
 shreg.ctrl.mms <- ctrl.mms
 ```
 
-First, we identify fraction (regions) of proteins with high protein amount. 
+First, we identify fraction (regions) of proteins with high protein amount.
+
 ```{r}
 largevalues.ctrl.mms <- apply(shreg.ctrl.mms[,2:24], 1, function(x) {
   largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
@@ -2613,6 +2705,7 @@ for (i in 1:nrow(shreg.ctrl.mms)) {
 ```
 
 We just want to have the large values which also occur in close value.
+
 ```{r}
 largevalues.closereg.ctrl.mms <- largevalues.ctrl.mms
 for (i in seq_along(largevalues.closereg.ctrl.mms)) {
@@ -2634,7 +2727,8 @@ shoulderregion.ctrl.mms <- lapply(ordered.largevalues.closereg.ctrl.mms,function
 })
 ```
 
-Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
+Now we can find shoulderregions which only occur in one sample (ctrl or rnase).
+
 ```{r}
 shoulderregion.a.mms <- lapply(names(shoulderregion.ctrl.mms), function(x) setdiff(shoulderregion.ctrl.mms[[x]], shoulderregion.rnase.mms[[x]]))
 names(shoulderregion.a.mms) <- names(shoulderregion.ctrl.mms)
@@ -2644,6 +2738,7 @@ names(shoulderregion.b.mms) <- names(shoulderregion.rnase.mms)
 ```
 
 At last, we only want does proteins with entries more than 2. The others have no significant difference.
+
 ```{r}
 selec.shoulderregion.a.mms <- lapply(shoulderregion.a.mms, function(x) 
   if (length(x) < 3) {return(numeric(0))} 
@@ -2655,6 +2750,7 @@ selec.shoulderregion.b.mms <- lapply(shoulderregion.b.mms, function(x)
 ```
 
 To include the shoulder regions into the dataframe with parameters, we create a new dataframe with 0 for shoulderregion and 1 with shoulderregion.
+
 ```{r}
 selec.shoulderregion.a.1.mms <- lapply(shoulderregion.a.mvm, function(x) 
   if (length(x) > 2) {return (1)} 
@@ -2679,6 +2775,7 @@ ShoulderRegion_mms <- t(shoulderregion.mms.nt.nt)
 ### 7.3 Protein amount under global peak
 
 #### 7.3.1 protein amount under global peak based on Mean-Value-Methode
+
 We can test for proteins with a significant higher protein amount under the global peaks in the RNase group.
 
 ```{r}
@@ -2691,6 +2788,7 @@ rownames(signi.global.pa.mvm) <- rownames(rnase.mvm)
 
 length(which(signi.global.pa.mvm==1))
 ```
+
 #### 7.3.2 protein amount under global peaks shift based on z-Transformation
 
 ```{r}
@@ -2710,14 +2808,14 @@ length(which(signi.global.pa.zt==1))
 
 #### 7.3.3 protein amount under global peaks shift based on Min-Max-Scaling
 
-With this method we can´t find any Rdeeps for the mms normalized data because all protein amount under the global peaks of the control and the RNase group are 100. 
+With this method we can´t find any Rdeeps for the mms normalized data because all protein amount under the global peaks of the control and the RNase group are 100.
 
-
-### 7.4 Protein amount under local peaks shift 
+### 7.4 Protein amount under local peaks shift
 
 #### 7.4.1 Protein amount under local peaks shift based on Mean-Value-Method
 
 First we have to sum up the protein amount under all local peaks - for the control group.
+
 ```{r}
 localpeaks.sumvalues.ctrl.mvm <- data.frame(sum_values = numeric(length(localpeaks.values.ctrl.mvm)))
 
@@ -2728,7 +2826,8 @@ for (i in seq_along(localpeaks.values.ctrl.mvm)) {
 # View(localpeaks.sumvalues.ctrl.mvm)
 ```
 
-Protein amount under all local peaks - for the RNase group 
+Protein amount under all local peaks - for the RNase group
+
 ```{r}
 localpeaks.sumvalues.rnase.mvm <- data.frame(sum_values = numeric(length(localpeaks.values.rnase.mvm)))
 
@@ -2759,6 +2858,7 @@ length(which(signi.local.pa.mvm==1))
 ```
 
 #### 7.4.2 protein amount under local peaks shift based on z-Transformation
+
 ```{r}
 localpeaks.sumvalues.ctrl.zt <- data.frame(Summed_Values = numeric(length(localpeaks.values.ctrl.zt)))
 
@@ -2800,6 +2900,7 @@ length(which(signifikante_reihen_local_zt==1))
 ```
 
 #### 7.4.3 protein amount under local peaks shift based on MMS
+
 ```{r}
 localpeaks.sumvalues.ctrl.mms <- data.frame(Summed_Values = numeric(length(localpeaks.values.ctrl.mms)))
 
@@ -2853,7 +2954,6 @@ View(parameters.mms)
 ```{r}
 # View(parameters.mvm)
 ```
-
 
 ## 8. Visualization of Results
 
@@ -2921,8 +3021,6 @@ print(plot_RBP[[x]])
 #print(plot_RBP[[1]])
 
 ```
-
-
 
 This barplot shows us how many proteins are RNA associated according to how many parameters:
 
@@ -3071,13 +3169,12 @@ for (z in 1:3){
 }
 ```
 
-
-
 ## 9. Kmeans clustering
 
-Here we cluster the peaks after different parameters. This helps to visualize the parameters from before. 
+Here we cluster the peaks after different parameters. This helps to visualize the parameters from before.
 
-Here we cluster the Proteins depending on the fractions in which the peaks are. 
+Here we cluster the Proteins depending on the fractions in which the peaks are.
+
 ```{r, warning = False}
 
 library("ggpubr")
@@ -3152,9 +3249,7 @@ print(plot.cluster.shifts[[x]])
 }
 ```
 
-
-
-Here we cluster the precipitation. 
+Here we cluster the precipitation.
 
 ```{r}
 library("ggpubr")
@@ -3193,8 +3288,7 @@ print(plot.cluster.precipitated[[x]])
 }
 ```
 
-
-Here we cluster the shoulderregions. 
+Here we cluster the shoulderregions.
 
 ```{r}
 library("ggpubr")
@@ -3218,14 +3312,14 @@ g + theme(axis.text.x = element_blank(),
 
 ```
 
+## 10. Regression analysis
 
-## 10. Regression analysis 
+### 10.1 Regression analysis MVM
 
-### 10.1 Regression analysis MVM 
+#### 10.1.1 Regression analysis only using global shift
 
-#### 10.1.1 Regression analysis only using global shift 
+zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um
 
-zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um 
 ```{r}
 library(dplyr)
 
@@ -3235,6 +3329,7 @@ shift_mvm_named <- as.data.frame(shift_mvm_named) %>%
 ```
 
 anschließend berechnen wir die Korrelation der Proteinmengen in Control und RNase für jedes Protein
+
 ```{r}
 correlation.mvm <-as.data.frame( sapply(1:nrow(ctrl.mvm), function(i) cor(ctrl.mvm[i, ], rnase.mvm[i, ])))
 rownames(correlation.mvm) <- rownames(rnase.mvm)
@@ -3244,7 +3339,7 @@ rownames(correlation.mvm) <- rownames(rnase.mvm)
 
 ```
 
-Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die ersten 2500 Proteine werden genutzt, um das Model zu trainieren. Auf die restlichen wird dann die Vorhersage angewendet 
+Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die ersten 2500 Proteine werden genutzt, um das Model zu trainieren. Auf die restlichen wird dann die Vorhersage angewendet
 
 ```{r}
 # Trainingssatz (Zeilen 1 bis 2500)
@@ -3270,14 +3365,14 @@ print(summary(model_mvm))
 
 ```
 
-Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
-
+Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift
 
 ### 10.2 Regression analysis z-Transformation
 
-#### 10.2.1 Regression analysis only using global shift 
+#### 10.2.1 Regression analysis only using global shift
 
-zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um 
+zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um
+
 ```{r}
 library(dplyr)
 
@@ -3286,8 +3381,8 @@ shift_zt_named <- as.data.frame(shift_zt_named) %>%
 
 ```
 
-
 anschließend berechnen wir die Korrelation der Proteinmengen in Control und RNase für jedes Protein
+
 ```{r}
 correlation.zt <-as.data.frame( sapply(1:nrow(ctrl.zt), function(i) cor(ctrl.zt[i, ], rnase.zt[i, ])))
 rownames(correlation.zt) <- rownames(rnase.zt)
@@ -3297,7 +3392,7 @@ rownames(correlation.zt) <- rownames(rnase.zt)
 
 ```
 
-Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die ersten 2500 Proteine werden genutzt, um das Model zu trainieren. Auf die restlichen wird dann die Vorhersage angewendet 
+Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die ersten 2500 Proteine werden genutzt, um das Model zu trainieren. Auf die restlichen wird dann die Vorhersage angewendet
 
 ```{r}
 train_zt <- data.frame(Korrelation_zt = correlation.zt[1:2500, ], Shift = shift_zt_named[1:2500, 2])
@@ -3314,13 +3409,14 @@ print(summary(model_zt))
 
 ```
 
-Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
+Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift
 
-### 10.3 Regression analysis MMS 
+### 10.3 Regression analysis MMS
 
-#### 10.3.1 Regression analysis only using global shift 
+#### 10.3.1 Regression analysis only using global shift
 
-zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um 
+zuerst wandeln wir die Information left shift, right shift und no shift in numerische Daten um
+
 ```{r}
 library(dplyr)
 
@@ -3330,6 +3426,7 @@ shift_mms_named <- as.data.frame(shift_mms_named) %>%
 ```
 
 anschließend berechnen wir die Korrelation der Proteinmengen in Control und RNase für jedes Protein
+
 ```{r}
 correlation.mms <-as.data.frame( sapply(1:nrow(ctrl.mvm), function(i) cor(ctrl.mvm[i, ], rnase.mvm[i, ])))
 rownames(correlation.mms) <- rownames(rnase.mms)
@@ -3339,7 +3436,7 @@ rownames(correlation.mms) <- rownames(rnase.mms)
 
 ```
 
-Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die ersten 2500 Proteine werden genutzt, um das Model zu trainieren. Auf die restlichen wird dann die Vorhersage angewendet 
+Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die ersten 2500 Proteine werden genutzt, um das Model zu trainieren. Auf die restlichen wird dann die Vorhersage angewendet
 
 ```{r}
 train_mms <- data.frame(Korrelation = correlation.mms[1:2500, ], Shift = shift_mms_named[1:2500, 2])
@@ -3356,11 +3453,12 @@ print(summary(model_mms))
 
 ```
 
-Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
+Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift
 
 ##11. t-test
 
-test significance of Correlation values 
+test significance of Correlation values
+
 ```{r}
 # Perform t-test on correlation values
 t_test_mvm <- t.test(correlation.mvm, mu = 0)
@@ -3371,8 +3469,8 @@ print(t_test_mms)
 
 ```
 
+t-test der prüft, ob unterschiede in protein amount zwischen ctrl und rnase signifikant
 
-t-test der prüft, ob unterschiede in protein amount zwischen ctrl und rnase signifikant 
 ```{r}
 num_rows <- nrow(ctrl.mvm)
 p_values_mvm <- numeric(num_rows)
@@ -3407,6 +3505,5 @@ for (i in 1:num_rows) {
 print(p_values_mms)
 
 ```
--> Ergebnis ist immer 1 -> RNA dependent proteins müssen auf anderem Wege gefunden werden 
 
-
+-\> Ergebnis ist immer 1 -\> RNA dependent proteins müssen auf anderem Wege gefunden werden
