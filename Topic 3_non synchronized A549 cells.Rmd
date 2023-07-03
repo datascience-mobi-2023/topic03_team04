@@ -10,7 +10,7 @@ output:
     toc: yes
 header-includes:
   - \usepackage{fontspec}
-  - \setmainfont{Timenewroman}
+  - \setmainfont{Cambria}
   - \usepackage{setspace}
   - \setstretch{1.25}
   
@@ -189,45 +189,8 @@ plots_ctrl_rnase.zt[[1798]] + labs(title = "3 - Significant fraction-shift of gl
 plots_ctrl_rnase.zt[[878]] + labs(title = "4 - Significant difference in position of shoulderregions")+ labs(title = expression("4 - " * italic("Significant difference in position of shoulderregion")))+ theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97"))+ theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
 ```
 #### 2.6.5. Boundaries and Precipitated proteins
-The local peakfinder can't find local maxima at the boundaries (fraction 1 and fraction 25) because they have only one neighbor fraction. Following conditions have to be met to be defined as a local peak at the boundary. Firstly, it has to have a higher y-value than the contiguous two fractions. Secondly, the protein amount of those three fractions has to be bigger than 10.
-
-
-Also precipitated proteins are not descriped by the parameters and have to be identified separately. 
-
-
-
-#### 5.3.3. Boundaries
-
-Futhermore, we have to look if there are peaks in fraction 1 or fraction 25. Again, we start with the identification of the boundaries for the control group.
-
-```{r}
-fraction1.peak.ctrl.mms <- which(peakidentif.ctrl.mms[, 1] > peakidentif.ctrl.mms[, 2] & peakidentif.ctrl.mms[, 1] > peakidentif.ctrl.mms[, 3])
-# length(fraction1.peak.ctrl.mms)
-
-fraction25.peak.ctrl.mms <- which(peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 24] & peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 23] & peakidentif.ctrl.mms[, 25] + peakidentif.ctrl.mms[, 24] +peakidentif.ctrl.mms[, 23] > 10) # wenn der peak am Ende nicht insgesamt 10 überschreitet, ist es relativ unrelevant. Scheinbar fallen viele Proteine am Ende etwas aus.
-# length(fraction25.peak.ctrl.mms)
-```
-
-```{r}
-fraction1.peak.rnase.mms <- which(peakidentif.rnase.mms[, 1] > peakidentif.rnase.mms[, 2] & peakidentif.rnase.mms[, 1] > peakidentif.rnase.mms[, 3])
-# length(fraction1.peak.rnase.mms)
-
-fraction25.peak.rnase.mms <- which(peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 24] & peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 23] & peakidentif.rnase.mms[, 25] + peakidentif.rnase.mms[, 24] + peakidentif.rnase.mms[, 23] > 10)
-# length(fraction25.peak.rnase.mms)
-```
-
-#### 5.3.4. Precipitated Proteins
-
-At last we identify the precipitated proteins:
-
-```{r}
-precipitated.ctrl.mms <- which(peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 24] & peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 23] & peakidentif.ctrl.mms[, 25] + peakidentif.ctrl.mms[, 24] + peakidentif.ctrl.mms[, 23] == 100)
-
-precipitated.rnase.mms <- which(peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 24] & peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 23] & peakidentif.rnase.mms[, 25] + peakidentif.rnase.mms[, 24] + peakidentif.rnase.mms[, 23] == 100)
-
-precipitated.mms <- unique(c(precipitated.ctrl.mms,precipitated.rnase.mms))
-```
-
+The local peakfinder can't find local maxima at the boundaries (fraction 1 and fraction 25) because they have only one neighbor fraction. A local peak at the boundary has to fulfill following requirements. Firstly, it has to have a higher y-value than the two succeeding fractions. Secondly, the protein amount of those three fractions has to be bigger than 10. Smaller protein amounts are not relevant enough.
+Also precipitated proteins are not described by the parameters and have to be identified separately. They have a global peak in fraction 25 and their total protein amount of 100 has to be split between fraction 23, 24 and 25. 
 
 ### 2.7. K-means clustering
 
