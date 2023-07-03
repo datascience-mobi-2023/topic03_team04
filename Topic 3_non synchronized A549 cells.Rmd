@@ -179,26 +179,15 @@ for (i in 1:num_rows) {
 }
 ```
 
-Parameter 1
-```{r, fig.show="hold", out.width="25%"}
-plots_ctrl_rnase.zt[[460]]
-plots_ctrl_rnase.zt[[663]]
-plots_ctrl_rnase.zt[[1798]]
-plots_ctrl_rnase.zt[[878]]
-```
-Parameter 2
-```{r}
-print(plots_ctrl_rnase.zt[[663]])
-```
-Parameter 3
-```{r}
-print(plots_ctrl_rnase.zt[[1798]])
-```
-Parameter 4
-```{r}
-print(plots_ctrl_rnase.zt[[878]])
-```
+```{r, fig.show="hold", out.width="50%"}
+plots_ctrl_rnase.zt[[460]] + labs(title = "1 - Significant change of protein amount under global peak")+ labs(title = expression("1 - " * italic("Significant change of protein amount under global peak"))) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97")) + theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
 
+plots_ctrl_rnase.zt[[663]] + labs(title = "2 - Significant change of protein amount under local peaks")+ labs(title = expression("2 - " * italic("Significant change of protein amount under local peaks"))) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97"))+ theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
+
+plots_ctrl_rnase.zt[[1798]] + labs(title = "3 - Significant fraction-shift of global peak")+ labs(title = expression("3 - " * italic("Significant fraction-shift of global peak")))+ theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97"))+ theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
+
+plots_ctrl_rnase.zt[[878]] + labs(title = "4 - Significant difference in position of shoulderregions")+ labs(title = expression("4 - " * italic("Significant difference in position of shoulderregion")))+ theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97"))+ theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
+```
 #### 2.6.5. Boundaries and Precipitated proteins
 The local peakfinder can't find local maxima at the boundaries (fraction 1 and fraction 25) because they have only one neighbor fraction. Following conditions have to be met to be defined as a local peak at the boundary. Firstly, it has to have a higher y-value than the contiguous two fractions. Secondly, the protein amount of those three fractions has to be bigger than 10.
 
