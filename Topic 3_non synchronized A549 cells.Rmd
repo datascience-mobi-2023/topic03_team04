@@ -3227,6 +3227,7 @@ Erstellen der Dataframes mit Parametern für Regressions analyse
 ```{r}
 parameters.all <- list(parameters.mvm, parameters.zt, parameters.mms)
 
+
 shift.vector.all <- list()
 
 for (z in 1:3){
@@ -3259,20 +3260,7 @@ for (z in 1:3){
     df.shift.sum[x+1,2] <- 
       sum(as.numeric(df.shift[which(sum_parameters == x),]))} 
   
-  
-  df.sum <- as.data.frame(sum_parameters)
-  df.sum.sum <- as.data.frame(c)
-  for (x in 0:(d+3)){
-    df.sum.sum[x+1,2] <- sum(sum_parameters == x)}
-
-  shift.vektor <- c()
-  for (x in 1:3074){
-    if(sum_parameters[x] == 2 || sum_parameters[x] == 3 || 
-       sum_parameters[x] == 4 || as.numeric(df.shift[x,1]) == 1){
-      shift.vektor[x] <- 1
-    }else{shift.vektor[x] <- 0}}
-  
-    vector <- c()
+      vector <- c()
   for (x in 1:3074){
     if(sum_parameters[x] == 2 || sum_parameters[x] == 3 || 
        sum_parameters[x] == 4 || as.numeric(df.shift[x,1]) == 1){
@@ -3308,17 +3296,12 @@ library(dplyr)
 
 shift_mvm_named <- as.data.frame(shift_mvm_named) %>%
   mutate(Shift = recode(shift_mvm_named, "left shift" = 1, "right shift" = 2, "no shift" = 0, .default = 0))
-
 ```
 
 anschließend berechnen wir die Korrelation der Proteinmengen in Control und RNase für jedes Protein
 ```{r}
 correlation.mvm <-as.data.frame( sapply(1:nrow(ctrl.mvm), function(i) cor(ctrl.mvm[i, ], rnase.mvm[i, ])))
 rownames(correlation.mvm) <- rownames(rnase.mvm)
-
-
-#print(correlation.mvm)
-
 ```
 
 Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die ersten 2500 Proteine werden genutzt, um das Model zu trainieren. Auf die restlichen wird dann die Vorhersage angewendet 
@@ -3346,7 +3329,6 @@ print(summary(model_mvm_global))
 #print(rounded_predictions_mvm_global)
 
 ```
-
 Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
 
 #### 10.1.2 Regression analysis using all parameters 
@@ -3365,8 +3347,61 @@ rownames(rounded_predictions_mvm_all) <- rownames(rnase.mvm[2501:3074, ])
 print(summary(model_mvm_all))
 
 #print(rounded_predictions_mvm_all)
+```
+```{r}
+shift.amount = abs(data.frame(shift_mvm_global))
+
+train_mvm_2 <- data.frame(Korrelation_2 = correlation.mvm[1:2500, ], Shift_2 = shift.amount[1:2500, ])
+
+model_mvm_all_2 <- lm(Shift_2 ~ Korrelation_2, data = train_mvm_2)
+
+test_mvm_2 <- data.frame(Korrelation_2 = correlation.mvm[2501:3074, ])
+
+predictions_mvm_2 <- as.data.frame(predict(model_mvm_all_2, newdata = test_mvm_2))
+rounded_predictions_mvm_all_2 <- round(predictions_mvm_2)
+rownames(rounded_predictions_mvm_all_2) <- rownames(rnase.mvm[2501:3074, ])
+
+
+print(summary(model_mvm_all_2))
+```
+
+```{r}
+x <- train_mvm_2$Korrelation_2
+y <- train_mvm_2$Shift_2
+
+# Punkte des Streudiagramms
+plot(x, y, main = "Regressionsanalyse", xlab = "Korrelation", ylab = "Shift", xlim = c(min(x), max(x)), ylim = c(min(y), max(y)))
+
+
+# Regressionsgerade hinzufügen
+abline(model_mvm_all_2, col = "red")
+```
+
+
+```{r}
+x <- train_mvm_2$Korrelation_2
+y <- train_mvm_2$Shift_2
+
+
+plot(x, y, main = "Regressionsanalyse", xlab = "Korrelation", ylab = "Shift", xlim = c(min(x), max(x)), ylim = c(min(y), max(y)))
+
+
+abline(model_mvm_all_2, col = "red")
+
+
+test_x <- test_mvm_2$Korrelation_2
+predicted_y <- predict(model_mvm_all_2, newdata = test_mvm_2)
+
+
+points(test_x, predicted_y, col = "blue", pch = 16)
+
+
+legend("topright", legend = c("Trainingsdaten", "Regressionsgerade", "Vorhersagen"),
+       col = c("black", "red", "blue"), pch = c(1, NA, 16), lty = c(NA, 1, NA))
 
 ```
+
+
 
 ### 10.2 Regression analysis z-Transformation
 
