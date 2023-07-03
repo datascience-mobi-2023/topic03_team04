@@ -1897,7 +1897,7 @@ for (i in 1:num_rows) {
  #   plots_gaussian_ctrl.zt[[i]] <- NULL
 #  }
 
-}
+#}
 ```
 
 ####6.4.2 example how to plot the Control and RNase curve of one specific protein
@@ -3291,6 +3291,11 @@ sum(shift.vector.zt ==1)
 sum(shift.vector.mms ==1)
 ```
 
+```{r}
+shift_mvm <- as.data.frame(shift.vector.mvm)
+shift_zt <- as.data.frame(shift.vector.zt)
+shift_mms <- as.data.frame(shift.vector.mms)
+```
 
 
 ### 10.1 Regression analysis MVM 
@@ -3323,27 +3328,45 @@ Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die erste
 train_mvm <- data.frame(Korrelation = correlation.mvm[1:2500, ], Shift = shift_mvm_named[1:2500, 2])
 
 # Lineares Regressionsmodell
-model_mvm <- lm(Shift ~ Korrelation, data = train_mvm)
+model_mvm_global <- lm(Shift ~ Korrelation, data = train_mvm)
 
 # Testdaten (Zeilen 2501 bis 3074)
 test_mvm <- data.frame(Korrelation = correlation.mvm[2501:3074, ])
 
 # Vorhersagen machen
-predictions_mvm <- predict(model_mvm, newdata = test_mvm)
+predictions_mvm <- as.data.frame(predict(model_mvm_global, newdata = test_mvm))
 
 # Vorhersagen auf diskrete Werte abrunden
-rounded_predictions_mvm <- round(predictions_mvm)
+rounded_predictions_mvm_global <- round(predictions_mvm)
+rownames(rounded_predictions_mvm_global) <- rownames(rnase.mvm[2501:3074, ])
 
 
+print(summary(model_mvm_global))
 
-print(summary(model_mvm))
-
-#print(rounded_predictions_mvm)
+#print(rounded_predictions_mvm_global)
 
 ```
 
 Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
 
+#### 10.1.2 Regression analysis using all parameters 
+```{r}
+train_mvm <- data.frame(Korrelation = correlation.mvm[1:2500, ], Shift = shift_mvm[1:2500, ])
+
+model_mvm_all <- lm(Shift ~ Korrelation, data = train_mvm)
+
+test_mvm <- data.frame(Korrelation = correlation.mvm[2501:3074, ])
+
+predictions_mvm <- as.data.frame(predict(model_mvm_all, newdata = test_mvm))
+rounded_predictions_mvm_all <- round(predictions_mvm)
+rownames(rounded_predictions_mvm_all) <- rownames(rnase.mvm[2501:3074, ])
+
+
+print(summary(model_mvm_all))
+
+#print(rounded_predictions_mvm_all)
+
+```
 
 ### 10.2 Regression analysis z-Transformation
 
@@ -3374,19 +3397,36 @@ Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die erste
 ```{r}
 train_zt <- data.frame(Korrelation_zt = correlation.zt[1:2500, ], Shift = shift_zt_named[1:2500, 2])
 
-model_zt <- lm(Shift ~ Korrelation_zt, data = train_zt)
+model_zt_gloabl <- lm(Shift ~ Korrelation_zt, data = train_zt)
 
 test_zt <- data.frame(Korrelation_zt = correlation.zt[2501:3074, ])
 
-predictions_zt <- predict(model_zt, newdata = test_zt)
-rounded_predictions_zt <- round(predictions_zt)
+predictions_zt <- as.data.frame(predict(model_zt_gloabl, newdata = test_zt))
+rounded_predictions_zt_global <- round(predictions_zt)
+rownames(rounded_predictions_zt_global) <- rownames(rnase.zt[2501:3074, ])
 
-print(summary(model_zt))
-#print(rounded_predictions_zt)
+print(summary(model_zt_global))
+#print(rounded_predictions_zt_global)
 
 ```
-
 Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
+
+#### 10.2.2 Regression analysis using all parameters 
+```{r}
+train_zt <- data.frame(Korrelation_zt = correlation.zt[1:2500, ], Shift = shift_zt[1:2500, ])
+
+model_zt_all <- lm(Shift ~ Korrelation_zt, data = train_zt)
+
+test_zt <- data.frame(Korrelation_zt = correlation.zt[2501:3074, ])
+
+predictions_zt <- as.data.frame(predict(model_zt_all, newdata = test_zt))
+rounded_predictions_zt_all <- round(predictions_zt)
+rownames(rounded_predictions_zt_all) <- rownames(rnase.zt[2501:3074, ])
+
+print(summary(model_zt_all)) 
+#print(rounded_predictions_zt_all)
+```
+
 
 ### 10.3 Regression analysis MMS 
 
@@ -3416,19 +3456,39 @@ Nun können wir mit Hilfe der linearen Regression Vorhersagen treffen. Die erste
 ```{r}
 train_mms <- data.frame(Korrelation = correlation.mms[1:2500, ], Shift = shift_mms_named[1:2500, 2])
 
-model_mms <- lm(Shift ~ Korrelation, data = train_mms)
+model_mms_global <- lm(Shift ~ Korrelation, data = train_mms)
 
 test_mms <- data.frame(Korrelation = correlation.mms[2501:3074, ])
 
-predictions_mms <- predict(model_mms, newdata = test_mms)
-rounded_predictions_mms <- round(predictions_mms)
+predictions_mms <- as.data.frame(predict(model_mms_global, newdata = test_mms))
+rounded_predictions_mms_global <- round(predictions_mms)
+rownames(rounded_predictions_mms_global) <- rownames(rnase.mms[2501:3074, ])
 
-print(summary(model_mms))
-#print(rounded_predictions_mms)
+
+
+print(summary(model_mms_global))
+#print(rounded_predictions_mms_global)
 
 ```
+Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift
 
-Auch bei der Vorhersage gilt: 0=no shift, 1=left shift, 2=right shift 
+#### 10.3.2 Regression analysis using all parameters 
+```{r}
+train_mms <- data.frame(Korrelation = correlation.mms[1:2500, ], Shift = shift_mms[1:2500, ])
+
+model_mms_all <- lm(Shift ~ Korrelation, data = train_mms)
+
+test_mms <- data.frame(Korrelation = correlation.mms[2501:3074, ])
+
+predictions_mms <- as.data.frame(predict(model_mms_all, newdata = test_mms))
+rounded_predictions_mms_all <- round(predictions_mms)
+rownames(rounded_predictions_mms_all) <- rownames(rnase.mms[2501:3074, ])
+
+
+print(summary(model_mms_all))
+#print(rounded_predictions_mms_all)
+```
+
 
 ##11. t-test
 
