@@ -3384,11 +3384,11 @@ shift_zt_named <- as.data.frame(shift_zt_named) %>%
 
 anschließend berechnen wir die Korrelation der Proteinmengen in Control und RNase für jedes Protein
 ```{r}
-correlation.zt <-as.data.frame( sapply(1:nrow(ctrl.zt), function(i) cor(ctrl.zt[i, ], rnase.zt[i, ])))
+correlation.zt <-as.data.frame(sapply(1:nrow(ctrl.zt), function(i) cor(as.numeric(ctrl.zt[i, ]), as.numeric(rnase.zt[i, ]))))
 rownames(correlation.zt) <- rownames(rnase.zt)
 
 
-#print(correlation.zt)
+print(correlation.zt)
 
 ```
 
