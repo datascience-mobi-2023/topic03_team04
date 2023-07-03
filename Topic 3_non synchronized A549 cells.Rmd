@@ -73,6 +73,132 @@ The third parameter focuses on the x-axis depicting the fractions. If the fracti
 
 At last it is observed if shoulderregions occur or disappear after the RNase treatment. A shoulderregion contains more than 2 consecutive fractions with a sd less than the *sd.threshold*. On the contrary to the local peak identification the fractions with small fluctuations are sorted. Of interest are those fractions belonging to shoulderregions which either occur in the Control or RNase sample but not in both. Often parts of the shoulderregions are overlapping, resulting in shoulderregions of interest with less than 3 consecutive fractions. So, a shoulderregion of interest is only significant if it has three or more consecutive fractions.
 
+```{r}
+#Nr <- c(1:dim(parameters.zt)[1])
+#parameters.zt.Nr = cbind(Nr, parameters.zt)
+#View(parameters.zt.Nr)
+```
+
+
+```{r}
+library(ggplot2)
+
+num_rows <- nrow(rnase.zt)
+
+plots_rnase.zt <- list()
+
+for (i in 1:num_rows) {
+  row_data_rnase <- rnase.zt[i, ]
+  
+  
+   if (sum(!is.na(row_data_rnase)) >= 2) {
+    df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
+    
+      p <- ggplot(df, aes(x = x, y = yrnase)) +
+      geom_line(color = "tomato") +
+      geom_point(color = "tomato") +
+      xlab("Fractions") +
+      ylab("Protein amount") +
+      labs(title = "RNase zT")
+      
+    
+    plots_rnase.zt[[i]] <- p
+  } else {
+    
+    plots_rnase.zt[[i]] <- NULL
+  }
+}
+```
+
+```{r}
+library(ggplot2)
+
+num_rows <- nrow(ctrl.zt)
+
+plots_ctrl.zt <- list()
+
+for (i in 1:num_rows) {
+  row_data_ctrl <- ctrl.zt[i, ]
+  
+    if (sum(!is.na(row_data_ctrl)) >= 2) {
+    df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
+    
+      p <- ggplot(df, aes(x = x, y = yctrl)) +
+      geom_line(color = "skyblue2") +
+      geom_point(color = "skyblue2") +
+      xlab("Fractions") +
+      ylab("Protein amount") +
+      labs(title = "Control zT")
+    
+    
+    plots_ctrl.zt[[i]] <- p
+  } else {
+    
+    plots_ctrl.zt[[i]] <- NULL
+  }
+}
+```
+
+The following code creates two plots in one diagram, so that the Control and RNase group can be compared.
+
+```{r}
+library(ggplot2)
+
+num_rows <- nrow(ctrl.zt)
+
+names.as.colum <- ctrl.zt
+protein.names <- rownames(names.as.colum)
+
+plots_ctrl_rnase.zt <- list()
+
+for (i in 1:num_rows) {
+  row_data_ctrl <- ctrl.zt[i, ]
+  row_data_rnase <- rnase.zt[i, ]
+  
+  if (sum(!is.na(row_data_ctrl)) >= 2) {
+    df <- data.frame(x = 1:length(row_data_ctrl),yctrl= as.numeric(row_data_ctrl),yrnase= as.numeric(row_data_rnase))
+    
+    
+    p <- ggplot(df, aes(x = x))+
+      geom_line(aes(y=yrnase,color="RNASE"))+
+      geom_point(aes(y=yrnase,color="RNASE"))+
+      geom_line(aes(y=yctrl, color="CTRL"))+
+      geom_point(aes(y=yctrl, color="CTRL"))+
+      xlab("Fractions") +
+      ylab("Protein amount") +
+      labs(title = paste("z Transformation -",protein.names[i])) +
+      scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
+    
+    
+    
+    plots_ctrl_rnase.zt[[i]] <- p
+  } else {
+     
+    plots_ctrl_rnase.zt[[i]] <- NULL
+  }
+}
+```
+
+Parameter 1
+```{r, fig.show="hold", out.width="25%"}
+plots_ctrl_rnase.zt[[460]]
+plots_ctrl_rnase.zt[[663]]
+plots_ctrl_rnase.zt[[1798]]
+plots_ctrl_rnase.zt[[878]]
+```
+Parameter 2
+```{r}
+print(plots_ctrl_rnase.zt[[663]])
+```
+Parameter 3
+```{r}
+print(plots_ctrl_rnase.zt[[1798]])
+```
+Parameter 4
+```{r}
+print(plots_ctrl_rnase.zt[[878]])
+```
+
 #### 2.6.5. Boundaries and Precipitated proteins
 The local peakfinder can't find local maxima at the boundaries (fraction 1 and fraction 25) because they have only one neighbor fraction. Following conditions have to be met to be defined as a local peak at the boundary. Firstly, it has to have a higher y-value than the contiguous two fractions. Secondly, the protein amount of those three fractions has to be bigger than 10.
 
@@ -2446,7 +2572,7 @@ shoulderregion.mvm.nt.nt <- data.frame(lapply(shoulderregion.mvm.nt, function(x)
 
 ShoulderRegion_mvm <- t(shoulderregion.mvm.nt.nt)
 
-# View(ShoulderRegion_mvm)
+#View(ShoulderRegion_mvm)
 ```
 
 #### 7.2.2 Shoulderregions based on z-Transformed values
@@ -2985,7 +3111,7 @@ parameters.zt <- cbind(signi.global.pa.zt, signifikante_reihen_local_zt, shift_z
 
 parameters.mms <- cbind(signifikante_reihen_local_mms, shift_mms_named, ShoulderRegion_mms)
 
-View(parameters.mms)
+View(parameters.zt)
 ```
 
 ```{r}
