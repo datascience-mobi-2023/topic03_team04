@@ -3163,22 +3163,28 @@ cluster.nr.zt <- 3
 cluster.nr.mms <- 4
 
 cluster.nr <- c(cluster.nr.mvm, cluster.nr.zt, cluster.nr.mms)
-shift.kmeans <- data.frame(MVM = rep(NA, length(res.km[[1]]$cluster)), 
-                               zt = rep(NA, length(res.km[[1]]$cluster)),
-                               MMS = rep(NA, length(res.km[[1]]$cluster)))
+shift.kmeans <- list(as.data.frame(rep(NA, length(res.km[[1]]$cluster))),
+                     as.data.frame(rep(NA, length(res.km[[1]]$cluster))),
+                     as.data.frame(rep(NA, length(res.km[[1]]$cluster))))
 
 for(z in 1:3){
   for (x in 1:length(res.km[[z]]$cluster)){
     if ((res.km[[z]]$cluster)[x] == cluster.nr[z]){
-      shift.kmeans[x,z] <- 1
-    }else{shift.kmeans[x,z] <- 0}
-}}
-rownames(shift.kmeans) = rownames(parameters.mms)
+      shift.kmeans[[z]][x,1] <- 1
+    }else{shift.kmeans[[z]][x,1] <- 0}
+  }}
+
+colnames <- c("MVM", "zt", "MMS")
+
+for(y in 1:3){
+  rownames(shift.kmeans[[y]]) = rownames(parameters.mms)
+  colnames(shift.kmeans[[y]]) = colnames[y]
+  }
 
 #View(shift.kmeans)
-#sum(shift.kmeans[,1] == 1)
-#sum(shift.kmeans[,2] == 1)
-#sum(shift.kmeans[,3] == 1)
+#sum(shift.kmeans[[1]][,1] == 1)
+#sum(shift.kmeans[[2]][,1] == 1)
+#sum(shift.kmeans[[3]][,1] == 1)
 ```
 With this method we could identify 160 RNA-associated Proteins for MVM, 155 for z-transformation and 159 for Min-Max-Scaling
 
@@ -3671,38 +3677,48 @@ csv <- "Table_HS_Non_RBP.csv"
 # Textdatei einlesen
 non.rdeep.text <- read.table(text, sep = "\t", header = TRUE, quote = "\"")
 
-
 # CSV-Datei schreiben
 write.csv(non.rdeep.text,csv, row.names = FALSE)
 
 non.rdeep <- read.csv(csv)
-View(non.rdeep)
 
-getwd()
 ```
-saveRDS(sd.mean.ctrl.mms, file = "Non_synchronized_A549_sd.mean.ctrl.mms ")
 
-### z-transformation
+
 
 We have the following data.frames we want to look at:
 
 ```{r}
 # the proteins identified by our four parameters:
-shift.parameters <- data.frame(MVM <- shift_mvm, zt = shift_zt, MMS = shift_mms)
-colnames(shift.parameters) = c("MVM", "zt", "MMS")
-rownames(shift.parameters) = rownames(shift.kmeans)
+comp.mvm.parameters <- shift_mvm
+comp.zt.parameters <- shift_zt
+comp.mms.parameters <- shift_mms
 
-comp.parameters <- shift.parameters
+rownames(comp.mvm.parameters) = rownames(parameters.mms)
+rownames(comp.zt.parameters) = rownames(parameters.mms)
+rownames(comp.mms.parameters) = rownames(parameters.mms)
 
+names.mvm.parameters <- rownames(comp.mvm.parameters)[which(comp.mvm.parameters ==1)]
+names.zt.parameters <- rownames(comp.zt.parameters)[which(comp.zt.parameters ==1)]
+names.mms.parameters <- rownames(comp.mms.parameters)[which(comp.mms.parameters ==1)]
 
-
+print(indices.mvm.parameters)
 # the proteins identified by kmeans-clustering:
-comp.kmeans <- shift.kmeans
+comp.mvm.kmeans <- shift.kmeans[[1]]
+comp.zt.kmeans <- shift.kmeans[[2]]
+comp.mms.kmeans <- shift.kmeans[[3]]
+
+names.mvm.kmeans <- rownames(comp.mvm.kmeans)[which(comp.mvm.kmeans ==1)]
+names.zt.kmeans <- rownames(comp.zt.kmeans)[which(comp.zt.kmeans ==1)]
+names.mms.kmeans <- rownames(comp.mms.kmeans)[which(comp.mms.kmeans ==1)]
+
+
 ```
 
 
 ```{r}
 View(rdeep)
+View(non.rdeep$Entry_Name)
 ```
 
 
@@ -3713,7 +3729,7 @@ Check how many of our proteins are in the data set present and are RBPs or not.
 
 counter <- 0
 
-for (i in rownames.zt) {
+for (i in rownames()) {
   if (i %in% non.rdeep$Entry_Name) {
     counter <- counter + 1
   }
