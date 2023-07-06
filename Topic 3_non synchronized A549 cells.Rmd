@@ -41,6 +41,8 @@ It should be noted that the protein amount is represented by the y-value, and fr
 
 ### 2.2. Normalization methods
 
+
+Min-Max scaling
 ### 2.3. Reproducibility and Batch Effect
 
 ### 2.4. Scaling and Reduction of Dataset
@@ -193,6 +195,7 @@ The local peakfinder can't find local maxima at the boundaries (fraction 1 and f
 Also precipitated proteins are not described by the parameters and have to be identified separately. They have a global peak in fraction 25 and their total protein amount of 100 has to be split between fraction 23, 24 and 25. 
 
 ### 2.7. K-means clustering
+K-means clustering was used to divide the proteins into four clusters depending on their control-peak and RNase-peak ratio. It was used to have an alternative Method for identification of RNA-dependent Proteins, besides our Parameters
 
 ### 2.8. Regression analysis
 
@@ -206,9 +209,16 @@ Also precipitated proteins are not described by the parameters and have to be id
 
 ### 3.3. K-means clustering
 
+We want to cluster the Proteins depending on their global control peaks and their global RNase Peaks. To find out how many proteins would be optimal in theory we used the elbow method that showed us, that two clusters would be optimal. But looking at the biological background two clusters, would not help us to identify RNA-dependent proteins, but rather group them into heavy and light proteins. To gain useful results from kmeans, we forced it to create four clusters. Kmeans clustered the proteins as followed: 
+**Graph**
+We chose the cluster at the bottom right for every normalization method, to be RNA-dependent. The other clusters can’t be identified as RNA-dependent or not. There are no visible differences between the RNA-dependent proteins clusters of the different normalization methods.
+
+
 ### 3.4. Regression analysis
 
 ### 3.5. Comparison with Database
+
+We compared our 
 
 ## 4. Discussion
 
@@ -3286,9 +3296,30 @@ for (z in 1:3){
 
 ## 9. Kmeans clustering
 
-Here we cluster the peaks after different parameters. This helps to visualize the parameters from before.
+Here we cluster the peaks after different parameters. This helps to visualize the parameters from before. 
 
-Here we cluster the Proteins depending on the fractions in which the peaks are.
+Here we cluster the Proteins depending on the fractions in which the peaks are. 
+First we test the optimal number of clusters
+```{r}
+df.peaks <- data.frame(cbind(globalpeak.ctrl.mvm, globalpeak.rnase.mvm, globalpeak.ctrl.zt, globalpeak.rnase.zt, globalpeak.ctrl.mms, globalpeak.rnase.mms))
+
+wss <- sapply(1:5, function(x){
+  kmeans(df.peaks, centers = x, nstart = 20)$tot.withinss
+})
+
+
+library("ggplot2")
+wss.df <- data.frame(values = wss)
+ggplot(wss.df, aes(x = 1:length(wss), y = values))+
+  geom_line(col = "mediumvioletred", lwd = 0.75)+
+  geom_point(col = "midnightblue")+
+  theme_bw()+
+  labs(x = "Number of clusters", y = "number of assigned proteins")+
+  theme(panel.border = element_rect(color="grey", fill = NA))
+
+```
+
+If we follow the results of the elbow method, the optimal number of clusters would be 2. But this would not lead to any useful results. So we force kmeans to create four clusters...
 
 ```{r, warning = False}
 
@@ -3302,26 +3333,17 @@ plot.cluster.fractions <- list()
 
 title <- c("Clusters of Peaks calculated after MVM","Clusters of Peaks calculated after z-Transformation", "Clusters of Peaks calculated after MMS")
 
+res.km <- list() 
+
 for (x in 1:3){
   
   df <- df.peaks[,(2*x -1):(2*x)]
   
   set.seed(666)
-  res.km <- kmeans(scale(df[, -5]), 3, nstart = 25)
+  res.km[[x]] <- kmeans(scale(df[, -5]), 4, nstart = 25)
   
-
-#for (y in 1:length(res.km$cluster)){
-#if (res.km$cluster[y] == 1){
-#res.km$cluster[y] <- "Light Proteins"
-#}
-#if (res.km$cluster[y] == 2){
-#res.km$cluster[y] <- "Heavy Proteins"
-#}
-#if (res.km$cluster[y] == 3){
-#res.km$cluster[y] <- "Medium Proteins"
-#}} 
   
-  g <- fviz_cluster(res.km, data = df,
+  g <- fviz_cluster(res.km[[x]], data = df,
                   geom = "point",
                   xlab = "Global Control Peaks",
                   ylab = "Global RNase Peaks",
@@ -3337,95 +3359,38 @@ print(plot.cluster.fractions[[x]])
 
 ```
 
-Here we cluster the shifts. Sadly the clusters do **not** correspond to the shifting categories (left shift, no shift, right shift)
+We select the cluster at the bottom right to be RNA-associated. For MVM this would be cluster 2, for z-transformation cluster 3 and for MMS cluster 4 (first three rows of code below should be adapted if this is not the case).
 
 ```{r}
-library("ggpubr")
-library("factoextra")
-library("ggplot2")
+cluster.nr.mvm <- 2
+cluster.nr.zt <- 3
+cluster.nr.mms <- 4
 
-df.shifts <- data.frame(cbind(shift_mvm_global, shift_mvm_global, shift_zt_global, shift_zt_global, shift_mms_global, shift_mms_global))
+cluster.nr <- c(cluster.nr.mvm, cluster.nr.zt, cluster.nr.mms)
+shift.kmeans <- list(as.data.frame(rep(NA, length(res.km[[1]]$cluster))),
+                     as.data.frame(rep(NA, length(res.km[[1]]$cluster))),
+                     as.data.frame(rep(NA, length(res.km[[1]]$cluster))))
 
-plot.cluster.shifts <- list()
+for(z in 1:3){
+  for (x in 1:length(res.km[[z]]$cluster)){
+    if ((res.km[[z]]$cluster)[x] == cluster.nr[z]){
+      shift.kmeans[[z]][x,1] <- 1
+    }else{shift.kmeans[[z]][x,1] <- 0}
+  }}
 
-title <- c("Clusters of Peaks calculated after MVM", "Clusters of Peaks calculated after z-Transformation", "Clusters of Peaks calculated after MMS")
+colnames <- c("MVM", "zt", "MMS")
 
-for (x in 1:3){
-df <- df.shifts[,(2*x-1):(2*x)]
-  res.km <- kmeans(scale(df[, -5]), 3, nstart = 25, algorithm = "Hartigan-Wong")
+for(y in 1:3){
+  rownames(shift.kmeans[[y]]) = rownames(parameters.mms)
+  colnames(shift.kmeans[[y]]) = colnames[y]
+  }
 
-plot.cluster.shifts[[x]] <- fviz_cluster(res.km, data = df,
-                  geom = "point",
-                  xlab = "Global Shift",
-                  ylab = "Global Shift",
-                  main = title[x],
-                  ggtheme = theme_bw())
-print(plot.cluster.shifts[[x]])
-}
+#View(shift.kmeans)
+#sum(shift.kmeans[[1]][,1] == 1)
+#sum(shift.kmeans[[2]][,1] == 1)
+#sum(shift.kmeans[[3]][,1] == 1)
 ```
-
-Here we cluster the precipitation.
-
-```{r}
-library("ggpubr")
-library("factoextra")
-library("ggplot2")
-install.packages("caret")
-library("caret")
-
-df.precipitation <- data.frame(cbind(precipitated.mvm.v, precipitated.mvm.v, precipitated.zt.v, precipitated.zt.v, precipitated.mms.v, precipitated.mms.v))
-
-plot.cluster.precipitated <- list()
-
-for (x in 1:3){
-  df <- df.precipitation[,(2*x-1):(2*x)]
-  
-  res.km <- 
-    kmeans(scale(df[, -5]), 2, nstart = 25, algorithm = "Hartigan-Wong")
-  
-  title <- c("Clusters of Precipitation calculated after MVM", 
-             "Clusters of Precipitation calculated after z-Transformation",
-             "Clusters of Precipitation calculated after MMS")
-  
-  g <- fviz_cluster(res.km, data = df,
-                    geom = "point",
-                    xlab = "Precipitation",
-                    ylab = "Precipitation",
-                    main = title[x],
-                    ggtheme = theme_bw(),)
-  
-plot.cluster.precipitated[[x]]<-
-  g #+ theme(axis.text.x = element_blank(),
-    #        axis.text.y = element_blank(),
-     #       axis.ticks = element_blank()) 
-
-print(plot.cluster.precipitated[[x]])
-}
-```
-
-Here we cluster the shoulderregions.
-
-```{r}
-library("ggpubr")
-library("factoextra")
-library("ggplot2")
-
-df <- data.frame(cbind(shoulderregion.zt.v, shoulderregion.zt.v))
-
-res.km <- kmeans(scale(df[, -5]), 3, nstart = 25, algorithm = "Hartigan-Wong")
-
-g <- fviz_cluster(res.km, data = df,
-                  geom = "point",
-                  xlab = "Shoulderregion",
-                  ylab = "Shoulderregion",
-                  main = "Clusters of Shoulderregions",
-                  ggtheme = theme_bw(),)
-
-g + theme(axis.text.x = element_blank(),
-          axis.text.y = element_blank(),
-          axis.ticks = element_blank()) 
-
-```
+With this method we could identify 160 RNA-associated Proteins for MVM, 155 for z-transformation and 159 for Min-Max-Scaling
 
 ## 10. Regression analysis
 
