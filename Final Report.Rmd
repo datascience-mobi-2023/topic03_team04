@@ -30,17 +30,23 @@ MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.
 ## 1. Introduction
 
 ### 1.1. Importance of RNA-binding proteins
+RNA-binding proteins (RBPs) constitute one of the largest families of proteins in the cell, with over 4000 RBPs identified to date (Gebauer et. al,2020). In addition to the examination of proteins that directly bind RNA, this analysis encompasses RNA-dependent proteins whose interactome relies on RNA, even without direct binding (Caudron-Herger et al., 2019). Unlike proteins with classical RNA-binding domains, these proteins can engage with RNA through intrinsically disordered domains (Corley et al., 2020). For the sake of simplicity, the term "Rdeep" will be used in this report to refer to both RNA-binding and RNA-dependent proteins. These proteins play a crucial role in controlling various aspects of RNA life, function, and efficiency, thereby acting as essential regulators in numerous cellular processes. Rdeeps are involved in extensive regulatory networks that govern critical processes, including transcription, splicing, RNA modification, intracellular trafficking, translation, and decay (Corley et al., 2020). 
+The significance of Rdeeps in human health is underscored by their involvement in a wide range of diseases. Mutations in genes encoding Rdeeps have been identified as the underlying cause of various disorders, leading to malfunction and tissue-specific defects. Rdeeps are particularly implicated in diseases of the nervous system and cancers, making them promising targets for therapeutic interventions. Remarkably, the prevalence of RBP mutations in diseases is substantial, with nearly one-third of Rdeeps implicated in various pathologies, encompassing over a thousand disease-related Rdeeps identified thus far. In mendelian disorders, Rdeeps outnumber other classes of proteins, including transcription factors, in terms of the prevalence of mutations(Gebauer et. al,2020).
+To comprehensively elucidate the involvement of Rdeeps in translational control and their roles in disease pathogenesis, further investigations are required. Understanding the mechanistic interplay between Rdeeps and RNA in cellular processes holds great promise for developing targeted therapeutic strategies to rectify RBP-related dysfunctions.
+Therefore, the goal of this analysis is, to identify which proteins in the given dataset are Rdeeps. The dataset to be analysed contains 3680 different proteins from synchronized mitotic A549 cells. At the end of this project, a linear regression will be developed, which will make it possible to predict RNA dependence for proteins based on their distribution of the control and RNase treated sample.
+
 
 ### 1.2. Experimental Setup
+To collect the mass spectrometry data, a strict protocol was followed. The cells were centrifuged and lysed. One sample was treated with RNAse, while the other served as the untreated control. Both samples were divided into 25 fractions using a sucrose gradient. Ultracentrifugation was performed, allowing the proteins to distribute based on their density. For statistical relevance, the protocol included three repetitions of the experiment. Therefore, triplicates are available for each protein for both Control and RNase. The fractions were then subjected to mass spectrometry analysis to determine the protein abundance, measured in arbitrary units (Caudron-Herger et al., 2019).
+Furthermore, it should be noted that the protein amount is represented by the y-value whilst the number of the fraction is the x-value.
 
-It should be noted that the protein amount is represented by the y-value, and fraction x-value
 
 ## 2. Methods
 
 ### 2.1. Data cleanup
 
 ### 2.2. Normalization methods
-
+Since each normalisation method has advantages and disadvantages, we apply three different methods to the dataframe. The mean-value method is the first data normalisation we use.The mean protein amount of each protein is substracted from the protein amount in each fraction.The values that are zero or smaller than the mean become negative through this subtraction. We set these negative values to zero to simplify further analysis. Afterwards, the sum of the proteinamount in each row is scaled to 100. 
 
 Min-Max scaling
 ### 2.3. Reproducibility and Batch Effect
@@ -49,11 +55,9 @@ Min-Max scaling
 
 from now on we work with the reduced dataset
 
-### 2.5. Our limitations with Gaussian fit
+### 2.5.Gaussian fit
+Goal of the gaussian fit is to fit a gaussian function to the data points, in our case the protein amount in each fraction of one protein. Therefore, we establish a list in which the parameters, which describe the distribution are saved. To fit the parameters to our data we used the optim() function implemented in R.
 
-description of problem with local peaks and inaccuracy of overlap
-
-Alternatively, we ...
 
 ### 2.6. Data description via Parameters
 
@@ -199,10 +203,15 @@ Also precipitated proteins are not described by the parameters and have to be id
 K-means clustering was used to divide the proteins into four clusters depending on their control-peak and RNase-peak ratio. It was used to have an alternative Method for identification of RNA-dependent Proteins, besides our Parameters
 
 ### 2.8. Regression analysis
+The goal of linear regression is to model the mathematical relationship between a dependent variable and a independent variable. The objective is to create a linear equation, typically represented as y = mx + n, which best fits the observed data. The residuals, calculated as the difference between the actual y-values and the predicted y-values, provide an indication of the model's accuracy.  We use the correlation of the protein amount in Control and RNase as the independent variable and the amount of the global peak shift in fractions as the dependent variable. This relationship is crucial for understanding the effects of equality of protein levels in Control and RNase on global peak shifts. Using linear regression, we can quantify and analyse this relationship. As a second model we use the same independent variable for each protein but used the information of our parameters as the dependent variable. Both models are trained with 2500 proteins, so that a prediction can be made for 574 proteins.  
 
 ### 3. Results
 
 ### 3.1. Cleaned Dataset
+
+### 3.2 Gaussian fit
+On the grounds of our lists, containing the parameters for the gaussian distribution for every protein, it is possible to plot the gaussian curves. The control and RNase curves can be plotted separately or together in one plot for better comparison. Because, we use the optim() function and to not implement further parameters ourselves, the distribution does not show local peaks or shoulder regions. Therefore,the gaussian fit is only used for visualisation not for further analysis.
+**Graph ???**
 
 ### 3.2. RNA-dependent Proteins
 
@@ -223,5 +232,14 @@ We compared our
 
 ## 4. Discussion
 
-## 5. Literature
+## 5.Outlook 
+nochmal ein paar sätze zum biological background. 
+
+## 6. Literature
+Gebauer et al., RNA-binding proteins in human genetic disease, 2020, Nature Reviews Genetics
+
+Caudron-Herger et al., R-DeeP: Proteome-wide and Quantitative Identification of RNA-Dependent Proteins by Density Gradient Ultracentrifugation, 2019, Molecular Cell
+
+
+Corley et al., How RNA-Binding Proteins Interact with RNA: Molecules and Mechanisms, 2020, Molecular Cell
 
