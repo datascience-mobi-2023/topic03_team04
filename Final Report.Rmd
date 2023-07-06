@@ -24,7 +24,7 @@ knitr::opts_chunk$set(echo = FALSE, results='hide')
 Loading the data:
 
 ```{r}
-#MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.csv?dl=1', header=TRUE, row.names=1, sep = ";")
+#MS_Table <- read.delim('https://www.dropbox.com/s/r417vauyr7cku8s/A549dataset.csv?dl=1', header=TRUE, row.names=1, sep = ";")
 ```
 
 ## 1. Introduction
@@ -39,18 +39,18 @@ It should be noted that the protein amount is represented by the y-value, and fr
 
 ### 2.1. Data cleanup
 
-### 2.2. Normalization methods
+### 2.2. Reproducibility
+The reproducibility of the replicates (rep) for the Control and the RNase group is calculated separately by computing the pearson correlation between rep1 and rep2, rep1 and rep3 as well as between rep2 and rep3. There are 2 scenarios where a protein is seen as not reproducible. Firstly, if a replicate of a protein has only zeros, its correlation can not be calculated (NA) and the protein is discarded. 83 proteins are affected. Moreover, if all 3 correlations either in the Control or RNase group of one protein are below 0.9 the protein isn't reliable enough for further analysis. Thus 523 proteins are additionally deleted, resulting 3074 proteins from initially 3680 proteins are left for further analysis.
+Some proteins contain two replicates similar to each other (correlation \< 0.9) and a third one that completely differs. Knowing that these proteins have one high and two smaller correlations, the deviating replicate was set to NA and will be ignored when uniting the replicates per protein. Consequently, important data is preserved without loosing too many proteins. 
+
+### 2.3. Normalization methods + Reduction and Scaling
 
 
 Min-Max scaling is a very simple scaling-method where the normalized value \(x'\) is calculated from the original value \(x\) as follows: \(x'=\frac{{x-\text{min}(x)}}{{\text{max}(x)-\text{min}(x)}}\)
-This means that the highest value is automaticly set to one and the lowest values to zero. With this method it is very easy to calculate the global peaks, but on the other hand, the protein amount, so the area beneath the graph cannot be normalized. 
+This means that the highest value is automaticly set to one and the lowest values to zero. With this method it is very easy to calculate the global peaks, but on the other hand, the protein amount, so the area beneath the graph cannot be normalized.
 
 
-### 2.3. Reproducibility and Batch Effect
-
-### 2.4. Scaling and Reduction of Dataset
-
-from now on we work with the reduced dataset
+exception: zt-tra. (reduction and scaling)
 
 ### 2.5. Our limitations with Gaussian fit
 

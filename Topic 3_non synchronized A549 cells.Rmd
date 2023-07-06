@@ -13,16 +13,10 @@ Zum PDF exportieren
 Loading the data:
 
 ```{r}
-MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.csv?dl=1', header=TRUE, row.names=1, sep = ";")
+MS_Table <- read.csv('https://www.dropbox.com/s/r417vauyr7cku8s/A549dataset.csv?dl=1', header=TRUE, row.names=1, sep = ",")
 ```
 
 ## 0. Data description
-
-```{r}
-dim(MS_Table)
-head(rownames(MS_Table))
-head(colnames(MS_Table))
-```
 
 ## 1. Preparing data for analysis
 
@@ -71,7 +65,7 @@ sum(apply(MS_Table_reordered, 2, is.numeric)) == ncol(MS_Table)
 MS_Table_Ctrl <-MS_Table_reordered[,1:75]
 #View(MS_Table_Ctrl)
 MS_Table_RNase <-MS_Table_reordered[,76:150]
-View(MS_Table_RNase)
+# View(MS_Table_RNase)
 ```
 
 ## 2. Reproducibility
@@ -91,7 +85,7 @@ rnase.rep2.reprod <- MS_Table_reordered[,101:125]
 rnase.rep3.reprod <- MS_Table_reordered[,126:150]
 ```
 
-Here we calculate the correlation between the replicates and put them together in one data frame (ctrl.cor and rnase.cor) (?)
+Here we calculate the correlation between the replicates and put them together in one data frame (ctrl.cor and rnase.cor) 
 
 ```{r, echo=FALSE, warning = FALSE}
 ctrl.cor <- 
@@ -112,6 +106,7 @@ rnase.cor <-
 
 ctrl.rnase.cor <- cbind(ctrl.cor,rnase.cor)
 ```
+
 
 Now we eliminate proteins which have NA-correlations (this happens when they contain replicates with only 0s). We then create new separate data frames for each replicate.
 
@@ -146,9 +141,8 @@ rnase.cor.naremoved <-
           sapply(seq.int(dim(rnase.rep1.naremoved)[1]), function(x) cor(as.numeric(rnase.rep2.naremoved[x,]), as.numeric(rnase.rep3.naremoved[x,]))), 
         rnase.cor.rep1.rep3.naremoved <- 
           sapply(seq.int(dim(rnase.rep1.naremoved)[1]), function(x) cor(as.numeric(rnase.rep1.naremoved[x,]), as.numeric(rnase.rep3.naremoved[x,]))))
-
-#View(ctrl.cor.naremoved)
 ```
+
 
 The following plot shows us the general distribution of correlation.
 
@@ -187,8 +181,6 @@ non.reproducible <- unique(c(non.reproducible.ctrl, non.reproducible.rnase))
 
 length(non.reproducible.rnase)
 length(non.reproducible.ctrl)
-
-#View(non.reproducible2)
 ```
 
 Now we eliminate the proteins that only have correlations under 0.9.
@@ -3355,6 +3347,7 @@ points(test_px, predicted_py, col = "lightblue", pch = 16, cex = 0.9)
 
 legend("topright", legend = c("Trained Data", "Predicted Data", "Regression Curve", "Threshold"),col = c("darkgrey", "lightblue", "red", "green4"), pch = c(16, 16, NA, NA), lty = c(NA, NA, 1, 1), cex = 0.8)
 ```
+
 #### 10.1.2 Regression analysis using all parameters 
 ```{r}
 train_mvm <- data.frame(Korrelation = correlation.mvm[1:2500, ], Shift = shift_mvm[1:2500, ])
