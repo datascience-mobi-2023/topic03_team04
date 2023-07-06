@@ -1,1 +1,227 @@
+---
+title: |
+  | \Huge\ **Final Report:** Proteome-wide Screen for RNA-dependent Proteins
+  | *non-synchronized A549 cells*
+author: "Anastasia Möller, Johannes Schadt, Sylviane Verschaeve, Tine Limberg"
+date: "17.07.2023"
+output:
+  pdf_document: 
+    latex_engine: xelatex
+    toc: yes
+header-includes:
+  - \usepackage{fontspec}
+  - \setmainfont{Cambria}
+  - \usepackage{setspace}
+  - \setstretch{1.25}
+  
+fontsize: 12pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, results='hide') 
+```
+
+Loading the data:
+
+```{r}
+MS_Table <- read.delim('https://www.dropbox.com/s/vm3lxljjm9chau8/RDeeP_A549_NS.csv?dl=1', header=TRUE, row.names=1, sep = ";")
+```
+
+## 1. Introduction
+
+### 1.1. Importance of RNA-binding proteins
+
+### 1.2. Experimental Setup
+
+It should be noted that the protein amount is represented by the y-value, and fraction x-value
+
+## 2. Methods
+
+### 2.1. Data cleanup
+
+### 2.2. Normalization methods
+
+
+Min-Max scaling
+### 2.3. Reproducibility and Batch Effect
+
+### 2.4. Scaling and Reduction of Dataset
+
+from now on we work with the reduced dataset
+
+### 2.5. Our limitations with Gaussian fit
+
+description of problem with local peaks and inaccuracy of overlap
+
+Alternatively, we ...
+
+### 2.6. Data description via Parameters
+
+To identify whether a Protein is RNA dependent or not each protein is tested on 4 parameters. The goal of those 4 parameters is the identification of significant differences between the Control and RNase sample. In the following sections the parameters will be elaborated.
+
+#### 2.6.1. Parameter 1: Significant change of protein amount under global peak
+
+The first parameter identifies a significant change of the protein amount under the global peak for each protein. The global maximum represents the fraction of the sucrose gradient containing the highest protein amount. It is determined by using the *which.max()* function for each protein. If the Protein amount of the global peak fraction is either in the Control or RNase sample 1.7 times higher than the other sample, we defined it as a significant change.
+
+#### 2.6.2. Parameter 2: Significant change of protein amount under local peaks
+
+The next parameter recognizes a significant change in the total protein amount under the local peaks between the Control and RNase sample for each protein. New local peaks can occur if after RNase treatment the protein either dissociates or gains new interaction partners. To detect a significant change the local peaks have to be identified. To be defined as a local peak four criteria have to be fulfilled. First, the y-value of the local peak fraction has to be higher than the y-value of its neighbor fractions. Afterwards we checked if the sd of the local peak's y-value and its neighbors is higher than the sd of the y-values which contain less than 8 % of the total protein amount (*sd.threshold*). The aim is to sort out small fluctuation between the y-values. The third criteria selects the relevant local peaks by sorting those out which have a smaller protein amount than 3 % of the total protein amount. Most of the already mentioned criteria fit to the global peaks as well and thus global maxima have to be removed. The total protein amount under the local peaks for each protein in the Control and RNase sample is of interest. If it differs more than 7.5 from each other a significant change of the protein amount under the local peak is present.
+
+#### 2.6.3. Parameter 3: Significant fraction-shift of global peak
+
+The third parameter focuses on the x-axis depicting the fractions. If the fraction of the global peak in either the Control or RNase sample differs more than two fractions in the positive or negative x-direction compared to the other sample, the protein is defined as RNA-dependent. It lost or gained an interaction partner due to the RNase treatment.
+
+#### 2.6.4. Parameter 4: Significant difference in position of shoulderregions
+
+At last it is observed if shoulderregions occur or disappear after the RNase treatment. A shoulderregion contains more than 2 consecutive fractions with a sd less than the *sd.threshold*. On the contrary to the local peak identification the fractions with small fluctuations are sorted. Of interest are those fractions belonging to shoulderregions which either occur in the Control or RNase sample but not in both. Often parts of the shoulderregions are overlapping, resulting in shoulderregions of interest with less than 3 consecutive fractions. So, a shoulderregion of interest is only significant if it has three or more consecutive fractions.
+
+```{r}
+#Nr <- c(1:dim(parameters.zt)[1])
+#parameters.zt.Nr = cbind(Nr, parameters.zt)
+#View(parameters.zt.Nr)
+```
+
+
+```{r}
+library(ggplot2)
+
+num_rows <- nrow(rnase.zt)
+
+plots_rnase.zt <- list()
+
+for (i in 1:num_rows) {
+  row_data_rnase <- rnase.zt[i, ]
+  
+  
+   if (sum(!is.na(row_data_rnase)) >= 2) {
+    df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
+    
+      p <- ggplot(df, aes(x = x, y = yrnase)) +
+      geom_line(color = "tomato") +
+      geom_point(color = "tomato") +
+      xlab("Fractions") +
+      ylab("Protein amount") +
+      labs(title = "RNase zT")
+      
+    
+    plots_rnase.zt[[i]] <- p
+  } else {
+    
+    plots_rnase.zt[[i]] <- NULL
+  }
+}
+```
+
+```{r}
+library(ggplot2)
+
+num_rows <- nrow(ctrl.zt)
+
+plots_ctrl.zt <- list()
+
+for (i in 1:num_rows) {
+  row_data_ctrl <- ctrl.zt[i, ]
+  
+    if (sum(!is.na(row_data_ctrl)) >= 2) {
+    df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
+    
+      p <- ggplot(df, aes(x = x, y = yctrl)) +
+      geom_line(color = "skyblue2") +
+      geom_point(color = "skyblue2") +
+      xlab("Fractions") +
+      ylab("Protein amount") +
+      labs(title = "Control zT")
+    
+    
+    plots_ctrl.zt[[i]] <- p
+  } else {
+    
+    plots_ctrl.zt[[i]] <- NULL
+  }
+}
+```
+
+The following code creates two plots in one diagram, so that the Control and RNase group can be compared.
+
+```{r}
+library(ggplot2)
+
+num_rows <- nrow(ctrl.zt)
+
+names.as.colum <- ctrl.zt
+protein.names <- rownames(names.as.colum)
+
+plots_ctrl_rnase.zt <- list()
+
+for (i in 1:num_rows) {
+  row_data_ctrl <- ctrl.zt[i, ]
+  row_data_rnase <- rnase.zt[i, ]
+  
+  if (sum(!is.na(row_data_ctrl)) >= 2) {
+    df <- data.frame(x = 1:length(row_data_ctrl),yctrl= as.numeric(row_data_ctrl),yrnase= as.numeric(row_data_rnase))
+    
+    
+    p <- ggplot(df, aes(x = x))+
+      geom_line(aes(y=yrnase,color="RNASE"))+
+      geom_point(aes(y=yrnase,color="RNASE"))+
+      geom_line(aes(y=yctrl, color="CTRL"))+
+      geom_point(aes(y=yctrl, color="CTRL"))+
+      xlab("Fractions") +
+      ylab("Protein amount") +
+      labs(title = paste("z Transformation -",protein.names[i])) +
+      scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
+    
+    
+    
+    plots_ctrl_rnase.zt[[i]] <- p
+  } else {
+     
+    plots_ctrl_rnase.zt[[i]] <- NULL
+  }
+}
+```
+
+```{r, fig.show="hold", out.width="50%"}
+plots_ctrl_rnase.zt[[460]] + labs(title = "1 - Significant change of protein amount under global peak")+ labs(title = expression("1 - " * italic("Significant change of protein amount under global peak"))) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97")) + theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
+
+plots_ctrl_rnase.zt[[663]] + labs(title = "2 - Significant change of protein amount under local peaks")+ labs(title = expression("2 - " * italic("Significant change of protein amount under local peaks"))) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97"))+ theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
+
+plots_ctrl_rnase.zt[[1798]] + labs(title = "3 - Significant fraction-shift of global peak")+ labs(title = expression("3 - " * italic("Significant fraction-shift of global peak")))+ theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97"))+ theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
+
+plots_ctrl_rnase.zt[[878]] + labs(title = "4 - Significant difference in position of shoulderregions")+ labs(title = expression("4 - " * italic("Significant difference in position of shoulderregion")))+ theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97"))+ theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
+#
+```
+#### 2.6.5. Boundaries and Precipitated proteins
+The local peakfinder can't find local maxima at the boundaries (fraction 1 and fraction 25) because they have only one neighbor fraction. A local peak at the boundary has to fulfill following requirements. Firstly, it has to have a higher y-value than the two succeeding fractions. Secondly, the protein amount of those three fractions has to be bigger than 10. Smaller protein amounts are not relevant enough.
+Also precipitated proteins are not described by the parameters and have to be identified separately. They have a global peak in fraction 25 and their total protein amount of 100 has to be split between fraction 23, 24 and 25. 
+
+### 2.7. K-means clustering
+K-means clustering was used to divide the proteins into four clusters depending on their control-peak and RNase-peak ratio. It was used to have an alternative Method for identification of RNA-dependent Proteins, besides our Parameters
+
+### 2.8. Regression analysis
+
+### 3. Results
+
+### 3.1. Cleaned Dataset
+
+### 3.2. RNA-dependent Proteins
+
+### 3.3. Comparison of the normalization methods
+
+### 3.3. K-means clustering
+
+We want to cluster the Proteins depending on their global control peaks and their global RNase Peaks. To find out how many proteins would be optimal in theory we used the elbow method that showed us, that two clusters would be optimal. But looking at the biological background two clusters, would not help us to identify RNA-dependent proteins, but rather group them into heavy and light proteins. To gain useful results from kmeans, we forced it to create four clusters. Kmeans clustered the proteins as followed: 
+**Graph**
+We chose the cluster at the bottom right for every normalization method, to be RNA-dependent. The other clusters can’t be identified as RNA-dependent or not. There are no visible differences between the RNA-dependent proteins clusters of the different normalization methods.
+
+
+### 3.4. Regression analysis
+
+### 3.5. Comparison with Database
+
+We compared our 
+
+## 4. Discussion
+
+## 5. Literature
 
