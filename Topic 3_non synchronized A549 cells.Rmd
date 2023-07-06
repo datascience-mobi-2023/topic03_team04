@@ -3950,7 +3950,7 @@ non.comparable.parameters <- data.frame(mvm = c(non.comparable.mvm.parameters, l
                                         mms = c(non.comparable.mms.parameters,length(non.comparable.mms.parameters)),
                                         "is shift? mms" = c(shifting.non.comparable.mms.parameters,
                                                             sum(shifting.non.comparable.mms.parameters)))
-
+colnames(non.comparable.parameters) = c("mvm", "shift?", "zt", "shift?", "mms", "shift?")
 
 non.comparable.kmeans <- data.frame(mvm = c(non.comparable.mvm.kmeans, length(non.comparable.mvm.kmeans)),
                                         "is shift? mvm" = c(shifting.non.comparable.mvm.kmeans,
@@ -3962,7 +3962,7 @@ non.comparable.kmeans <- data.frame(mvm = c(non.comparable.mvm.kmeans, length(no
                                         "is shift? mms" = c(shifting.non.comparable.mms.kmeans,
                                                             sum(shifting.non.comparable.mms.kmeans)))
 
-
+colnames(non.comparable.kmeans) = c("mvm", "shift?", "zt", "shift?", "mms", "shift?")
 
 number.non.comparable.parameters <- data.frame(mvm = length(non.comparable.mvm.parameters), 
                                         zt = length(non.comparable.zt.parameters), 
@@ -3986,8 +3986,8 @@ rownames(summary.numbers.parameters) = c("True Positives","False Positives", "Tr
 summary.rates.parameters <- rbind(fnr.parameters , fpr.parameters, precision.parameters)
 rownames(summary.rates.parameters) = c("FNR", "FPR", "Precision")
 
-View(summary.numbers.parameters)
-View(summary.rates.parameters)
+#View(summary.numbers.parameters)
+#View(summary.rates.parameters)
 
 #for the results of kmeans
 summary.numbers.kmeans <- rbind(true.positives.kmeans, false.positives.kmeans, true.negatives.kmeans, false.negatives.kmeans)
