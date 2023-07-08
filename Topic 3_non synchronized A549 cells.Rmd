@@ -3906,7 +3906,7 @@ names.rdp.mms.parameters <- rownames(comp.mms.parameters)[which(comp.mms.paramet
 
 names.rdp.parameters <- list(names.rdp.mvm.parameters, names.rdp.zt.parameters, names.rdp.mms.parameters)
 
-number.observed.RBPs.parameters <- c(length(names.rdp.mvm.parameters), length(names.rdp.zt.parameters), length(names.rdp.zt.parameters))
+number.observed.RBPs.parameters <- c(length(names.rdp.mvm.parameters), length(names.rdp.zt.parameters), length(names.rdp.mms.parameters))
 
 # the proteins identified as non-RNA-dependent by our four parameters:
 names.nrdp.mvm.parameters <- rownames(comp.mvm.parameters)[which(comp.mvm.parameters == 0)]
@@ -3914,7 +3914,7 @@ names.nrdp.zt.parameters <- rownames(comp.zt.parameters)[which(comp.zt.parameter
 names.nrdp.mms.parameters <- rownames(comp.mms.parameters)[which(comp.mms.parameters == 0)]
 
 names.nrdp.parameters <- list(names.nrdp.mvm.parameters, names.nrdp.zt.parameters, names.nrdp.mms.parameters)
-number.observed.non.RBPs.parameters <- c(length(names.nrdp.mvm.parameters), length(names.nrdp.zt.parameters), length(names.nrdp.zt.parameters))
+number.observed.non.RBPs.parameters <- c(length(names.nrdp.mvm.parameters), length(names.nrdp.zt.parameters), length(names.nrdp.mms.parameters))
 
 # the proteins identified as RNA-dependent by kmeans-clustering:
 comp.mvm.kmeans <- shift.kmeans[[1]]
@@ -3926,7 +3926,7 @@ names.rdp.zt.kmeans <- rownames(comp.zt.kmeans)[which(comp.zt.kmeans == 1)]
 names.rdp.mms.kmeans <- rownames(comp.mms.kmeans)[which(comp.mms.kmeans == 1)]
 
 names.rdp.kmeans <- list(names.rdp.mvm.kmeans, names.rdp.zt.kmeans, names.rdp.mms.kmeans)
-number.observed.RBPs.kmeans <- c(length(names.rdp.mvm.kmeans), length(names.rdp.zt.kmeans), length(names.rdp.zt.kmeans))
+number.observed.RBPs.kmeans <- c(length(names.rdp.mvm.kmeans), length(names.rdp.zt.kmeans), length(names.rdp.mms.kmeans))
 
 # the proteins identified as non-RNA-dependent by kmeans-clustering:
 names.nrdp.mvm.kmeans <- rownames(comp.mvm.kmeans)[which(comp.mvm.kmeans == 0)]
@@ -3934,7 +3934,38 @@ names.nrdp.zt.kmeans <- rownames(comp.zt.kmeans)[which(comp.zt.kmeans == 0)]
 names.nrdp.mms.kmeans <- rownames(comp.mms.kmeans)[which(comp.mms.kmeans == 0)]
 
 names.nrdp.kmeans <- list(names.nrdp.mvm.kmeans, names.nrdp.zt.kmeans, names.nrdp.mms.kmeans)
-number.observed.non.RBPs.kmeans <- c(length(names.nrdp.mvm.kmeans), length(names.nrdp.zt.kmeans), length(names.nrdp.zt.kmeans))
+number.observed.non.RBPs.kmeans <- c(length(names.nrdp.mvm.kmeans), length(names.nrdp.zt.kmeans), length(names.nrdp.mms.kmeans))
+
+
+# the proteins identified as RNA-dependent by the global shift parameter
+comp.glob <- shift_named
+for(x in 1:3){
+  for(y in 1:dim(comp.glob)[1]){
+    if (shift_named[y,x] == "no shift"){
+      comp.glob[y,x] <- 0
+    }else{comp.glob[y,x] <- 1}
+  }
+}
+names.rdp.mvm.glob <- rownames(as.data.frame(comp.glob[,1]))[which(as.data.frame(comp.glob[,1]) == 1)]
+names.rdp.zt.glob <- rownames(as.data.frame(comp.glob[,2]))[which(as.data.frame(comp.glob[,2]) == 1)]
+names.rdp.mms.glob <- rownames(as.data.frame(comp.glob[,3]))[which(as.data.frame(comp.glob[,3]) == 1)]
+
+names.rdp.glob <- list(names.rdp.mvm.glob, names.rdp.zt.glob, names.rdp.mms.glob)
+
+
+number.observed.RBPs.glob <- c(length(names.rdp.mvm.glob), length(names.rdp.zt.glob), length(names.rdp.mms.glob))
+print(number.observed.RBPs.glob)
+
+# the proteins identified as non-RNA-dependent by our four parameters:
+names.nrdp.mvm.glob <- rownames(as.data.frame(comp.glob[,1]))[which(as.data.frame(comp.glob[,1]) == 0)]
+names.nrdp.zt.glob <- rownames(as.data.frame(comp.glob[,2]))[which(as.data.frame(comp.glob[,2]) == 0)]
+names.nrdp.mms.glob <- rownames(as.data.frame(comp.glob[,3]))[which(as.data.frame(comp.glob[,3]) == 0)]
+
+names.nrdp.glob <- list(names.nrdp.mvm.glob, names.nrdp.zt.glob, names.nrdp.mms.glob)
+
+number.observed.non.RBPs.glob <- c(length(names.nrdp.mvm.glob), length(names.nrdp.zt.glob), #length(names.nrdp.mms.glob))
+
+
 
 ```
 Using the parameters we have identified 464 RNA-associated Proteins with MVM, 468 with z-transformation and 396 with MMS.
@@ -3964,7 +3995,7 @@ for(z in 1:3){
   true.positives.parameters[z] <- counter
 }
 
-#Number of correctly assigned (true positives) RBPs with parameters
+#Number of correctly assigned (true positives) RBPs with kmeans
 true.positives.kmeans <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
@@ -3974,6 +4005,18 @@ for(z in 1:3){
     }
   }
   true.positives.kmeans[z] <- counter
+}
+
+#Number of correctly assigned (true positives) RBPs with global shift
+true.positives.glob <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.rdp.glob[[z]]) {
+    if (i %in% rownames(rdeep)) {
+      counter <- counter + 1
+    }
+  }
+  true.positives.glob[z] <- counter
 }
 ```
 
@@ -4005,6 +4048,18 @@ for(z in 1:3){
   }
   false.positives.kmeans[z] <- counter
 }
+
+# Number of wrongly assigned (false positives) RBPs with global shift
+false.positives.glob <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.rdp.glob[[z]]) {
+    if (i %in% non.rdeep$Entry_Name) {
+      counter <- counter + 1
+    }
+  }
+  false.positives.glob[z] <- counter
+}
 ```
 
 
@@ -4035,6 +4090,18 @@ for(z in 1:3){
   }
   true.negatives.kmeans[z] <- counter
 }
+
+# Number of correctly assigned non-RBPs (true negatives) with global shift
+true.negatives.glob <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.nrdp.glob[[z]]) {
+    if (i %in% non.rdeep$Entry_Name) {
+      counter <- counter + 1
+    }
+  }
+  true.negatives.glob[z] <- counter
+}
 ```
 
 
@@ -4064,6 +4131,18 @@ for(z in 1:3){
   }
   false.negatives.kmeans[z] <- counter
 }
+
+#Number of correctly assigned (true positives) RBPs with global shift
+false.negatives.glob <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.nrdp.glob[[z]]) {
+    if (i %in% rownames(rdeep)) {
+      counter <- counter + 1
+    }
+  }
+  false.negatives.glob[z] <- counter
+}
 ```
 
 
@@ -4081,6 +4160,10 @@ for(x in 1:3){
   fnr.kmeans[x] <- false.negatives.kmeans[x]/(false.negatives.kmeans[x] + true.positives.kmeans[x])
 }
 
+fnr.glob <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(x in 1:3){
+  fnr.glob[x] <- false.negatives.glob[x]/(false.negatives.glob[x] + true.positives.glob[x])
+}
 ```
 
 
@@ -4099,6 +4182,10 @@ for(x in 1:3){
   fpr.kmeans[x] <- false.positives.kmeans[x]/(false.positives.kmeans[x]+true.negatives.kmeans[x])
 }
 
+fpr.glob <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(x in 1:3){
+  fpr.glob[x] <- false.positives.glob[x]/(false.positives.glob[x]+true.negatives.glob[x])
+}
 ```
 
 
@@ -4117,6 +4204,10 @@ for(x in 1:3){
   precision.kmeans[x] <- true.positives.kmeans[x]/(true.positives.kmeans[x] + false.positives.kmeans[x])
 }
 
+precision.glob <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(x in 1:3){
+  precision.glob[x] <- true.positives.glob[x]/(true.positives.glob[x] + false.positives.glob[x])
+}
 ```
 
 
@@ -4198,6 +4289,16 @@ rownames(summary.rates.kmeans) = c("FNR", "FPR", "Precision")
 
 #View(summary.numbers.kmeans)
 #View(summary.rates.kmeans)
+
+#for the results of global shift
+summary.numbers.glob <- rbind(true.positives.glob, false.positives.glob, true.negatives.glob, false.negatives.glob)
+rownames(summary.numbers.glob) = c("True Positives","False Positives", "True Negatives", "False Negatives")
+
+summary.rates.glob <- rbind(fnr.glob , fpr.glob, precision.glob)
+rownames(summary.rates.glob) = c("FNR", "FPR", "Precision")
+
+#View(summary.numbers.glob)
+#View(summary.rates.glob)
 
 ```
 

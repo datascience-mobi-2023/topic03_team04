@@ -315,6 +315,26 @@ cat("</div>\n")
 cat("</div>\n")
 ```
 
+The following tables do the same for our results that only depended on out global shift:
+```{r, warning=FALSE, results='asis'}
+library("kableExtra")
+summary.numbers.global0 <- kable(summary.numbers.global)
+table.summary.numbers.global <- kable_styling(summary.numbers.global0, "striped", full_width = FALSE)
+
+summary.rates.global.rounded <- round(summary.rates.global,4)
+summary.rates.global0 <- kable(summary.rates.global.rounded)
+table.summary.rates.global <- kable_styling(summary.rates.global0, "striped", full_width = FALSE)
+
+cat("<div class='row'>\n")
+cat("<div class='column'>\n")
+print(table.summary.numbers.global, row.names = FALSE)
+cat("</div>\n")
+cat("<div class='column'>\n")
+print(table.summary.rates.global, row.names = FALSE)
+cat("</div>\n")
+cat("</div>\n")
+```
+
 There are thirteen proteins, that are not present neither in the RDeep data set, nor the table containing non-RNA-associated Proteins from the paper. The following tables show the names of these proteins and whether they are considered as RNA-dependent by our analysis or not. On the left side are the results using our parameters, on the right side the ones obtained by kmeans:
 
 ```{r, warning=FALSE, results='asis'}
@@ -336,6 +356,11 @@ cat("</div>\n")
 ```
 
 ## 4. Discussion
+Our goal was to identify RNA-dependent proteins using the data provided by mass-spectrometry. To do this we used several methods to find out which variant of our analysis was the best. 
+Overall, we had a very high false negative rate, independent of the methods we used. The lowest was **0.**. This could be, because our criteria were to strict (e.g. **w**), but it is likelier that the method used in the experiment is not able to detect all RNA-dependent proteins. The RDeep Database uses the results of many different papers that used all sorts of different experiments to identify RNA-dependent proteins. (**unterschiedliche Zellstadie?**)So it is impossible for our results to have a low false-negative rate. More important for us would be to look at the false-positive rate and precision of our results:
+Through all methods, normalization via mean-values method was the best. It lead to the lowest false-negative rates, the lowest false-positive rates and the highest precision. z-transformation seams to have been the worst of the three methods. So, mean-value method is the normalization method that should be used when analyzing this sort of data. (**Why?**)
+If we look at the mvm-results of kmeans, our parameters and global shift alone, we observe that kmeans is the most precise, but also leaves out a lot more proteins that were detected by other methods.This is because, we only chose one cluster, that probably contained right shift proteins, leaving out all precipitated and left shifting proteins. To increase the number of proteins found this way, we would have to create more clusters and choose them accordingly. So, if we want to be sure that the proteins we identify as RNA dependent, really are RNA dependent, we should choose kmeans. But we have to embrace the possibility that we miss a lot of proteins. 
+Looking at the false negative rate of the results of all four parameters versus the results of only the global shift, it is clear that the global shift already gives a pretty good 
 
 ## 5.Outlook 
 nochmal ein paar sätze zum biological background. 
