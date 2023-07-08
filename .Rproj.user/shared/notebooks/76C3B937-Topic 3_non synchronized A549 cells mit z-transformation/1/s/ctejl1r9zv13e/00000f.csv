@@ -1,0 +1,2 @@
+"0","MS_Table <- read.delim('RDeep_A549_NS.csv', header=TRUE, row.names=1, sep = "";"")"
+"0","View(MS_Table)"

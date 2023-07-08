@@ -1895,7 +1895,7 @@ for (i in 1:num_rows) {
 ####6.4.2 example how to plot the Control and RNase curve of one specific protein
 
 ```{r}
-n=1  #Number of protein you want to see
+n=81  #Number of protein you want to see
 x <- c(1:25)
 a1<- parameter_gaussian_ctrl.zt_table[n, 1 ]
 mu1 <- parameter_gaussian_ctrl.zt_table[n, 2]
@@ -3347,7 +3347,6 @@ points(test_px, predicted_py, col = "lightblue", pch = 16, cex = 0.9)
 
 legend("topright", legend = c("Trained Data", "Predicted Data", "Regression Curve", "Threshold"),col = c("darkgrey", "lightblue", "red", "green4"), pch = c(16, 16, NA, NA), lty = c(NA, NA, 1, 1), cex = 0.8)
 ```
-
 #### 10.1.2 Regression analysis using all parameters 
 ```{r}
 train_mvm <- data.frame(Korrelation = correlation.mvm[1:2500, ], Shift = shift_mvm[1:2500, ])
@@ -3366,7 +3365,6 @@ print(summary(model_mvm_all))
 #print(rounded_predictions_mvm_all)
 
 ```
-
 ### 10.2 Regression analysis z-Transformation
 
 #### 10.2.1 Regression analysis based on fraction shift
@@ -3469,7 +3467,6 @@ points(test_px, predicted_py, col = "lightblue", pch = 16, cex = 0.9)
 legend("topright", legend = c("Trained Data", "Predicted Data", "Regression Curve", "Threshold"),col = c("darkgrey", "lightblue", "red", "green4"), pch = c(16, 16, NA, NA), lty = c(NA, NA, 1, 1), cex = 0.8)
 ```
 
-
 #### 10.2.2 Regression analysis using all parameters 
 ```{r}
 train_zt <- data.frame(Korrelation_zt = correlation.zt[1:2500, ], Shift = shift_zt[1:2500, ])
@@ -3489,7 +3486,7 @@ print(summary(model_zt_all))
 
 ### 10.3 Regression analysis MMS 
 
-#### 10.1.1 Regression analysis based on the shift amount
+#### 10.3.1 Regression analysis based on the shift amount
 
 The two parameters for the regression analysis are the global shift amount and the correlation between the Ctrl and RNase dataset. The global shift amount is already calculated and saved as dataframe in absolute numbers under *shift.amount*. First we determine the correlation.
 ```{r}
@@ -3604,6 +3601,216 @@ print(summary(model_mms_all))
 #print(rounded_predictions_mms_all)
 ```
 
+#### 10.4.1 Comparison of trained data based on global shift amount with RDeep
+
+Regression based on global shift amount
+```{r}
+predictions_mms_rdeep_shift <- matrix(0, nrow = nrow(predictions_mms_plot), ncol = ncol(predictions_mms_plot))
+
+for(i in 1:nrow(predictions_mms_plot)) {
+  for(j in 1:ncol(predictions_mms_plot)){
+    if(predictions_mms_plot[i,j] > 2) {
+      predictions_mms_rdeep_shift[i,j] <- 1 
+    } else if (predictions_mms_plot[i,j] < 2) {
+      predictions_mms_rdeep_shift[i,j] <- 0
+    } 
+  }
+}
+
+rownames(predictions_mms_rdeep_shift) <- rownames(rnase.mms[2501:3074, ])
+# predictions_mms_rdeep_shift
+
+
+predictions_zt_rdeep_shift <- matrix(0, nrow = nrow(predictions_zt_plot), ncol = ncol(predictions_zt_plot))
+
+for(i in 1:nrow(predictions_zt_plot)) {
+  for(j in 1:ncol(predictions_zt_plot)){
+    if(predictions_zt_plot[i,j] > 2) {
+      predictions_zt_rdeep_shift[i,j] <- 1 
+    } else if (predictions_zt_plot[i,j] < 2) {
+      predictions_zt_rdeep_shift[i,j] <- 0
+    } 
+  }
+}
+
+rownames(predictions_zt_rdeep_shift) <- rownames(rnase.zt[2501:3074, ])
+predictions_zt_rdeep_shift
+
+predictions_mvm_rdeep_shift <- matrix(0, nrow = nrow(predictions_mvm_plot), ncol = ncol(predictions_mvm_plot))
+
+for(i in 1:nrow(predictions_mvm_plot)) {
+  for(j in 1:ncol(predictions_mvm_plot)){
+    if(predictions_mvm_plot[i,j] > 2) {
+      predictions_mvm_rdeep_shift[i,j] <- 1 
+    } else if (predictions_mvm_plot[i,j] < 2) {
+      predictions_mvm_rdeep_shift[i,j] <- 0
+    } 
+  }
+}
+
+rownames(predictions_mvm_rdeep_shift) <- rownames(rnase.mvm[2501:3074, ])
+```
+
+```{r}
+names.rdp.mvm.regression <- rownames(predictions_mvm_rdeep_shift)[which(predictions_mvm_rdeep_shift == 1)]
+names.rdp.zt.regression <- rownames(predictions_zt_rdeep_shift)[which(predictions_zt_rdeep_shift == 1)]
+names.rdp.mms.regression <- rownames(predictions_mms_rdeep_shift)[which(predictions_mms_rdeep_shift == 1)]
+
+names.rdp.regression <- list(names.rdp.mvm.regression, names.rdp.zt.regression, names.rdp.mms.regression)
+number.observed.RBPs.regression <- c(length(names.rdp.mvm.regression), length(names.rdp.zt.regression), length(names.rdp.mms.regression))
+
+
+names.nrdp.mvm.regression <- rownames(predictions_mvm_rdeep_shift)[which(predictions_mvm_rdeep_shift == 0)]
+names.nrdp.zt.regression <- rownames(predictions_zt_rdeep_shift)[which(predictions_zt_rdeep_shift == 0)]
+names.nrdp.mms.regression <- rownames(predictions_mms_rdeep_shift)[which(predictions_mms_rdeep_shift == 0)]
+
+names.nrdp.regression <- list(names.nrdp.mvm.regression, names.nrdp.zt.regression, names.nrdp.mms.regression)
+number.observed.nonRBPs.regression <- c(length(names.nrdp.mvm.regression), length(names.nrdp.zt.regression), length(names.nrdp.mms.regression))
+```
+
+### 10.4.2 True Positives - regression
+
+Check how many of our proteins really are RNA-dependent:
+
+```{r}
+# number.observed.RBPs.regression
+```
+
+
+```{r}
+#Number of correctly assigned (true positives) RBPs with parameters
+true.positives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.rdp.regression[[z]]) {
+    if (i %in% rownames(rdeep)) {
+      counter <- counter + 1
+    }
+  }
+  true.positives.regression.shift[z] <- counter
+}
+# true.positives.regression.shift
+```
+
+
+### 10.4.3 False positives - regression
+
+
+```{r}
+# Number of wrongly assigned (false positives) RBPs with parameters
+
+false.positives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.rdp.regression[[z]]) {
+    if (i %in% non.rdeep$Entry_Name) {
+      counter <- counter + 1
+    }
+  }
+  false.positives.regression.shift[z] <- counter
+}
+false.positives.regression.shift
+```
+
+### 10.4.4 True negatives - regression
+
+```{r}
+number.observed.nonRBPs.regression
+```
+
+```{r}
+# Number of correctly assigned non-RBPs (true negatives) with parameters
+
+true.negatives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.nrdp.regression[[z]]) {
+    if (i %in% non.rdeep$Entry_Name) {
+      counter <- counter + 1
+    }
+  }
+  true.negatives.regression.shift[z] <- counter
+}
+true.negatives.regression.shift
+```
+
+
+### 10.4.5 False negatives - regression
+
+```{r}
+# Number of wrongly assigned non-RBPs (true negatives) with parameters
+false.negatives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.nrdp.regression[[z]]) {
+    if (i %in% rownames(rdeep)) {
+      counter <- counter + 1
+    }
+  }
+  false.negatives.regression.shift[z] <- counter
+}
+# false.negatives.regression.shift
+```
+### 10.4.6 false-negative-rate (FNR) - regression
+
+FNR = FN/(FN + TP)
+```{r}
+fnr.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(x in 1:3){
+  fnr.regression.shift[x] <- false.negatives.regression.shift[x]/(false.negatives.regression.shift[x] + true.positives.regression.shift[x])
+}
+fnr.regression.shift
+```
+
+
+
+### 10.4.7 false-positive-rate (FPR) - regression
+
+FPR = FP/(FP + TN)
+```{r}
+fpr.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(x in 1:3){
+  fpr.regression.shift[x] <- false.positives.regression.shift[x]/(false.positives.regression.shift[x]+true.negatives.regression.shift[x])
+}
+fpr.regression.shift
+```
+
+
+
+### 10.4.8 Precision - regression
+
+precision = TP/(TP + FP)
+```{r}
+precision.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(x in 1:3){
+  precision.regression.shift[x] <- true.positives.regression.shift[x]/(true.positives.regression.shift[x] + false.positives.regression.shift[x])
+}
+precision.regression.shift
+```
+#### 10.4.2 Comparison of trained data based on parameters amount with RDeep
+
+```{r}
+names.rdp.mvm.regression.para <- rownames(rounded_predictions_mvm_all)[which(rounded_predictions_mvm_all == 1)]
+names.rdp.zt.regression.para <- rownames(rounded_predictions_zt_all)[which(rounded_predictions_zt_all == 1)]
+names.rdp.mms.regression.para <- rownames(rounded_predictions_mms_all)[which(rounded_predictions_mms_all == 1)]
+
+names.rdp.regression.para <- list(names.rdp.mvm.regression.para, names.rdp.zt.regression.para, names.rdp.mms.regression.para)
+number.observed.RBPs.regression.para <- c(length(names.rdp.mvm.regression.para), length(names.rdp.zt.regression.para), length(names.rdp.mms.regression.para))
+
+
+names.nrdp.mvm.regression.para <- rownames(rounded_predictions_mvm_all)[which(rounded_predictions_mvm_all == 0)]
+names.nrdp.zt.regression.para <- rownames(rounded_predictions_zt_all)[which(rounded_predictions_zt_all == 0)]
+names.nrdp.mms.regression.para <- rownames(rounded_predictions_mms_all)[which(rounded_predictions_mms_all == 0)]
+
+names.nrdp.regression.para <- list(names.nrdp.mvm.regression.para, names.nrdp.zt.regression.para, names.nrdp.mms.regression.para)
+number.observed.nonRBPs.regression.para <- c(length(names.nrdp.mvm.regression.para), length(names.nrdp.zt.regression.para), length(names.nrdp.mms.regression.para))
+```
+
+Check how many of our proteins really are RNA-dependent:
+
+```{r}
+number.observed.RBPs.regression.para
+```
 
 ##11. t-test
 

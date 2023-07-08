@@ -1,0 +1,6 @@
+"0","MS_Table_Ctrl_rep1 <-MS_Table_reordered[,1:25]"
+"0","MS_Table_Ctrl_rep2 <-MS_Table_reordered[,26:50]"
+"0","MS_Table_Ctrl_rep3 <-MS_Table_reordered[,51:75]"
+"0","MS_Table_RNase_rep1 <-MS_Table_reordered[,76:100]"
+"0","MS_Table_RNase_rep2 <-MS_Table_reordered[,101:125]"
+"0","MS_Table_RNase_rep3 <-MS_Table_reordered[,126:150]"

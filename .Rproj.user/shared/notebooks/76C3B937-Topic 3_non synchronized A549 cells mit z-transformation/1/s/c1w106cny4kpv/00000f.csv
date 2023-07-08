@@ -1,0 +1,4 @@
+"0","MS_Table_Ctrl <-MS_Table_reordered[,1:75]"
+"0","#View(MS_Table_Ctrl)"
+"0","MS_Table_RNase <-MS_Table_reordered[,76:150]"
+"0","#View(MS_Table_RNase)"

@@ -1,0 +1,1 @@
+{"frames":[{"func":"sweep(ctrl_mean, 1, 1/ctrl_rowsums, \"*\")","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0}],"message":"Error in sweep(ctrl_mean, 1, 1/ctrl_rowsums, \"*\") : \n  object 'ctrl_rowsums' not found\n"}
