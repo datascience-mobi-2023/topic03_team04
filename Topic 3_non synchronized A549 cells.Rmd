@@ -3120,17 +3120,6 @@ for (x in 1:3){
   res.km[[x]] <- kmeans(scale(df[, -5]), 4, nstart = 25)
   
 
-#for (y in 1:length(res.km$cluster)){
-#if (res.km$cluster[y] == 1){
-#res.km$cluster[y] <- "Light Proteins"
-#}
-#if (res.km$cluster[y] == 2){
-#res.km$cluster[y] <- "Heavy Proteins"
-#}
-#if (res.km$cluster[y] == 3){
-#res.km$cluster[y] <- "Medium Proteins"
-#}} 
-  
   g <- fviz_cluster(res.km[[x]], data = df,
                   geom = "point",
                   xlab = "Global Control Peaks",
@@ -3963,7 +3952,7 @@ names.nrdp.mms.glob <- rownames(as.data.frame(comp.glob[,3]))[which(as.data.fram
 
 names.nrdp.glob <- list(names.nrdp.mvm.glob, names.nrdp.zt.glob, names.nrdp.mms.glob)
 
-number.observed.non.RBPs.glob <- c(length(names.nrdp.mvm.glob), length(names.nrdp.zt.glob), #length(names.nrdp.mms.glob))
+number.observed.non.RBPs.glob <- c(length(names.nrdp.mvm.glob), length(names.nrdp.zt.glob), length(names.nrdp.mms.glob))
 
 
 
