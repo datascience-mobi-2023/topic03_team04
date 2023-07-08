@@ -211,7 +211,7 @@ Kmeans is used to group a set of data points of a \(d\) - dimensional space into
 In our case we grouped our proteins in a two-dimensional space (fraction of control-peak and fraction of rnase) into \(k=4\) clusters. We performed kmeans to have an alternative Method for identification of RNA-dependent Proteins, besides our Parameters.
 
 ### 2.8. Regression analysis
-The goal of linear regression is to model the mathematical relationship between a dependent variable and a independent variable. The objective is to create a linear equation, typically represented as y = mx + n, which best fits the observed data. The residuals, calculated as the difference between the actual y-values and the predicted y-values, provide an indication of the model's accuracy.  We use the correlation of the protein amount in Control and RNase as the independent variable and the amount of the global peak shift in fractions as the dependent variable. This relationship is crucial for understanding the effects of equality of protein levels in Control and RNase on global peak shifts. Using linear regression, we can quantify and analyse this relationship. As a second model we use the same independent variable for each protein but used the information of our parameters as the dependent variable. Both models are trained with 2500 proteins, so that a prediction can be made for 574 proteins.  
+Linear regression can predict the value of a variable (dependent variable) based on the value of another value (independent variable). The beginning 2/3 of the dataset is used to train the regression model and the remaining third is tested by the model. As independent variable the correlation between the Control and RNase group over all fractions per protein is used to predict the global shift amount [fractions] of the tested data.
 
 
 ### 3. Results
@@ -253,6 +253,62 @@ Using kmeans we were able to identify 160 RNA-associated Proteins for MVM, 155 f
 
 
 ### 3.6. Regression analysis
+The linear regression was performed as previous mentioned under the topic methods. Each protein is depicted as a dot in the plot below. As expected the majority of the trained data, marked in grey shows a high correlation with a shift under 2 fractions. On the other hand those with a small correlation have shift upwards of 2 fractions. As already decided for the parameter **Significant fraction-shift of global peak**: a protein is classified as RNA-dependent protein if it has a shift higher than two fractions. The threshold is marked as green line in the plot.  
+
+```{r}
+shift.amount.plot = abs(data.frame(shift_zt_global))
+
+train_zt_plot <- data.frame(Korrelation_plot = correlation.zt[1:2500, ], Shift_plot = shift.amount.plot[1:2500, ])
+
+model_zt_all_plot <- lm(Shift_plot ~ Korrelation_plot, data = train_zt_plot)
+
+test_zt_plot <- data.frame(Korrelation_plot = correlation.zt[2501:3074, ])
+
+predictions_zt_plot <- as.data.frame(predict(model_zt_all_plot, newdata = test_zt_plot))
+rownames(predictions_zt_plot) <- rownames(rnase.zt[2501:3074, ])
+
+px <- train_zt_plot$Korrelation_plot
+py <- train_zt_plot$Shift_plot
+
+
+plot(px, py, main = "Regression Analysis", xlab = "Correlation - Ctrl and RNase", ylab = "Shift [Fraction]", xlim = c(min(px), max(px)), ylim = c(min(py), max(py)), pch = 16, cex = 0.9, cex.main = 0.97, cex.lab = 0.9, col = "darkgrey")
+
+
+abline(model_zt_all_plot, col = "red", lwd = 2)
+
+abline(h = 2.5, col = "green4", lwd = 2)
+
+
+test_px <- test_zt_plot$Korrelation_plot
+predicted_py <- predict(model_zt_all_plot, newdata = test_zt_plot)
+
+
+points(test_px, predicted_py, col = "lightblue", pch = 16, cex = 0.9)
+
+
+legend("topright", legend = c("Trained Data", "Predicted Data", "Regression Curve", "Threshold"),col = c("darkgrey", "lightblue", "red", "green4"), pch = c(16, 16, NA, NA), lty = c(NA, NA, 1, 1), cex = 0.8)
+```
+
+The tested data, marked in blue could now be grouped in RNA-dependent protein or not RNA-dependent protein. AUSWERTUNG RATEN 
+
+```{r, warning=FALSE, results='asis',fig.show="hold", out.width="50%"}
+library("kableExtra")
+summary.numbers.regression0 <- kable(summary.numbers.regression)
+table.summary.numbers.regression <- kable_styling(summary.numbers.regression0, "striped", full_width = FALSE)
+
+summary.rates.regression.shift0 <- kable(summary.rates.regression.shift)
+table.summary.rates.regression.shift <- kable_styling(summary.rates.regression.shift0, "striped", full_width = FALSE)
+
+cat("<div class='row'>\n")
+cat("<div class='column'>\n")
+print(table.summary.numbers.regression, row.names = FALSE)
+cat("</div>\n")
+cat("<div class='column'>\n")
+print(table.summary.rates.regression.shift, row.names = FALSE)
+cat("</div>\n")
+cat("</div>\n")
+```
+
 
 ### 3.7. Comparison with Database
 
