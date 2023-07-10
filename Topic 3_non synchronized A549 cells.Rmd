@@ -3273,7 +3273,7 @@ for(i in 1:nrow(predictions_mvm_2)) {
 
 rownames(predictions_mvm_rdeep) <- rownames(rnase.mvm[2501:3074, ])
 
-# print(summary(model_mvm_all_2))
+print(summary(model_mvm_all_2))
 # View(predictions_mvm_rdeep)
 ```
 
@@ -3336,6 +3336,7 @@ points(test_px, predicted_py, col = "lightblue", pch = 16, cex = 0.9)
 
 legend("topright", legend = c("Trained Data", "Predicted Data", "Regression Curve", "Threshold"),col = c("darkgrey", "lightblue", "red", "green4"), pch = c(16, 16, NA, NA), lty = c(NA, NA, 1, 1), cex = 0.8)
 ```
+
 #### 10.1.2 Regression analysis using all parameters 
 ```{r}
 train_mvm <- data.frame(Korrelation = correlation.mvm[1:2500, ], Shift = shift_mvm[1:2500, ])

@@ -1,7 +1,7 @@
 ---
 title: |
-  | *non-synchronized A549 cells*
   | \Huge\ **Final Report:** Proteome-wide Screen for RNA-dependent Proteins
+  | *non-synchronized A549 cells*
 author: "Anastasia Möller, Johannes Schadt, Sylviane Verschaeve, Tine Limberg"
 date: "17.07.2023"
 output:
@@ -24,7 +24,6 @@ knitr::opts_chunk$set(echo = FALSE, results='hide')
 load("Environment.RData")
 ```
 
-Loading the data:
 
 ```{r}
 #MS_Table <- read.delim('https://www.dropbox.com/s/r417vauyr7cku8s/A549dataset.csv?dl=1', header=TRUE, row.names=1, sep = ";")
@@ -49,36 +48,20 @@ Therefore, the goal of this analysis is, to identify which proteins in the given
 The dataset to be analysed contains 3680 different proteins from synchronized mitotic A549 cells.
 At the end of this project, a linear regression will be developed, which will make it possible to predict RNA dependence for proteins based on their distribution of the control and RNase treated sample.
 
-### 1.1. Importance of RNA-binding proteins
+### 1.1. Experimental Setup
 
-### 1.2. Experimental Setup
+To collect the mass spectrometry data, a strict protocol was followed. The cells were centrifuged and lysed. One sample was treated with RNAse, while the other served as the untreated control. Both samples were divided into 25 fractions using a sucrose gradient. Ultracentrifugation was performed, allowing the proteins to distribute based on their density. For statistical relevance, the protocol included three repetitions of the experiment. Therefore, triplicates are available for each protein for both Control and RNase. The fractions were then subjected to mass spectrometry analysis to determine the protein abundance, measured in arbitrary units (Caudron-Herger et al., 2019). Furthermore, it should be noted that the protein amount is represented by the y-value whilst the number of the fraction is the x-value.
 
-To collect the mass spectrometry data, a strict protocol was followed.
-The cells were centrifuged and lysed.
-One sample was treated with RNAse, while the other served as the untreated control.
-Both samples were divided into 25 fractions using a sucrose gradient.
-Ultracentrifugation was performed, allowing the proteins to distribute based on their density.
-For statistical relevance, the protocol included three repetitions of the experiment.
-Therefore, triplicates are available for each protein for both Control and RNase.
-The fractions were then subjected to mass spectrometry analysis to determine the protein abundance, measured in arbitrary units (Caudron-Herger et al., 2019).
-Furthermore, it should be noted that the protein amount is represented by the y-value whilst the number of the fraction is the x-value.
 
 ## 2. Methods
 
 ### 2.1. Data cleanup
+
 The data clean up consists of checking for missing values and if necessary deleting rows of zeros. Furthermore, the columns are reordered to facilitate the separation of the dataset into two dataframes one containing Control while the other consists of the RNase group.
 
 ### 2.2. Reproducibility
 
-The reproducibility of the replicates (rep) for the Control and the RNase group is calculated separately by computing the pearson correlation between rep1 and rep2, rep1 and rep3 as well as between rep2 and rep3.
-There are 2 scenarios where a protein is seen as not reproducible.
-Firstly, if a replicate of a protein has only zeros, its correlation can not be calculated (NA) and the protein is discarded.
-83 proteins are affected.
-Moreover, if all 3 correlations either in the Control or RNase group of one protein are below 0.9 the protein isn't reliable enough for further analysis.
-Thus 523 proteins are additionally deleted, resulting 3074 proteins from initially 3680 proteins are left for further analysis.
-Some proteins contain two replicates similar to each other (correlation \< 0.9) and a third one that completely differs.
-Knowing that these proteins have one high and two smaller correlations, the deviating replicate was set to NA and will be ignored when uniting the replicates per protein.
-Consequently, important data is preserved without loosing too many proteins.
+The reproducibility of the replicates (rep) for the Control and the RNase group is calculated separately by computing the pearson correlation between rep1 and rep2, rep1 and rep3 as well as between rep2 and rep3. There are 2 scenarios where a protein is seen as not reproducible. Firstly, if a replicate of a protein has only zeros, its correlation can not be calculated (NA) and the protein is discarded. 83 proteins are affected. Moreover, if all 3 correlations either in the Control or RNase group of one protein are below 0.9 the protein isn't reliable enough for further analysis. Thus 523 proteins are additionally deleted, resulting 3074 proteins from initially 3680 proteins are left for further analysis. Some proteins contain two replicates similar to each other (correlation \< 0.9) and a third one that completely differs. Knowing that these proteins have one high and two smaller correlations, the deviating replicate was set to NA and will be ignored when uniting the replicates per protein. Consequently, important data is preserved without loosing too many proteins.
 
 ### 2.3. Normalization methods and Reduction/Scaling
 
@@ -92,62 +75,29 @@ To avoid negative values and not lose to much information as we did with the mea
 The last used normalization method is **Min-Max scaling (mms)**, which is a very simple scaling-method where the normalized value $x'$ is calculated from the original value $x$ as follows: $x'=\frac{{x-\text{min}(x)}}{{\text{max}(x)-\text{min}(x)}}$. This means that the highest value is automaticly set to one and the lowest values to zero.
 With this method it is very easy to calculate the global peaks, but on the other hand, the protein amount, so the area beneath the graph cannot be normalized.
 
+### 2.4. Gaussian fit
 
-### 2.5.Gaussian fit
-
-Goal of the gaussian fit is to fit a gaussian function to the data points, in our case the protein amount in each fraction of one protein.
-Therefore, we establish a list in which the parameters, which describe the distribution are saved.
-To fit the parameters to our data we used the optim() function implemented in R.
+Goal of the gaussian fit is to fit a gaussian function to the data points, in our case the protein amount in each fraction of one protein. Therefore, we establish a list in which the parameters, which describe the distribution are saved. To fit the parameters to our data we used the optim() function implemented in R.
 
 ### 2.6. Data description via Parameters
 
-To identify whether a Protein is RNA dependent or not each protein is tested on 4 parameters.
-The goal of those 4 parameters is the identification of significant differences between the Control and RNase sample.
-In the following sections the parameters will be elaborated.
+To identify whether a Protein is RNA dependent or not each protein is tested on 4 parameters. The goal of those 4 parameters is the identification of significant differences between the Control and RNase sample. In the following sections the parameters will be elaborated.
 
 #### 2.6.1. Parameter 1: Significant change of protein amount under global peak
 
-The first parameter identifies a significant change of the protein amount under the global peak for each protein.
-The global maximum represents the fraction of the sucrose gradient containing the highest protein amount.
-It is determined by using the *which.max()* function for each protein.
-If the Protein amount of the global peak fraction is either in the Control or RNase sample 1.7 times higher than the other sample, we defined it as a significant change.
+The first parameter identifies a significant change of the protein amount under the global peak for each protein. The global maximum represents the fraction of the sucrose gradient containing the highest protein amount. It is determined by using the *which.max()* function for each protein. If the Protein amount of the global peak fraction is either in the Control or RNase sample 1.7 times higher than the other sample, we defined it as a significant change.
 
 #### 2.6.2. Parameter 2: Significant change of protein amount under local peaks
 
-The next parameter recognizes a significant change in the total protein amount under the local peaks between the Control and RNase sample for each protein.
-New local peaks can occur if after RNase treatment the protein either dissociates or gains new interaction partners.
-To detect a significant change the local peaks have to be identified.
-To be defined as a local peak four criteria have to be fulfilled.
-First, the y-value of the local peak fraction has to be higher than the y-value of its neighbor fractions.
-Afterwards we checked if the sd of the local peak's y-value and its neighbors is higher than the sd of the y-values which contain less than 8 % of the total protein amount (*sd.threshold*).
-The aim is to sort out small fluctuation between the y-values.
-The third criteria selects the relevant local peaks by sorting those out which have a smaller protein amount than 3 % of the total protein amount.
-Most of the already mentioned criteria fit to the global peaks as well and thus global maxima have to be removed.
-The total protein amount under the local peaks for each protein in the Control and RNase sample is of interest.
-If it differs more than 7.5 from each other a significant change of the protein amount under the local peak is present.
+The next parameter recognizes a significant change in the total protein amount under the local peaks between the Control and RNase sample for each protein. New local peaks can occur if after RNase treatment the protein either dissociates or gains new interaction partners. To detect a significant change the local peaks have to be identified. To be defined as a local peak four criteria have to be fulfilled. First, the y-value of the local peak fraction has to be higher than the y-value of its neighbor fractions. Afterwards we checked if the sd of the local peak's y-value and its neighbors is higher than the sd of the y-values which contain less than 8 % of the total protein amount (*sd.threshold*). The aim is to sort out small fluctuation between the y-values. The third criteria selects the relevant local peaks by sorting those out which have a smaller protein amount than 3 % of the total protein amount. Most of the already mentioned criteria fit to the global peaks as well and thus global maxima have to be removed. The total protein amount under the local peaks for each protein in the Control and RNase sample is of interest. If it differs more than 7.5 from each other a significant change of the protein amount under the local peak is present.
 
 #### 2.6.3. Parameter 3: Significant fraction-shift of global peak
 
-The third parameter focuses on the x-axis depicting the fractions.
-If the fraction of the global peak in either the Control or RNase sample differs more than two fractions in the positive or negative x-direction compared to the other sample, the protein is defined as RNA-dependent.
-It lost or gained an interaction partner due to the RNase treatment.
+The third parameter focuses on the x-axis depicting the fractions. If the fraction of the global peak in either the Control or RNase sample differs more than two fractions in the positive or negative x-direction compared to the other sample, the protein is defined as RNA-dependent. It lost or gained an interaction partner due to the RNase treatment.
 
 #### 2.6.4. Parameter 4: Significant difference in position of shoulderregions
 
-At last it is observed if shoulderregions occur or disappear after the RNase treatment.
-A shoulderregion contains more than 2 consecutive fractions with a sd less than the *sd.threshold*.
-On the contrary to the local peak identification the fractions with small fluctuations are sorted.
-Of interest are those fractions belonging to shoulderregions which either occur in the Control or RNase sample but not in both.
-Often parts of the shoulderregions are overlapping, resulting in shoulderregions of interest with less than 3 consecutive fractions.
-So, a shoulderregion of interest is only significant if it has three or more consecutive fractions.
-
-```{r}
-#Nr <- c(1:dim(parameters.zt)[1])
-#parameters.zt.Nr = cbind(Nr, parameters.zt)
-#View(parameters.zt.Nr)
-```
-
-The following code creates two plots in one diagram, so that the Control and RNase group can be compared.
+At last it is observed if shoulderregions occur or disappear after the RNase treatment. A shoulderregion contains more than 2 consecutive fractions with a sd less than the *sd.threshold*. On the contrary to the local peak identification the fractions with small fluctuations are sorted. Of interest are those fractions belonging to shoulderregions which either occur in the Control or RNase sample but not in both.Often parts of the shoulderregions are overlapping, resulting in shoulderregions of interest with less than 3 consecutive fractions. So, a shoulderregion of interest is only significant if it has three or more consecutive fractions.
 
 ```{r}
 library(ggplot2)
@@ -200,18 +150,11 @@ plots_ctrl_rnase.zt[[878]] + labs(title = "4 - Significant difference in positio
 
 #### 2.6.5. Boundaries and Precipitated proteins
 
-The local peakfinder can't find local maxima at the boundaries (fraction 1 and fraction 25) because they have only one neighbor fraction.
-A local peak at the boundary has to fulfill following requirements.
-Firstly, it has to have a higher y-value than the two succeeding fractions.
-Secondly, the protein amount of those three fractions has to be bigger than 10.
-Smaller protein amounts are not relevant enough.
-Also precipitated proteins are not described by the parameters and have to be identified separately.
-They have a global peak in fraction 25 and their total protein amount of 100 has to be split between fraction 23, 24 and 25.
+The local peakfinder can't find local maxima at the boundaries (fraction 1 and fraction 25) because they have only one neighbor fraction. A local peak at the boundary has to fulfill following requirements. Firstly, it has to have a higher y-value than the two succeeding fractions. Secondly, the protein amount of those three fractions has to be bigger than 10. Smaller protein amounts are not relevant enough. Also precipitated proteins are not described by the parameters and have to be identified separately. They have a global peak in fraction 25 and their total protein amount of 100 has to be split between fraction 23, 24 and 25.
 
 ### 2.7. K-means clustering
 
-Kmeans is used to group a set of data points of a $d$ - dimensional space into a certain number $k$ of clusters.
-Each cluster has a center, the so called centroid.
+Kmeans is used to group a set of data points of a $d$ - dimensional space into a certain number $k$ of clusters. Each cluster has a center, the so called centroid.
 At the beginning of the clustering process $k$ number of clusters are set randomly.
 Then, the following steps have to be repeated again and again ($n$-times), until no further change can be obeserved: 1.
 The points are assigned to the cluster to whose centroid they are closest to.
@@ -225,11 +168,10 @@ We performed kmeans to have an alternative Method for identification of RNA-depe
 The linear regression models the mathematical relationship between a dependent variable and a independent variable. The linear equation is represented as y = mx + n. To analyse the model two values have to be taken into account. At first if the *p-value* is above 5 %, the model has to be discarded.
 Furthermore, the R-squared value describes the model's accuracy representing the proportion of the variance in the dependent variable that can be explained by the independent variables. Tow regression models are generated, both working with the pearson correlation between the Control and RNase protein amounts as the independent variable. The two models differ in their dependent variable. One uses the result of our four parameters, while the other uses the global shift amount in fractions. They are trained with 80 % of our dataset, so a prediction can be made for the remaining 20 %.
 
+
 ### 3. Results
 
-### 3.1. Cleaned Dataset
-
-### 3.2 Gaussian fit
+### 3.1 Gaussian fit
 
 On the grounds of our lists, containing the parameters for the gaussian distribution for every protein, it is possible to plot the gaussian curves.
 The control and RNase curves can be plotted separately or together in one plot for better comparison.
@@ -237,7 +179,7 @@ Because, we use the optim() function and to not implement further parameters our
 Therefore,the gaussian fit is only used for visualisation not for further analysis.
 **Graph ???**
 
-### 3.3. RNA-dependent Proteins
+### 3.2. RNA-dependent Proteins
 
 Using just parameter 1 (global peaks), we were able to characterize the shift-type, so whether the peaks show no shift, a right shift, a left shift, or are precipitated.
 The following graph visualizes our results for MVM:
@@ -256,9 +198,7 @@ All proteins that have two positive parameters and all proteins that have solely
 print(plot.parameters.detail[[1]])
 ```
 
-### 3.4. Comparison of the normalization methods
-
-### 3.5. K-means clustering
+### 3.3. K-means clustering
 
 We want to cluster the Proteins depending on their global control peaks and their global RNase Peaks.
 To find out how many proteins would be optimal in theory we used the elbow method that showed us, that two clusters would be optimal.
@@ -275,7 +215,7 @@ The other clusters can't be identified as RNA-dependent or not.
 There are no visible differences between the RNA-dependent proteins clusters of the different normalization methods.
 Using kmeans we were able to identify 160 RNA-associated Proteins for MVM, 155 for z-transformation and 159 for Min-Max-Scaling.
 
-### 3.6. Regression analysis
+### 3.4. Regression analysis
 The two already described regression models show both a p-value below 0.05 and therefore they can be used for further analysis. The highest R-squared values are detected for the z-transformed data: the model based on the parameters shows a R-squared value of 0.43, while in the model using the global shift amount the R-squared value is 0.66.
 The model with the higher R-squared value is visualized in the plot below. Each protein is depicted as a dot. As expected the majority of the trained data, marked in grey shows a high correlation and a shift under 2 fractions. On the other hand those with a small correlation have a shift upwards of 2 fractions. As already decided for the parameter **Significant fraction-shift of global peak**: a protein is classified as RNA-dependent protein if it has a shift higher than two fractions. The threshold is marked as a green line in the plot.
 
@@ -313,14 +253,14 @@ points(test_px, predicted_py, col = "lightblue", pch = 16, cex = 0.9)
 legend("topright", legend = c("Trained Data", "Predicted Data", "Regression Curve", "Threshold"),col = c("darkgrey", "lightblue", "red", "green4"), pch = c(16, 16, NA, NA), lty = c(NA, NA, 1, 1), cex = 0.8)
 ```
 
-### 3.7. Comparison with Database
+### 3.5. Comparison with Database
 
 We compared our results with the RDeep Database and a table containing non-RNA-associated Proteins from another paper (Quelle?).
 The following table shows how well the Method via our parameters worked.
 The table on the left shows the number of true positives, false positives, true negatives and false negatives.
 The table on the right shows the false negative rate (FNR), the false positive rate (FPR) and the precision.
 
-```{r, warning=FALSE, results='asis'}
+```{r, warning=FALSE, results='asis',out.width="50%"}
 library("kableExtra")
 summary.numbers.parameters0 <- kable(summary.numbers.parameters)
 table.summary.numbers.parameters <- kable_styling(summary.numbers.parameters0, "striped", full_width = FALSE)
@@ -341,7 +281,7 @@ cat("</div>\n")
 
 The following tables do the same for our kmeans results:
 
-```{r, warning=FALSE, results='asis'}
+```{r, warning=FALSE, results='asis',out.width="50%"}
 library("kableExtra")
 summary.numbers.kmeans0 <- kable(summary.numbers.kmeans)
 table.summary.numbers.kmeans <- kable_styling(summary.numbers.kmeans0, "striped", full_width = FALSE)
@@ -362,7 +302,7 @@ cat("</div>\n")
 
 The following tables do the same for our results that only depended on out global shift:
 
-```{r, warning=FALSE, results='asis'}
+```{r, warning=FALSE, results='asis',out.width="50%"}
 library("kableExtra")
 summary.numbers.global0 <- kable(summary.numbers.glob)
 table.summary.numbers.global <- kable_styling(summary.numbers.global0, "striped", full_width = FALSE)
@@ -385,7 +325,7 @@ There are thirteen proteins, that are not present neither in the RDeep data set,
 The following tables show the names of these proteins and whether they are considered as RNA-dependent by our analysis or not.
 On the left side are the results using our parameters, on the right side the ones obtained by kmeans:
 
-```{r, warning=FALSE, results='asis'}
+```{r, warning=FALSE, results='asis',out.width="50%"}
 library("kableExtra")
 non.comparable.parameters0 <- kable(non.comparable.parameters)
 table.non.comparable.parameters <- kable_styling(non.comparable.parameters0, "striped", full_width = FALSE)
@@ -402,6 +342,7 @@ print(table.non.comparable.kmeans, row.names = FALSE)
 cat("</div>\n")
 cat("</div>\n")
 ```
+
 
 ## 4. Discussion
 
