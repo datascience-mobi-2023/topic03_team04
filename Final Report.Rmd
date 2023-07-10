@@ -66,6 +66,7 @@ Furthermore, it should be noted that the protein amount is represented by the y-
 ## 2. Methods
 
 ### 2.1. Data cleanup
+The data clean up consists of checking for missing values and if necessary deleting rows of zeros. Furthermore, the columns are reordered to facilitate the separation of the dataset into two dataframes one containing Control while the other consists of the RNase group.
 
 ### 2.2. Reproducibility
 
@@ -86,11 +87,8 @@ The **mean-value method (mvm)** is the first data normalisation we use.
 The mean protein amount of each protein is substracted from the protein amount in each fraction.The values that are zero or smaller than the mean become negative through this subtraction.
 We set these negative values to zero to simplify further analysis.
 Afterwards, the sum of the proteinamount in each row is scaled to 100.
-
 Furthermore we used the **z-transformation**, which transforms our data into a standard normal distribution with a mean of 0 and a standard deviation of 1 by using the formula: Z = (X - μ) / σ.
 To avoid negative values and not lose to much information as we did with the mean-value method, the smallest value per protein is added to each fraction of the corresponding protein, meaning the smallest value is now 0. In case of the z-transformation we first normalized than scaled to 100. Afterwards we reduced by calculating the mean between the replicates with a higher correlation than 0.9 and scaled again to 100.
-
-
 The last used normalization method is **Min-Max scaling (mms)**, which is a very simple scaling-method where the normalized value $x'$ is calculated from the original value $x$ as follows: $x'=\frac{{x-\text{min}(x)}}{{\text{max}(x)-\text{min}(x)}}$. This means that the highest value is automaticly set to one and the lowest values to zero.
 With this method it is very easy to calculate the global peaks, but on the other hand, the protein amount, so the area beneath the graph cannot be normalized.
 
@@ -147,65 +145,6 @@ So, a shoulderregion of interest is only significant if it has three or more con
 #Nr <- c(1:dim(parameters.zt)[1])
 #parameters.zt.Nr = cbind(Nr, parameters.zt)
 #View(parameters.zt.Nr)
-```
-
-```{r}
-library(ggplot2)
-
-num_rows <- nrow(rnase.zt)
-
-plots_rnase.zt <- list()
-
-for (i in 1:num_rows) {
-  row_data_rnase <- rnase.zt[i, ]
-  
-  
-   if (sum(!is.na(row_data_rnase)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
-    
-      p <- ggplot(df, aes(x = x, y = yrnase)) +
-      geom_line(color = "tomato") +
-      geom_point(color = "tomato") +
-      xlab("Fractions") +
-      ylab("Protein amount") +
-      labs(title = "RNase zT")
-      
-    
-    plots_rnase.zt[[i]] <- p
-  } else {
-    
-    plots_rnase.zt[[i]] <- NULL
-  }
-}
-```
-
-```{r}
-library(ggplot2)
-
-num_rows <- nrow(ctrl.zt)
-
-plots_ctrl.zt <- list()
-
-for (i in 1:num_rows) {
-  row_data_ctrl <- ctrl.zt[i, ]
-  
-    if (sum(!is.na(row_data_ctrl)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
-    
-      p <- ggplot(df, aes(x = x, y = yctrl)) +
-      geom_line(color = "skyblue2") +
-      geom_point(color = "skyblue2") +
-      xlab("Fractions") +
-      ylab("Protein amount") +
-      labs(title = "Control zT")
-    
-    
-    plots_ctrl.zt[[i]] <- p
-  } else {
-    
-    plots_ctrl.zt[[i]] <- NULL
-  }
-}
 ```
 
 The following code creates two plots in one diagram, so that the Control and RNase group can be compared.
@@ -283,14 +222,8 @@ In our case we grouped our proteins in a two-dimensional space (fraction of cont
 We performed kmeans to have an alternative Method for identification of RNA-dependent Proteins, besides our Parameters.
 
 ### 2.8. Regression analysis
-
-Linear regression can predict the value of a variable (dependent variable) based on the value of another value (independent variable).
-The beginning 2/3 of the dataset is used to train the regression model and the remaining third is tested by the model.
-As independent variable the correlation between the Control and RNase group over all fractions per protein is used to predict the global shift amount [fractions] of the tested data.
-
-
-The goal of linear regression is to model the mathematical relationship between a dependent variable and a independent variable. The objective is to create a linear equation, typically represented as y = mx + n, which best fits the observed data. The residuals, calculated as the difference between the actual y-values and the predicted y-values, provide an indication of the model's accuracy.  We use the correlation of the protein amount in Control and RNase as the independent variable and the amount of the global peak shift in fractions as the dependent variable. This relationship is crucial for understanding the effects of equality of protein levels in Control and RNase on global peak shifts. Using linear regression, we can quantify and analyse this relationship. As a second model we use the same independent variable for each protein but used the information of our parameters as the dependent variable. Both models are trained with 2500 proteins, so that a prediction can be made for 574 proteins.  
-
+The linear regression models the mathematical relationship between a dependent variable and a independent variable. The linear equation is represented as y = mx + n. To analyse the model two values have to be taken into account. At first if the *p-value* is above 5 %, the model has to be discarded.
+Furthermore, the R-squared value describes the model's accuracy representing the proportion of the variance in the dependent variable that can be explained by the independent variables. Tow regression models are generated, both working with the pearson correlation between the Control and RNase protein amounts as the independent variable. The two models differ in their dependent variable. One uses the result of our four parameters, while the other uses the global shift amount in fractions. They are trained with 80 % of our dataset, so a prediction can be made for the remaining 20 %.
 
 ### 3. Results
 
@@ -343,13 +276,8 @@ There are no visible differences between the RNA-dependent proteins clusters of 
 Using kmeans we were able to identify 160 RNA-associated Proteins for MVM, 155 for z-transformation and 159 for Min-Max-Scaling.
 
 ### 3.6. Regression analysis
-
-The linear regression was performed as previous mentioned under the topic methods.
-Each protein is depicted as a dot in the plot below.
-As expected the majority of the trained data, marked in grey shows a high correlation with a shift under 2 fractions.
-On the other hand those with a small correlation have shift upwards of 2 fractions.
-As already decided for the parameter **Significant fraction-shift of global peak**: a protein is classified as RNA-dependent protein if it has a shift higher than two fractions.
-The threshold is marked as green line in the plot.
+The two already described regression models show both a p-value below 0.05 and therefore they can be used for further analysis. The highest R-squared values are detected for the z-transformed data: the model based on the parameters shows a R-squared value of 0.43, while in the model using the global shift amount the R-squared value is 0.66.
+The model with the higher R-squared value is visualized in the plot below. Each protein is depicted as a dot. As expected the majority of the trained data, marked in grey shows a high correlation and a shift under 2 fractions. On the other hand those with a small correlation have a shift upwards of 2 fractions. As already decided for the parameter **Significant fraction-shift of global peak**: a protein is classified as RNA-dependent protein if it has a shift higher than two fractions. The threshold is marked as a green line in the plot.
 
 ```{r}
 shift.amount.plot = abs(data.frame(shift_zt_global))
@@ -383,27 +311,6 @@ points(test_px, predicted_py, col = "lightblue", pch = 16, cex = 0.9)
 
 
 legend("topright", legend = c("Trained Data", "Predicted Data", "Regression Curve", "Threshold"),col = c("darkgrey", "lightblue", "red", "green4"), pch = c(16, 16, NA, NA), lty = c(NA, NA, 1, 1), cex = 0.8)
-```
-
-The tested data, marked in blue could now be grouped in RNA-dependent protein or not RNA-dependent protein.
-AUSWERTUNG RATEN
-
-```{r, warning=FALSE, results='asis',fig.show="hold", out.width="50%"}
-library("kableExtra")
-summary.numbers.regression0 <- kable(summary.numbers.regression)
-table.summary.numbers.regression <- kable_styling(summary.numbers.regression0, "striped", full_width = FALSE)
-
-summary.rates.regression.shift0 <- kable(summary.rates.regression.shift)
-table.summary.rates.regression.shift <- kable_styling(summary.rates.regression.shift0, "striped", full_width = FALSE)
-
-cat("<div class='row'>\n")
-cat("<div class='column'>\n")
-print(table.summary.numbers.regression, row.names = FALSE)
-cat("</div>\n")
-cat("<div class='column'>\n")
-print(table.summary.rates.regression.shift, row.names = FALSE)
-cat("</div>\n")
-cat("</div>\n")
 ```
 
 ### 3.7. Comparison with Database
