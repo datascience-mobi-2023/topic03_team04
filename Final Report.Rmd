@@ -21,6 +21,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, results='hide') 
+load("Environment.RData")
 ```
 
 Loading the data:
@@ -286,6 +287,10 @@ We performed kmeans to have an alternative Method for identification of RNA-depe
 Linear regression can predict the value of a variable (dependent variable) based on the value of another value (independent variable).
 The beginning 2/3 of the dataset is used to train the regression model and the remaining third is tested by the model.
 As independent variable the correlation between the Control and RNase group over all fractions per protein is used to predict the global shift amount [fractions] of the tested data.
+
+
+The goal of linear regression is to model the mathematical relationship between a dependent variable and a independent variable. The objective is to create a linear equation, typically represented as y = mx + n, which best fits the observed data. The residuals, calculated as the difference between the actual y-values and the predicted y-values, provide an indication of the model's accuracy.  We use the correlation of the protein amount in Control and RNase as the independent variable and the amount of the global peak shift in fractions as the dependent variable. This relationship is crucial for understanding the effects of equality of protein levels in Control and RNase on global peak shifts. Using linear regression, we can quantify and analyse this relationship. As a second model we use the same independent variable for each protein but used the information of our parameters as the dependent variable. Both models are trained with 2500 proteins, so that a prediction can be made for 574 proteins.  
+
 
 ### 3. Results
 
