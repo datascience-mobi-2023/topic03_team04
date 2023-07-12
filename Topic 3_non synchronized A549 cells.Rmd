@@ -2918,6 +2918,8 @@ for (z in 1:3){
 ```
 
 ```{r}
+library(ggplot2)
+
 parameters.all <- list(parameters.mvm, parameters.zt, parameters.mms)
 plot.parameters.detail <- list()
 
