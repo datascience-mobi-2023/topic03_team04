@@ -1895,20 +1895,20 @@ for (i in 1:num_rows) {
 ####6.4.2 example how to plot the Control and RNase curve of one specific protein
 
 ```{r}
-n=81  #Number of protein you want to see
-x <- c(1:25)
-a1<- parameter_gaussian_ctrl.zt_table[n, 1 ]
-mu1 <- parameter_gaussian_ctrl.zt_table[n, 2]
-sigma1 <- parameter_gaussian_ctrl.zt_table[n,3]
+#=81  #Number of protein you want to see
+#x <- c(1:25)
+#a1<- parameter_gaussian_ctrl.zt_table[n, 1 ]
+#mu1 <- parameter_gaussian_ctrl.zt_table[n, 2]
+#sigma1 <- parameter_gaussian_ctrl.zt_table[n,3]
 
-a2<- parameter_gaussian_rnase.zt_table[n, 1 ]
-mu2 <- parameter_gaussian_rnase.zt_table[n, 2]
-sigma2 <- parameter_gaussian_rnase.zt_table[n,3]
+#a2<- parameter_gaussian_rnase.zt_table[n, 1 ]
+#mu2 <- parameter_gaussian_rnase.zt_table[n, 2]
+#sigma2 <- parameter_gaussian_rnase.zt_table[n,3]
 
-plot(x, type = "n", ylim= c(0,50))
+#plot(x, type = "n", ylim= c(0,50))
 
-curve(gauss(x, a=a1, mu=mu1, sigma=sigma1), from = min(x), to = max(x), add = TRUE, col = "palegreen2", lwd = 2)+
-curve(gauss(x, a=a2, mu=mu2, sigma=sigma2), from = min(x), to = max(x), add = TRUE, col = "violet", lwd = 2)
+#curve(gauss(x, a=a1, mu=mu1, sigma=sigma1), from = min(x), to = max(x), add = TRUE, col = "palegreen2", lwd = 2)+
+#curve(gauss(x, a=a2, mu=mu2, sigma=sigma2), from = min(x), to = max(x), add = TRUE, col = "violet", lwd = 2)
 ```
 
 Hinweis: Um die Graphen einer anderen Normalisierungsmethode zu sehen, kann zt in mvm oder mms abgeändert werden.
@@ -2813,11 +2813,11 @@ library("ggplot2")
 
 for (x in 1:3){
 
-col <- c("springgreen", "cyan", "violetred1", "orange")
+col <- c("lightsteelblue2", "darkseagreen3","tomato1", "lightsteelblue4" )
 vjust <- c(-0.5, 1, -0.5, -0.5)
 labels <- c("left shift", "no shift", "precipitated", "right shift")
 
-title <- c("Shifttypes Mean Value Method", "Shifttypes z-Transformation", "Shifttypes Min-Max-Scaling")
+title <- c("Shifttypes", "Shifttypes z-Transformation", "Shifttypes Min-Max-Scaling")
 
 
 peaks <- data.frame(peak.ctrl, peak.rnase, shift_named[,x])
@@ -2828,8 +2828,8 @@ peaks$cluster <- factor(shift_named[,x])
 dot.plot <- ggplot(peaks, aes(peak.ctrl,peak.rnase)) + 
   geom_point(aes(colour = shift_named[,x]), 
              shape = 19, 
-             alpha = 0.5, size = 1.5, 
-             position = position_jitter(width = 0.1, height = 0.1))+
+             alpha = 0.7, size = 2, 
+             position = position_jitter(width = 0.2, height = 0.2))+
   labs(x = "Fraction of Control Peak", 
        y = "Fraction of RNase Peak", 
        title = title[x])+
@@ -2839,7 +2839,7 @@ dot.plot <- ggplot(peaks, aes(peak.ctrl,peak.rnase)) +
 
 
 bar.plot <- ggplot(number.of.clusters, aes(factor(value)))+
-  geom_bar(fill = col, width = 0.5)+
+  geom_bar(fill = col, width = 0.7)+
   theme_minimal()+
   theme(axis.text.x = element_blank(), 
         axis.text.y = element_blank(),
@@ -2851,7 +2851,7 @@ bar.plot <- ggplot(number.of.clusters, aes(factor(value)))+
   geom_text(stat = 'count', 
             aes(label = after_stat(count)), 
             vjust = vjust, 
-            size = 2.5)
+            size = 2.7)
 
 
 plot_RBP[[x]] <- dot.plot + annotation_custom(grob = ggplotGrob(bar.plot), 
@@ -2859,11 +2859,14 @@ plot_RBP[[x]] <- dot.plot + annotation_custom(grob = ggplotGrob(bar.plot),
                     xmax = 26.75, 
                     ymin = -1, 
                     ymax = 8)
-print(plot_RBP[[x]])
+print(plot_RBP[[x]])+ labs(subtitle = paste("Figure 5: Categorization into shifting behaviour based on global shift.")) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97")) + theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
 }
 
-#print(plot_RBP[[1]])
+print(plot_RBP[[1]])
 
+```
+```{r}
+print(plot_RBP[[1]]) + labs(subtitle = paste("Figure 5: Categorization into shifting behaviour based on global shift.")) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97")) + theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
 ```
 
 
@@ -2915,11 +2918,6 @@ for (z in 1:3){
 ```
 
 ```{r}
-library(ggplot2)
-library(ggpubr)
-
-
-
 parameters.all <- list(parameters.mvm, parameters.zt, parameters.mms)
 plot.parameters.detail <- list()
 
@@ -2939,9 +2937,9 @@ for (z in 1:3){
     sum(as.numeric(x))})
   
   df <- as.data.frame(sum_parameters)
-  title <- c("How many parameters support the proteins? MVM", 
-             "How many parameters support the proteins? z-Transformation",
-             "How many parameters support the proteins? MMS")
+  title <- c("Protein spilt by number of Parameters", 
+             "Protein spilt by number of Parameters - zTransformation",
+             "Protein spilt by number of Parameters - MMS")
 
   if(z == 3){
     c <- c(0,1,2,3)
@@ -2988,7 +2986,7 @@ for (z in 1:3){
                       value = c(df.glob.sum[,2], df.loc.sum[,2], 
                                 df.shift.sum[,2], df.shoulder.sum[,2], 
                                 df.sum.sum[,2]),
-                      parameters = c(rep(c("Global", "Local", "Shifts", 
+                      Parameters = c(rep(c("Global", "Local", "Shifts", 
                                            "Shoulderregion", "Total"), 
                                          each = 5)))
   }else{
@@ -2996,33 +2994,38 @@ for (z in 1:3){
                                    df.shoulder.sum[,1],df.sum.sum[,1]), 
                       value = c(df.loc.sum[,2], df.shift.sum[,2], 
                                 df.shoulder.sum[,2], df.sum.sum[,2]),
-                      parameters = c(rep(c("Local", "Shift", "Shoulderregion", 
+                      Parameters = c(rep(c("Local", "Shift", "Shoulderregion", 
                                            "Total"), each = 4)))
   }
   
   if(z == 3){
-    colour <- c("darkseagreen3", "lightsteelblue4","cadetblue3", "seashell2" )
-  }else{colour <- c("darkseagreen3", "cadetblue3", "lightblue3", "paleturquoise3", "seashell2" )}
+    colour <- c("lightsteelblue4", "darkseagreen3","paleturquoise3", "seashell2" )
+  }else{colour <- c("lightsteelblue4", "darkseagreen3", "lightsteelblue2", "paleturquoise3", "seashell2" )}
   
   plot.parameters.detail[[z]] <- 
-    ggplot(df2, aes(x = category, y = value, fill = parameters))+
+    ggplot(df2, aes(x = category, y = value, fill = Parameters))+
     geom_bar(stat = "identity", position = position_dodge(width = 0.9))+
     theme_bw()+
     geom_text(aes(label = value), 
               vjust = -0.5, 
               position = position_dodge(width = 0.9), 
               size = 2)+
-    labs(x = "number of parameters pro shift", 
-         y = "number of proteins", 
+    labs(x = "Number of Parameters", 
+         y = "Number of Proteins", 
          title = title[[z]])+
     scale_fill_manual(values = colour)
   
   print(plot.parameters.detail[[z]])
 }
 ```
+
+
 ```{r}
-print(plot.parameters.detail[[z]])
+print(plot.parameters.detail[[1]]) + labs(subtitle = 
+paste("Figure 5: The number of Proteins for each Parameter depending on the occuring 
+                Parameter amount is depicted.")) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97")) + theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
 ```
+
 
 
 
@@ -3054,11 +3057,6 @@ ggplot(wss.df, aes(x = 1:length(wss), y = values))+
 If we follow the results of the elbow method, the optimal number of clusters would be 2. But this would not lead to any useful results. So we force kmeans to create four clusters...
 
 ```{r, warning = False}
-
-library("ggpubr")
-library("factoextra")
-library("ggplot2")
-
 df.peaks <- data.frame(cbind(globalpeak.ctrl.mvm, globalpeak.rnase.mvm, globalpeak.ctrl.zt, globalpeak.rnase.zt, globalpeak.ctrl.mms, globalpeak.rnase.mms))
 
 plot.cluster.fractions <- list()
@@ -3074,13 +3072,24 @@ for (x in 1:3){
   set.seed(666)
   res.km[[x]] <- kmeans(scale(df[, -5]), 4, nstart = 25)
   
+  g <- ggplot(data = df, aes(x = globalpeak.ctrl, y = globalpeak.rnase)) +
+    geom_point(aes(fill = factor(res.km[[x]]$cluster)),  
+               shape = 19, 
+               size = 3,  
+               color = c("lightsteelblue2", "darkseagreen3","tomato1", "lightsteelblue4" )) +  
+    labs(x = "Global Control Peaks",
+         y = "Global RNase Peaks",
+         title = title[x]) +
+    scale_fill_manual(values = c("lightsteelblue2", "darkseagreen3","tomato1", "lightsteelblue4" )) +  
+    theme_bw()
 
   g <- fviz_cluster(res.km[[x]], data = df,
                   geom = "point",
                   xlab = "Global Control Peaks",
                   ylab = "Global RNase Peaks",
                   main = title[x],
-                  ggtheme = theme_bw())
+                  ggtheme = theme_bw()) +
+                  scale_fill_manual(values = c("lightsteelblue2", "darkseagreen3","tomato1", "lightsteelblue4" ))
                   
 plot.cluster.fractions[[x]] <- g + theme(axis.text.x = element_blank(),
           axis.text.y = element_blank(),
@@ -3089,6 +3098,42 @@ plot.cluster.fractions[[x]] <- g + theme(axis.text.x = element_blank(),
 print(plot.cluster.fractions[[x]])
 }
 
+```
+```{r}
+df.peaks <- data.frame(cbind(globalpeak.ctrl.mvm, globalpeak.rnase.mvm, globalpeak.ctrl.zt, globalpeak.rnase.zt, globalpeak.ctrl.mms, globalpeak.rnase.mms))
+
+plot.cluster.fractions <- list()
+
+title <- c("Clusters of Peaks calculated after MVM", "Clusters of Peaks calculated after z-Transformation", "Clusters of Peaks calculated after MMS")
+
+res.km <- list()
+
+colors <- c("lightsteelblue2", "darkseagreen3", "tomato1", "lightsteelblue4")
+
+for (x in 1:3) {
+
+  df <- df.peaks[, (2*x - 1):(2*x)]
+
+  set.seed(666)
+  res.km[[x]] <- kmeans(scale(df[, -5]), 4, nstart = 25)
+
+  g <- ggplot(data = df, aes(x = globalpeak.ctrl, y = globalpeak.rnase)) +
+    geom_point(aes(fill = factor(res.km[[x]]$cluster), color = factor(res.km[[x]]$cluster)),  
+               shape = 16, 
+               size = 3) +
+    labs(x = "Global Control Peaks",
+         y = "Global RNase Peaks",
+         title = title[x]) +
+    scale_fill_manual(values = colors) +
+    scale_color_manual(values = colors) +
+    theme_bw()
+
+  plot.cluster.fractions[[x]] <- g + theme(axis.text.x = element_blank(),
+                                           axis.text.y = element_blank(),
+                                           axis.ticks = element_blank()) 
+
+  print(plot.cluster.fractions[[x]])
+}
 ```
 
 We select the cluster at the bottom right to be RNA-associated. For MVM this would be cluster 2, for z-transformation cluster 3 and for MMS cluster 4 (first three rows of code below should be adapted if this is not the case).

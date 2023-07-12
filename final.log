@@ -1,8 +1,8 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.7.10)  12 JUL 2023 20:01
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.7.10)  12 JUL 2023 23:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**final.tex
+**Final.tex
 (./final.tex
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-06-30>
@@ -968,62 +968,73 @@ LaTeX Font Info:    Font shape `TU/Cambria(0)/m/n' will be
 LaTeX Font Info:    Font shape `TU/Cambria(0)/m/it' will be
 (Font)              scaled to size 12.0pt on input line 250.
 [4]
-File: final_files/figure-latex/unnamed-chunk-2-1.pdf Graphic file (type pdf)
-<use final_files/figure-latex/unnamed-chunk-2-1.pdf>
-File: final_files/figure-latex/unnamed-chunk-2-2.pdf Graphic file (type pdf)
-<use final_files/figure-latex/unnamed-chunk-2-2.pdf>
-File: final_files/figure-latex/unnamed-chunk-2-3.pdf Graphic file (type pdf)
-<use final_files/figure-latex/unnamed-chunk-2-3.pdf>
-File: final_files/figure-latex/unnamed-chunk-2-4.pdf Graphic file (type pdf)
-<use final_files/figure-latex/unnamed-chunk-2-4.pdf>
+File: Final_files/figure-latex/unnamed-chunk-2-1.pdf Graphic file (type pdf)
+<use Final_files/figure-latex/unnamed-chunk-2-1.pdf>
+File: Final_files/figure-latex/unnamed-chunk-2-2.pdf Graphic file (type pdf)
+<use Final_files/figure-latex/unnamed-chunk-2-2.pdf>
+File: Final_files/figure-latex/unnamed-chunk-2-3.pdf Graphic file (type pdf)
+<use Final_files/figure-latex/unnamed-chunk-2-3.pdf>
+File: Final_files/figure-latex/unnamed-chunk-2-4.pdf Graphic file (type pdf)
+<use Final_files/figure-latex/unnamed-chunk-2-4.pdf>
 
 Underfull \hbox (badness 10000) in paragraph at lines 309--313
 [][] []
  []
 
 [5] [6]
-File: final_files/figure-latex/unnamed-chunk-3-1.pdf Graphic file (type pdf)
-<use final_files/figure-latex/unnamed-chunk-3-1.pdf>
-File: final_files/figure-latex/unnamed-chunk-3-2.pdf Graphic file (type pdf)
-<use final_files/figure-latex/unnamed-chunk-3-2.pdf>
+File: Final_files/figure-latex/unnamed-chunk-3-1.pdf Graphic file (type pdf)
+<use Final_files/figure-latex/unnamed-chunk-3-1.pdf>
+File: Final_files/figure-latex/unnamed-chunk-3-2.pdf Graphic file (type pdf)
+<use Final_files/figure-latex/unnamed-chunk-3-2.pdf>
+File: Final_files/figure-latex/unnamed-chunk-3-3.pdf Graphic file (type pdf)
+<use Final_files/figure-latex/unnamed-chunk-3-3.pdf>
+File: Final_files/figure-latex/unnamed-chunk-3-4.pdf Graphic file (type pdf)
+<use Final_files/figure-latex/unnamed-chunk-3-4.pdf>
 
-Overfull \hbox (1.76054pt too wide) in paragraph at lines 393--395
-[][] [] 
+Overfull \hbox (1.76054pt too wide) in paragraph at lines 405--409
+[][] []
  []
 
-[7]
-File: final_files/figure-latex/unnamed-chunk-5-1.pdf Graphic file (type pdf)
-<use final_files/figure-latex/unnamed-chunk-5-1.pdf>
-[8]
-Underfull \hbox (badness 1776) in paragraph at lines 439--445
+
+Overfull \hbox (1.76054pt too wide) in paragraph at lines 405--409
+[] [] 
+ []
+
+[7] [8]
+File: Final_files/figure-latex/unnamed-chunk-4-1.pdf Graphic file (type pdf)
+<use Final_files/figure-latex/unnamed-chunk-4-1.pdf>
+File: Final_files/figure-latex/unnamed-chunk-5-1.pdf Graphic file (type pdf)
+<use Final_files/figure-latex/unnamed-chunk-5-1.pdf>
+[9]
+Underfull \hbox (badness 1776) in paragraph at lines 467--473
 \TU/Cambria(0)/m/n/12 We compared our results with the RDeep Database and a table containing non-RNA-
  []
 
-[9]
-Underfull \hbox (badness 2608) in paragraph at lines 556--558
+[10]
+Underfull \hbox (badness 2608) in paragraph at lines 584--645
 \TU/Cambria(0)/m/n/12 The goal was to identify RNA-dependent proteins using the data provided by mass-
  []
 
-[10] [11]
-Underfull \hbox (badness 1571) in paragraph at lines 627--630
+[11] [12]
+Underfull \hbox (badness 1571) in paragraph at lines 660--663
 []\TU/Cambria(0)/m/n/12 Caudron-Herger et al., R-DeeP: Proteome-wide and Quantitative Identification of RNA-
  []
 
-[12] [13] (./final.aux)
+[13] [14] (./final.aux)
  ***********
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-06-30>
  ***********
 Package rerunfilecheck Info: File `final.out' has not changed.
-(rerunfilecheck)             Checksum: BA6471AEF8E9A9BFBEB57D9D5DC82E84;765.
+(rerunfilecheck)             Checksum: C24A72033A722B526EC80CF748EFB36D;765.
  ) 
 Here is how much of TeX's memory you used:
- 18699 strings out of 477889
- 343048 string characters out of 5821843
- 1928869 words of memory out of 5000000
- 39311 multiletter control sequences out of 15000+600000
+ 18735 strings out of 477889
+ 344794 string characters out of 5821843
+ 1934869 words of memory out of 5000000
+ 39343 multiletter control sequences out of 15000+600000
  564724 words of font info for 103 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  90i,9n,122p,310b,355s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on final.pdf (13 pages).
+Output written on final.pdf (14 pages).

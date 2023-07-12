@@ -239,10 +239,10 @@ tested on 4 parameters. The goal of those 4 parameters is the
 identification of significant differences between the Control and RNase
 sample. In the following sections the parameters will be elaborated.
 
-\hypertarget{parameter-1-significant-change-of-protein-amount-under-global-peak}{%
-\subsubsection{2.6.1. Parameter 1: Significant change of protein amount
+\hypertarget{parameter-a-significant-change-of-protein-amount-under-global-peak}{%
+\subsubsection{2.6.1. Parameter A: Significant change of protein amount
 under global
-peak}\label{parameter-1-significant-change-of-protein-amount-under-global-peak}}
+peak}\label{parameter-a-significant-change-of-protein-amount-under-global-peak}}
 
 The first parameter identifies a significant change of the protein
 amount under the global peak for each protein. The global maximum
@@ -252,10 +252,10 @@ function for each protein. If the Protein amount of the global peak
 fraction is either in the Control or RNase sample 1.7 times higher than
 the other sample, we defined it as a significant change.
 
-\hypertarget{parameter-2-significant-change-of-protein-amount-under-local-peaks}{%
-\subsubsection{2.6.2. Parameter 2: Significant change of protein amount
+\hypertarget{parameter-b-significant-change-of-protein-amount-under-local-peaks}{%
+\subsubsection{2.6.2. Parameter B: Significant change of protein amount
 under local
-peaks}\label{parameter-2-significant-change-of-protein-amount-under-local-peaks}}
+peaks}\label{parameter-b-significant-change-of-protein-amount-under-local-peaks}}
 
 The next parameter recognizes a significant change in the total protein
 amount under the local peaks between the Control and RNase sample for
@@ -277,9 +277,9 @@ Control and RNase sample is of interest. If it differs more than 7.5
 from each other a significant change of the protein amount under the
 local peak is present.
 
-\hypertarget{parameter-3-significant-fraction-shift-of-global-peak}{%
-\subsubsection{2.6.3. Parameter 3: Significant fraction-shift of global
-peak}\label{parameter-3-significant-fraction-shift-of-global-peak}}
+\hypertarget{parameter-c-significant-fraction-shift-of-global-peak}{%
+\subsubsection{2.6.3. Parameter C: Significant fraction-shift of global
+peak}\label{parameter-c-significant-fraction-shift-of-global-peak}}
 
 The third parameter focuses on the x-axis depicting the fractions. If
 the fraction of the global peak in either the Control or RNase sample
@@ -287,9 +287,9 @@ differs more than two fractions in the positive or negative x-direction
 compared to the other sample, the protein is defined as RNA-dependent.
 It lost or gained an interaction partner due to the RNase treatment.
 
-\hypertarget{parameter-4-significant-difference-in-position-of-shoulderregions}{%
-\subsubsection{2.6.4. Parameter 4: Significant difference in position of
-shoulderregions}\label{parameter-4-significant-difference-in-position-of-shoulderregions}}
+\hypertarget{parameter-d-significant-difference-in-position-of-shoulderregions}{%
+\subsubsection{2.6.4. Parameter D: Significant difference in position of
+shoulderregions}\label{parameter-d-significant-difference-in-position-of-shoulderregions}}
 
 At last it is observed if shoulderregions occur or disappear after the
 RNase treatment. A shoulderregion contains more than 2 consecutive
@@ -306,10 +306,10 @@ consecutive fractions.
 ## Warning: Paket 'ggplot2' wurde unter R Version 4.2.3 erstellt
 \end{verbatim}
 
-\includegraphics[width=0.45\linewidth]{final_files/figure-latex/unnamed-chunk-2-1}
-\includegraphics[width=0.45\linewidth]{final_files/figure-latex/unnamed-chunk-2-2}
-\includegraphics[width=0.45\linewidth]{final_files/figure-latex/unnamed-chunk-2-3}
-\includegraphics[width=0.45\linewidth]{final_files/figure-latex/unnamed-chunk-2-4}
+\includegraphics[width=0.45\linewidth]{Final_files/figure-latex/unnamed-chunk-2-1}
+\includegraphics[width=0.45\linewidth]{Final_files/figure-latex/unnamed-chunk-2-2}
+\includegraphics[width=0.45\linewidth]{Final_files/figure-latex/unnamed-chunk-2-3}
+\includegraphics[width=0.45\linewidth]{Final_files/figure-latex/unnamed-chunk-2-4}
 
 \hypertarget{boundaries-and-precipitated-proteins}{%
 \subsubsection{2.6.5. Boundaries and Precipitated
@@ -326,8 +326,20 @@ identified separately. They have a global peak in fraction 25 and their
 total protein amount of 100 has to be split between fraction 23, 24 and
 25.
 
+\hypertarget{analysis-of-significant-y-shift-using-t-test}{%
+\subsubsection{2.7. Analysis of significant y-shift using
+t-test}\label{analysis-of-significant-y-shift-using-t-test}}
+
+A two-sided Welch's t-test was used to validate the results of the
+parameter for significant y-shifts. The t-test was performed on the
+global peaks of Control and RNase and its neighbors. To strengthen the
+power of the t-test, additional values were added in 0.25 steps between
+existing fractions using linear approximation. This leads to a smaller
+variance of each sample and an enhanced influence of the value of the
+global maxima which potentially differs between RNase and Control.
+
 \hypertarget{k-means-clustering}{%
-\subsubsection{2.7. K-means clustering}\label{k-means-clustering}}
+\subsubsection{2.8. K-means clustering}\label{k-means-clustering}}
 
 Kmeans is used to group a set of data points of a \(d\) - dimensional
 space into a certain number \(k\) of clusters. Each cluster has a
@@ -336,14 +348,14 @@ process \(k\) number of clusters are set randomly. Then, the following
 steps have to be repeated again and again (\(n\)-times), until no
 further change can be obeserved: 1. The points are assigned to the
 cluster to whose centroid they are closest to. The distance is commonly
-the euclidean distance. 2. Thus, the centers of the clusters change and
+the euclidean distance. 2.Thus, the centers of the clusters change and
 the centroids move. In our case we grouped our proteins in a
 two-dimensional space (fraction of control-peak and fraction of rnase)
 into \(k=4\) clusters. We performed kmeans to have an alternative Method
 for identification of RNA-dependent Proteins, besides our Parameters.
 
 \hypertarget{regression-analysis}{%
-\subsubsection{2.8. Regression analysis}\label{regression-analysis}}
+\subsubsection{2.9. Regression analysis}\label{regression-analysis}}
 
 The linear regression models the mathematical relationship between a
 dependent variable and a independent variable. The linear equation is
@@ -372,49 +384,65 @@ together in one plot for better comparison. Because, we use the optim()
 function and to not implement further parameters ourselves, the
 distribution does not show local peaks or shoulder regions.
 Therefore,the gaussian fit is only used for visualisation not for
-further analysis. \textbf{Graph ???}
+further analysis.
 
 \hypertarget{rna-dependent-proteins}{%
 \subsubsection{3.2. RNA-dependent
 Proteins}\label{rna-dependent-proteins}}
 
-Using just parameter 1 (global peaks), we were able to characterize the
-shift-type, so whether the peaks show no shift, a right shift, a left
-shift, or are precipitated. The graph below visualizes our results for
-MVM. Using only parameter 1 we were able to identify 368 RNA-dependent
+Using just parameter C (global shift), we were able to characterize the
+shifttype, so whether the peaks show no shift, a right shift, a left
+shift, or are precipitated. The graph 5 visualizes our results for MVM.
+Using only parameter C we were able to identify 368 RNA-dependent
 Proteins with MVM, 349 with z-transformation and 320 with MMS. Using our
 parameters, we were able to identify 464 RNA-dependent proteins with
-MVM, 468 with z-transformation and 396 with MMS. The following plot
-shows the significance of the different parameters and how they they
-contributed to the characterization for MVM. All proteins that have two
-positive parameters and all proteins that have solely a global shift are
-classified as RNA-dependent.
+MVM, 468 with z-transformation and 396 with MMS. The following figure 6
+shows the significance of the different parameters and how they
+contributed to the characterization of the data. All proteins that have
+two positive parameters and all proteins that have solely a global shift
+are classified as RNA-dependent.
 
-\includegraphics[width=0.5\linewidth]{final_files/figure-latex/unnamed-chunk-3-1}
-\includegraphics[width=0.5\linewidth]{final_files/figure-latex/unnamed-chunk-3-2}
+\includegraphics[width=0.5\linewidth]{Final_files/figure-latex/unnamed-chunk-3-1}
+\includegraphics[width=0.5\linewidth]{Final_files/figure-latex/unnamed-chunk-3-2}
+\includegraphics[width=0.5\linewidth]{Final_files/figure-latex/unnamed-chunk-3-3}
+\includegraphics[width=0.5\linewidth]{Final_files/figure-latex/unnamed-chunk-3-4}
+
+\hypertarget{analysis-of-significant-y-shift-using-t-test-1}{%
+\subsubsection{3.3. Analysis of significant y-shift using
+t-test}\label{analysis-of-significant-y-shift-using-t-test-1}}
+
+For the z-transformed dataset the t-test identifies 305 significant
+y-shifts (p-value ≤ 0.025) where as the parameter 1 based version
+recognizes 196 y-shifts. 128 proteins are in common. The t-test
+furthermore finds 195 y-shifting proteins for the dataset using the
+mean-value method. The parameter based version identified 253
+significant y-shifts. For 108 proteins both methods returned a
+significant shift. Using the min-max scaling every global peak has the
+protein amount of 100 no matter if Control or RNase making a comparison
+not possible.
 
 \hypertarget{k-means-clustering-1}{%
-\subsubsection{3.3. K-means clustering}\label{k-means-clustering-1}}
+\subsubsection{3.4. K-means clustering}\label{k-means-clustering-1}}
 
 We want to cluster the Proteins depending on their global control peaks
 and their global RNase Peaks. To find out how many proteins would be
 optimal in theory we used the elbow method that showed us, that two
-clusters would be optimal. But looking at the biological background, two
-clusters would not help us to identify RNA-dependent proteins, but
-rather group them into heavy and light proteins. To gain useful results
-from kmeans, we forced it to create four clusters. Kmeans clustered the
-proteins as followed:
+clusters would be optimal. However, looking at the biological
+background, two clusters would not help us to identify RNA-dependent
+proteins, but rather group them into heavy and light proteins. To gain
+useful results from kmeans, we forced it to create four clusters. Kmeans
+clustered the proteins as shown in figure 7. We chose the cluster at the
+bottom right for every normalization method, to be RNA-dependent (for
+MVM this would be cluster two). The other clusters can't be
+characterized. There are no visible differences between the
+RNA-dependent proteins clusters of the different normalization methods.
+Using kmeans we were able to identify 160 RNA-associated Proteins for
+MVM, 155 for z-transformation and 159 for Min-Max-Scaling.
 
-We chose the cluster at the bottom right for every normalization method,
-to be RNA-dependent (for MVM this would be cluster two). The other
-clusters can't be identified as RNA-dependent or not. There are no
-visible differences between the RNA-dependent proteins clusters of the
-different normalization methods. Using kmeans we were able to identify
-160 RNA-associated Proteins for MVM, 155 for z-transformation and 159
-for Min-Max-Scaling.
+\includegraphics[width=0.5\linewidth]{Final_files/figure-latex/unnamed-chunk-4-1}
 
 \hypertarget{regression-analysis-1}{%
-\subsubsection{3.4. Regression analysis}\label{regression-analysis-1}}
+\subsubsection{3.5. Regression analysis}\label{regression-analysis-1}}
 
 The two already described regression models show both a p-value below
 0.05 and therefore they can be used for further analysis. The highest
@@ -430,10 +458,10 @@ shift upwards of 2 fractions. As already decided for the parameter
 classified as RNA-dependent protein if it has a shift higher than two
 fractions. The threshold is marked as a green line in the plot.
 
-\includegraphics{final_files/figure-latex/unnamed-chunk-5-1.pdf}
+\includegraphics{Final_files/figure-latex/unnamed-chunk-5-1.pdf}
 
 \hypertarget{comparison-with-database}{%
-\subsubsection{3.5. Comparison with
+\subsubsection{3.6. Comparison with
 Database}\label{comparison-with-database}}
 
 We compared our results with the RDeep Database and a table containing
@@ -554,8 +582,13 @@ paper.
 \subsection{4. Discussion}\label{discussion}}
 
 The goal was to identify RNA-dependent proteins using the data provided
-by mass-spectrometry. -\textgreater{} t-test
-
+by mass-spectrometry. Our discussion will first focus on the t-test
+followed by the regression analysis and last but not least ends with the
+examination of our identified number of Rdeeps in comparison with the
+database. First of all the t-test couldn't replace the Parameter 1. The
+low overlap between the results of the t-test and the parameter 1 is an
+indicator for a not high enough precision of the t-test to use it for
+further analysis.\\
 Regarding the regression analysis, the R-squared values differ notably.
 This can be explained with the following information: for the model
 based on the results of the parameters, we used zeros for non-Rdeep
@@ -571,37 +604,37 @@ strict (e.g.~\textbf{w}). But it has to be taken into account that the
 method used in the experiment is not able to detect all RNA-dependent
 proteins. The RDeep Database uses the results of many different papers
 that used all sorts of different experiments to identify RNA-dependent
-proteins. So it is impossible for our results to have a low
-false-negative rate. (\textbf{unterschiedliche Zellstadien?}) More
-important for us would be to look at the false-positive rate and
-precision of our results: Through all methods, normalization via
-mean-values method was the best. It led to the lowest false-negative
-rates, the lowest false-positive rates and the highest precision.
-z-transformation seams to have been the worst of the three methods. So,
-mean-value method is the normalization method that should be used when
-analyzing this sort of data. (\textbf{Why?}) The following applies to
-our MVM-results, but is similar to our z-transformation results and MMS
-results. If we look at the results of kmeans, our parameters and global
-shift alone, we observe that kmeans is the most precise, but also leaves
-out a lot more RNA-dependent proteins that were detected by other
-methods.This is because, we only chose one cluster, that probably
-contained right shift proteins, leaving out all precipitated and left
-shifting proteins. To increase the number of proteins found this way, we
-would have to create more clusters and choose them accordingly. Looking
-at the false negative rate of the results of only the global shift, it
-is clear that the global shift already detects more RNA-dependent
-proteins than kmeans, but also has a higher false positive rate.~Still,
-the low false-positive rate of our global shift results is quite low,
-and validates our decision to qualify proteins that solely have a global
-shift, but no other positive parameter, as RNA-dependent. If we look at
-the results of our four parameters, we see the same pattern. We found
-way more RNA-dependent proteins, but the false positive rate increased
-as well. In summary: If we want to be sure that the proteins we identify
-as RNA dependent, really are RNA dependent, we should choose kmeans. But
-we have to embrace the possibility that we miss a lot of proteins. If we
-want to detect many proteins, we should choose our parameters, but take
-into account that our precision will go down by about 4-5\% depending on
-the normalization method. Looking at the global shift as sole parameter,
+proteins. So it is nearly impossible for our results to have a low
+false-negative rate. More important for us would be to look at the
+false-positive rate and precision of our results: Through all methods,
+normalization via mean-values method was the best. It led to the lowest
+false-negative rates, the lowest false-positive rates and the highest
+precision. z-transformation seams to have been the worst of the three
+methods. So, mean-value method is the normalization method that should
+be used when analyzing this sort of data, regarding our results. The
+following applies to our MVM-results, but is similar to our
+z-transformation results and MMS results. If we look at the results of
+kmeans, our parameters and global shift alone, we observe that kmeans is
+the most precise, but also leaves out a lot more RNA-dependent proteins
+that were detected by other methods.This is because, we only chose one
+cluster, that probably contained right shift proteins, leaving out all
+precipitated and left shifting proteins. To increase the number of
+proteins found this way, we would have to create more clusters and
+choose them accordingly. Looking at the false negative rate of the
+results of only the global shift, it is clear that the global shift
+already detects more RNA-dependent proteins than kmeans, but also has a
+higher false positive rate.~Still, the low false-positive rate of our
+global shift results is quite low, and validates our decision to qualify
+proteins that solely have a global shift, but no other positive
+parameter, as RNA-dependent. If we look at the results of our four
+parameters, we see the same pattern. We found way more RNA-dependent
+proteins, but the false positive rate increased as well. In summary: If
+we want to be sure that the proteins we identify as RNA dependent,
+really are RNA dependent, we should choose kmeans. But we have to
+embrace the possibility that we miss a lot of proteins. If we want to
+detect many proteins, we should choose our parameters, but take into
+account that our precision will go down by about 4-5\% depending on the
+normalization method. Looking at the global shift as sole parameter,
 would be a comprise between precision and quantity. But even with kmeans
 clustering, our false positive rate is at about 1\%, so the results
 should be verified by another method. Using our methods, we were able to
