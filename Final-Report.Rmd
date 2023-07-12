@@ -13,6 +13,7 @@ header-includes:
   - \setmainfont{Cambria}
   - \usepackage{setspace}
   - \setstretch{1.15}
+  - \usepackage{titlesec}
 fontsize: 12pt
 editor_options: 
   markdown: 
@@ -24,10 +25,7 @@ knitr::opts_chunk$set(echo = FALSE, results='hide')
 load("Environment.RData")
 ```
 
-
-```{r}
-#MS_Table <- read.delim('https://www.dropbox.com/s/r417vauyr7cku8s/A549dataset.csv?dl=1', header=TRUE, row.names=1, sep = ";")
-```
+\newpage
 
 ## 1. Introduction
 
@@ -49,22 +47,22 @@ The dataset to be analysed contains 3680 different proteins from synchronized mi
 At the end of this project, a linear regression will be developed, which will make it possible to predict RNA dependence for proteins based on their distribution of the control and RNase treated sample.
 
 ### 1.1. Experimental Setup
-
+\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 To collect the mass spectrometry data, a strict protocol was followed. The non-synchronized A549 cells were centrifuged and lysed. One sample was treated with RNAse, while the other served as the untreated control. Both samples were divided into 25 fractions using a sucrose gradient. Ultracentrifugation was performed, allowing the proteins to distribute based on their density. For statistical relevance, the protocol included three repetitions of the experiment. Therefore, triplicates are available for each protein for both Control and RNase. The fractions were then subjected to mass spectrometry analysis to determine the protein abundance, measured in arbitrary units (Caudron-Herger et al., 2019). Furthermore, it should be noted that the protein amount is represented by the y-value whilst the number of the fraction is the x-value.
 
 
 ## 2. Methods
 
 ### 2.1. Data cleanup
-
+\renewcommand{\subsection}{\titlespacing*{\subsection}{0pt}{0.3\baselineskip}{0.2\baselineskip}\subsection}
 The data clean up consists of checking for missing values and if necessary deleting rows of zeros. Furthermore, the columns are reordered to facilitate the separation of the dataset into two dataframes one containing Control while the other consists of the RNase group.
 
 ### 2.2. Reproducibility
-
+\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 The reproducibility of the replicates (rep) for the Control and the RNase group is calculated separately by computing the pearson correlation between rep1 and rep2, rep1 and rep3 as well as between rep2 and rep3. There are 2 scenarios where a protein is seen as not reproducible. Firstly, if a replicate of a protein has only zeros, its correlation can not be calculated (NA) and the protein is discarded. 83 proteins are affected. Moreover, if all 3 correlations either in the Control or RNase group of one protein are below 0.9 the protein isn't reliable enough for further analysis. Thus 523 proteins are additionally deleted, resulting 3074 proteins from initially 3680 proteins are left for further analysis. Some proteins contain two replicates similar to each other (correlation \< 0.9) and a third one that completely differs. Knowing that these proteins have one high and two smaller correlations, the deviating replicate was set to NA and will be ignored when uniting the replicates per protein. Consequently, important data is preserved without loosing too many proteins.
 
 ### 2.3. Normalization methods and Reduction
-
+\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 Since each normalisation method has advantages and disadvantages, we apply three different methods to the dataframe.
 The **mean-value method (mvm)** is the first data normalisation we use.
 The mean protein amount of each protein is substracted from the protein amount in each fraction.The values that are zero or smaller than the mean become negative through this subtraction.
@@ -76,27 +74,27 @@ The last used normalization method is **Min-Max scaling (mms)**, which is a very
 With this method it is very easy to calculate the global peaks, but on the other hand, the protein amount, so the area beneath the graph cannot be normalized.
 
 ### 2.4. Gaussian fit
-
+\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 Goal of the gaussian fit is to fit a gaussian function to the data points, in our case the protein amount in each fraction of one protein. Therefore, we establish a list in which the parameters, which describe the distribution are saved. To fit the parameters to our data we used the optim() function implemented in R.
 
 ### 2.6. Data description via Parameters
-
+\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 To identify whether a Protein is RNA dependent or not each protein is tested on 4 parameters. The goal of those 4 parameters is the identification of significant differences between the Control and RNase sample. In the following sections the parameters will be elaborated.
 
 ### 2.6.1. Parameter 1: Significant change of protein amount under global peak
-
+\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 The first parameter identifies a significant change of the protein amount under the global peak for each protein. The global maximum represents the fraction of the sucrose gradient containing the highest protein amount. It is determined by using the *which.max()* function for each protein. If the Protein amount of the global peak fraction is either in the Control or RNase sample 1.7 times higher than the other sample, we defined it as a significant change.
 
 ### 2.6.2. Parameter 2: Significant change of protein amount under local peaks
-
+\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 The next parameter recognizes a significant change in the total protein amount under the local peaks between the Control and RNase sample for each protein. New local peaks can occur if after RNase treatment the protein either dissociates or gains new interaction partners. To detect a significant change the local peaks have to be identified. To be defined as a local peak four criteria have to be fulfilled. First, the y-value of the local peak fraction has to be higher than the y-value of its neighbor fractions. Afterwards we checked if the sd of the local peak's y-value and its neighbors is higher than the sd of the y-values which contain less than 8 % of the total protein amount (*sd.threshold*). The aim is to sort out small fluctuation between the y-values. The third criteria selects the relevant local peaks by sorting those out which have a smaller protein amount than 3 % of the total protein amount. Most of the already mentioned criteria fit to the global peaks as well and thus global maxima have to be removed. The total protein amount under the local peaks for each protein in the Control and RNase sample is of interest. If it differs more than 7.5 from each other a significant change of the protein amount under the local peak is present.
 
 ### 2.6.3. Parameter 3: Significant fraction-shift of global peak
-
+\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 The third parameter focuses on the x-axis depicting the fractions. If the fraction of the global peak in either the Control or RNase sample differs more than two fractions in the positive or negative x-direction compared to the other sample, the protein is defined as RNA-dependent. It lost or gained an interaction partner due to the RNase treatment.
 
 ### 2.6.4. Parameter 4: Significant difference in position of shoulderregions
-
+\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 At last it is observed if shoulderregions occur or disappear after the RNase treatment. A shoulderregion contains more than 2 consecutive fractions with a sd less than the *sd.threshold*. On the contrary to the local peak identification the fractions with small fluctuations are sorted. Of interest are those fractions belonging to shoulderregions which either occur in the Control or RNase sample but not in both.Often parts of the shoulderregions are overlapping, resulting in shoulderregions of interest with less than 3 consecutive fractions. So, a shoulderregion of interest is only significant if it has three or more consecutive fractions.
 
 ```{r}
@@ -137,7 +135,7 @@ for (i in 1:num_rows) {
 }
 ```
 
-```{r, fig.show="hold", out.width="45%"}
+```{r fig.show="hold", message=FALSE, warning=FALSE, out.width="45%"}
 plots_ctrl_rnase.zt[[460]] + labs(title = "1 - Significant change of protein amount under global peak")+ labs(title = expression("1 - " * italic("Significant change of protein amount under global peak"))) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97")) + theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
 
 plots_ctrl_rnase.zt[[663]] + labs(title = "2 - Significant change of protein amount under local peaks")+ labs(title = expression("2 - " * italic("Significant change of protein amount under local peaks"))) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97"))+ theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
@@ -182,20 +180,15 @@ Therefore,the gaussian fit is only used for visualisation not for further analys
 ### 3.2. RNA-dependent Proteins
 
 Using just parameter 1 (global peaks), we were able to characterize the shift-type, so whether the peaks show no shift, a right shift, a left shift, or are precipitated.
-The following graph visualizes our results for MVM:
-
-```{r,out.width="50%"}
-print(plot_RBP[[1]])
-```
-
+The graph below visualizes our results for MVM.
 Using only parameter 1 we were able to identify 368 RNA-dependent Proteins with MVM, 349 with z-transformation and 320 with MMS.
-
 Using our parameters, we were able to identify 464 RNA-dependent proteins with MVM, 468 with z-transformation and 396 with MMS.
 The following plot shows the significance of the different parameters and how they they contributed to the characterization for MVM.
 All proteins that have two positive parameters and all proteins that have solely a global shift are classified as RNA-dependent.
 
 ```{r,out.width="50%"}
-print(plot.parameters.detail[[1]])
+print(plot_RBP[[1]]) + labs(title = "1 - Shift types")+ labs(title = expression("1 - " * italic("Shift types"))) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97")) + theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
+print(plot.parameters.detail[[1]])+labs(title = "2 - How many parameters support the proteins?")+ labs(title = expression("2 - " * italic("How many parameters support the proteins?"))) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97")) + theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
 ```
 
 ### 3.3. K-means clustering
@@ -283,7 +276,7 @@ The following tables do the same for our kmeans results:
 
 ```{r, warning=FALSE, results='asis',out.width="50%"}
 library("kableExtra")
-summary.numbers.kmeans0 <- kable(summary.numbers.kmeans)
+summary.numbers.kmeans0 <- kable(summary.numbers.kmeans, caption = "Tabelle 1")
 table.summary.numbers.kmeans <- kable_styling(summary.numbers.kmeans0, "striped", full_width = FALSE)
 
 summary.rates.kmeans.rounded <- round(summary.rates.kmeans,4)
@@ -322,27 +315,6 @@ cat("</div>\n")
 ```
 
 There are thirteen proteins, that are not present neither in the RDeep data set, nor the table containing non-RNA-associated Proteins from the paper.
-The following tables show the names of these proteins and whether they are considered as RNA-dependent by our analysis or not.
-On the left side are the results using our parameters, on the right side the ones obtained by kmeans:
-
-```{r, warning=FALSE, results='asis',out.width="50%"}
-library("kableExtra")
-non.comparable.parameters0 <- kable(non.comparable.parameters)
-table.non.comparable.parameters <- kable_styling(non.comparable.parameters0, "striped", full_width = FALSE)
-
-non.comparable.kmeans0 <- kable(non.comparable.kmeans)
-table.non.comparable.kmeans <- kable_styling(non.comparable.kmeans0, "striped", full_width = FALSE)
-
-cat("<div class='row'>\n")
-cat("<div class='column'>\n")
-print(table.non.comparable.parameters, row.names = FALSE)
-cat("</div>\n")
-cat("<div class='column'>\n")
-print(table.non.comparable.kmeans, row.names = FALSE)
-cat("</div>\n")
-cat("</div>\n")
-```
-
 
 ## 4. Discussion
 
@@ -367,3 +339,22 @@ Caudron-Herger et al., R-DeeP: Proteome-wide and Quantitative Identification of 
 Corley et al., How RNA-Binding Proteins Interact with RNA: Molecules and Mechanisms, 2020, Molecular Cell
 
 ## 7. Appendix
+The following tables show the names of these proteins and whether they are considered as RNA-dependent by our analysis or not.
+On the left side are the results using our parameters, on the right side the ones obtained by kmeans:
+```{r, warning=FALSE, results='asis',out.width="50%"}
+library("kableExtra")
+non.comparable.parameters0 <- kable(non.comparable.parameters)
+table.non.comparable.parameters <- kable_styling(non.comparable.parameters0, "striped", full_width = FALSE)
+
+non.comparable.kmeans0 <- kable(non.comparable.kmeans)
+table.non.comparable.kmeans <- kable_styling(non.comparable.kmeans0, "striped", full_width = FALSE)
+
+cat("<div class='row'>\n")
+cat("<div class='column'>\n")
+print(table.non.comparable.parameters, row.names = FALSE)
+cat("</div>\n")
+cat("<div class='column'>\n")
+print(table.non.comparable.kmeans, row.names = FALSE)
+cat("</div>\n")
+cat("</div>\n")
+```
