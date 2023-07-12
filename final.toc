@@ -1,0 +1,25 @@
+\contentsline {subsection}{1. Introduction}{2}{subsection*.1}%
+\contentsline {subsubsection}{1.1. Experimental Setup}{2}{subsubsection*.2}%
+\contentsline {subsection}{2. Methods}{3}{subsection*.3}%
+\contentsline {subsubsection}{2.1. Data cleanup}{3}{subsubsection*.4}%
+\contentsline {subsubsection}{2.2. Reproducibility}{3}{subsubsection*.5}%
+\contentsline {subsubsection}{2.3. Normalization methods and Reduction}{3}{subsubsection*.6}%
+\contentsline {subsubsection}{2.4. Gaussian fit}{4}{subsubsection*.7}%
+\contentsline {subsubsection}{2.6. Data description via Parameters}{4}{subsubsection*.8}%
+\contentsline {subsubsection}{2.6.1. Parameter 1: Significant change of protein amount under global peak}{4}{subsubsection*.9}%
+\contentsline {subsubsection}{2.6.2. Parameter 2: Significant change of protein amount under local peaks}{4}{subsubsection*.10}%
+\contentsline {subsubsection}{2.6.3. Parameter 3: Significant fraction-shift of global peak}{5}{subsubsection*.11}%
+\contentsline {subsubsection}{2.6.4. Parameter 4: Significant difference in position of shoulderregions}{5}{subsubsection*.12}%
+\contentsline {subsubsection}{2.6.5. Boundaries and Precipitated proteins}{6}{subsubsection*.13}%
+\contentsline {subsubsection}{2.7. K-means clustering}{6}{subsubsection*.14}%
+\contentsline {subsubsection}{2.8. Regression analysis}{6}{subsubsection*.15}%
+\contentsline {subsection}{3. Results}{7}{subsection*.16}%
+\contentsline {subsubsection}{3.1 Gaussian fit}{7}{subsubsection*.17}%
+\contentsline {subsubsection}{3.2. RNA-dependent Proteins}{7}{subsubsection*.18}%
+\contentsline {subsubsection}{3.3. K-means clustering}{8}{subsubsection*.19}%
+\contentsline {subsubsection}{3.4. Regression analysis}{8}{subsubsection*.20}%
+\contentsline {subsubsection}{3.5. Comparison with Database}{9}{subsubsection*.21}%
+\contentsline {subsection}{4. Discussion}{10}{subsection*.22}%
+\contentsline {subsection}{5. Outlook}{11}{subsection*.23}%
+\contentsline {subsection}{6. Literature}{12}{subsection*.24}%
+\contentsline {subsection}{7. Appendix}{12}{subsection*.25}%

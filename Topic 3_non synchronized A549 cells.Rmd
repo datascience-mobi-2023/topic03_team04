@@ -2027,22 +2027,6 @@ for (i in 1:nrow(rnase.mvm)) {
 # View(shift_mvm_named)
 ```
 
-```{r}
-length(shift_mvm_named[shift_mvm_named == "right shift"])
-```
-
-```{r}
-length(shift_mvm_named[shift_mvm_named == "no shift"])
-```
-
-```{r}
-length(shift_mvm_named[shift_mvm_named == "left shift"])
-```
-
-```{r}
-length(shift_mvm_named[shift_mvm_named == "precipitated"])
-```
- 
 To be able to use the data whether a protein is clustered or not, we need to put it in a vector
 ```{r}
 precipitated.mvm
@@ -2080,23 +2064,6 @@ for (i in 1:nrow(ctrl.zt)) {
 # View(shift_zt_named)
 ```
 
-```{r}
-length(shift_zt_named[shift_zt_named == "right shift"])
-```
-
-```{r}
-length(shift_zt_named[shift_zt_named == "no shift"])
-```
-
-```{r}
-length(shift_zt_named[shift_zt_named == "left shift"])
-```
-
-```{r}
-length(shift_zt_named[shift_zt_named == "precipitated"])
-```
-
-
 To be able to use the data whether a protein is clustered or not, we need to put it in a vector
 ```{r}
 precipitated.zt
@@ -2131,22 +2098,6 @@ for (i in 1:nrow(ctrl.mms)) {
 }
 
 # View(shift_mms_named)
-```
-
-```{r}
-length(shift_mms_named[shift_mms_named == "right shift"])
-```
-
-```{r}
-length(shift_mms_named[shift_mms_named == "no shift"])
-```
-
-```{r}
-length(shift_mms_named[shift_mms_named == "left shift"])
-```
-
-```{r}
-length(shift_mms_named[shift_mms_named == "precipitated"])
 ```
 
 To be able to use the data whether a protein is clustered or not, we need to put it in a vector
@@ -2665,8 +2616,9 @@ shoulderregion.mms.nt.nt <- data.frame(lapply(shoulderregion.mms.nt, function(x)
 
 ShoulderRegion_mms <- t(shoulderregion.mms.nt.nt)
 
-# View(ShoulderRegion_mms)
+ View(ShoulderRegion_mms)
 ```
+
 
 ### 7.3 Protein amount under global peak
 
@@ -2851,7 +2803,7 @@ parameters.mms <- cbind(signifikante_reihen_local_mms, shift_mms_named, Shoulder
 
 With the previously identified parameters we can identify which proteins are RNA-associated.
 
-The following plots visualize our results. (Only considerung the global shifts):
+The following plots visualize our results. (Only considering the global shifts):
 
 ```{r, warning = False}
 shift_named <- cbind(shift_mvm_named, shift_zt_named, shift_mms_named)
@@ -3036,21 +2988,21 @@ for (z in 1:3){
                       value = c(df.glob.sum[,2], df.loc.sum[,2], 
                                 df.shift.sum[,2], df.shoulder.sum[,2], 
                                 df.sum.sum[,2]),
-                      parameters = c(rep(c("glob", "loc", "shift", 
-                                           "shoulder", "sum"), 
+                      parameters = c(rep(c("Global", "Local", "Shifts", 
+                                           "Shoulderregion", "Total"), 
                                          each = 5)))
   }else{
     df2 <- data.frame(category = c(df.loc.sum[,1], df.shift.sum[,1], 
                                    df.shoulder.sum[,1],df.sum.sum[,1]), 
                       value = c(df.loc.sum[,2], df.shift.sum[,2], 
                                 df.shoulder.sum[,2], df.sum.sum[,2]),
-                      parameters = c(rep(c("loc", "shift", "shoulder", 
-                                           "sum"), each = 4)))
+                      parameters = c(rep(c("Local", "Shift", "Shoulderregion", 
+                                           "Total"), each = 4)))
   }
   
   if(z == 3){
-    colour <- c("cyan", "orange","springgreen", "violetred" )
-  }else{colour <- c("cyan", "orange", "springgreen", "grey", "violetred" )}
+    colour <- c("darkseagreen3", "lightsteelblue4","cadetblue3", "seashell2" )
+  }else{colour <- c("darkseagreen3", "cadetblue3", "lightblue3", "paleturquoise3", "seashell2" )}
   
   plot.parameters.detail[[z]] <- 
     ggplot(df2, aes(x = category, y = value, fill = parameters))+
@@ -3067,6 +3019,9 @@ for (z in 1:3){
   
   print(plot.parameters.detail[[z]])
 }
+```
+```{r}
+print(plot.parameters.detail[[z]])
 ```
 
 
@@ -3126,7 +3081,7 @@ for (x in 1:3){
                   ylab = "Global RNase Peaks",
                   main = title[x],
                   ggtheme = theme_bw())
-  
+                  
 plot.cluster.fractions[[x]] <- g + theme(axis.text.x = element_blank(),
           axis.text.y = element_blank(),
           axis.ticks = element_blank()) 

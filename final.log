@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.7.10)  12 JUL 2023 15:47
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.7.10)  12 JUL 2023 20:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -599,8 +599,7 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 285.
 )
 \Hy@SectionHShift=\skip67
-)
-No file final.aux.
+) (./final.aux)
 \openout1 = `final.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 95.
@@ -884,11 +883,9 @@ LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 Package hyperref Info: Link coloring OFF on input line 95.
+(./final.out) (./final.out)
 \@outlinefile=\write3
 \openout3 = `final.out'.
-
-
-Package hyperref Warning: Rerun to get /PageLabels entry.
 
 LaTeX Font Info:    Font shape `TU/Cambria(0)/m/n' will be
 (Font)              scaled to size 20.74pt on input line 97.
@@ -924,4 +921,109 @@ LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
 (Font)              scaled to size 7.58063pt on input line 97.
 LaTeX Font Info:    Trying to load font information for U+msa on input line 97.
 (c:/Users/tinel/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
-File: umsa.fd 2013/01/14 v3.01 AMS symbols
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 97.
+(c:/Users/tinel/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+LaTeX Font Info:    Font shape `TU/Cambria(0)/m/n' will be
+(Font)              scaled to size 17.28pt on input line 100.
+LaTeX Font Info:    Font shape `TU/Cambria(0)/b/n' will be
+(Font)              scaled to size 17.28pt on input line 100.
+(./final.toc
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
+(Font)              scaled to size 9.09764pt on input line 1.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(1)/m/n' will be
+(Font)              scaled to size 6.49832pt on input line 1.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 12.99792pt on input line 1.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 9.09853pt on input line 1.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 6.49896pt on input line 1.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 12.99536pt on input line 1.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 9.09674pt on input line 1.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 6.49768pt on input line 1.
+)
+\tf@toc=\write4
+\openout4 = `final.toc'.
+
+[1
+
+]
+LaTeX Font Info:    Font shape `TU/Cambria(0)/b/n' will be
+(Font)              scaled to size 14.4pt on input line 105.
+LaTeX Font Info:    Font shape `TU/Cambria(0)/b/n' will be
+(Font)              scaled to size 12.0pt on input line 147.
+[2]
+LaTeX Font Info:    Font shape `TU/Cambria(0)/m/n' will be
+(Font)              scaled to size 8.4pt on input line 218.
+LaTeX Font Info:    Font shape `TU/Cambria(0)/m/n' will be
+(Font)              scaled to size 6.0pt on input line 218.
+[3]
+LaTeX Font Info:    Font shape `TU/Cambria(0)/m/it' will be
+(Font)              scaled to size 12.0pt on input line 250.
+[4]
+File: final_files/figure-latex/unnamed-chunk-2-1.pdf Graphic file (type pdf)
+<use final_files/figure-latex/unnamed-chunk-2-1.pdf>
+File: final_files/figure-latex/unnamed-chunk-2-2.pdf Graphic file (type pdf)
+<use final_files/figure-latex/unnamed-chunk-2-2.pdf>
+File: final_files/figure-latex/unnamed-chunk-2-3.pdf Graphic file (type pdf)
+<use final_files/figure-latex/unnamed-chunk-2-3.pdf>
+File: final_files/figure-latex/unnamed-chunk-2-4.pdf Graphic file (type pdf)
+<use final_files/figure-latex/unnamed-chunk-2-4.pdf>
+
+Underfull \hbox (badness 10000) in paragraph at lines 309--313
+[][] []
+ []
+
+[5] [6]
+File: final_files/figure-latex/unnamed-chunk-3-1.pdf Graphic file (type pdf)
+<use final_files/figure-latex/unnamed-chunk-3-1.pdf>
+File: final_files/figure-latex/unnamed-chunk-3-2.pdf Graphic file (type pdf)
+<use final_files/figure-latex/unnamed-chunk-3-2.pdf>
+
+Overfull \hbox (1.76054pt too wide) in paragraph at lines 393--395
+[][] [] 
+ []
+
+[7]
+File: final_files/figure-latex/unnamed-chunk-5-1.pdf Graphic file (type pdf)
+<use final_files/figure-latex/unnamed-chunk-5-1.pdf>
+[8]
+Underfull \hbox (badness 1776) in paragraph at lines 439--445
+\TU/Cambria(0)/m/n/12 We compared our results with the RDeep Database and a table containing non-RNA-
+ []
+
+[9]
+Underfull \hbox (badness 2608) in paragraph at lines 556--558
+\TU/Cambria(0)/m/n/12 The goal was to identify RNA-dependent proteins using the data provided by mass-
+ []
+
+[10] [11]
+Underfull \hbox (badness 1571) in paragraph at lines 627--630
+[]\TU/Cambria(0)/m/n/12 Caudron-Herger et al., R-DeeP: Proteome-wide and Quantitative Identification of RNA-
+ []
+
+[12] [13] (./final.aux)
+ ***********
+LaTeX2e <2023-06-01> patch level 1
+L3 programming layer <2023-06-30>
+ ***********
+Package rerunfilecheck Info: File `final.out' has not changed.
+(rerunfilecheck)             Checksum: BA6471AEF8E9A9BFBEB57D9D5DC82E84;765.
+ ) 
+Here is how much of TeX's memory you used:
+ 18699 strings out of 477889
+ 343048 string characters out of 5821843
+ 1928869 words of memory out of 5000000
+ 39311 multiletter control sequences out of 15000+600000
+ 564724 words of font info for 103 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
+ 90i,9n,122p,310b,355s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+Output written on final.pdf (13 pages).

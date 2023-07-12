@@ -146,8 +146,6 @@ sample.
 \hypertarget{experimental-setup}{%
 \subsubsection{1.1. Experimental Setup}\label{experimental-setup}}
 
-\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
-
 To collect the mass spectrometry data, a strict protocol was followed.
 The non-synchronized A549 cells were centrifuged and lysed. One sample
 was treated with RNAse, while the other served as the untreated control.
@@ -168,8 +166,6 @@ x-value.
 \hypertarget{data-cleanup}{%
 \subsubsection{2.1. Data cleanup}\label{data-cleanup}}
 
-\renewcommand{\subsection}{\titlespacing*{\subsection}{0pt}{0.3\baselineskip}{0.2\baselineskip}\subsection}
-
 The data clean up consists of checking for missing values and if
 necessary deleting rows of zeros. Furthermore, the columns are reordered
 to facilitate the separation of the dataset into two dataframes one
@@ -177,8 +173,6 @@ containing Control while the other consists of the RNase group.
 
 \hypertarget{reproducibility}{%
 \subsubsection{2.2. Reproducibility}\label{reproducibility}}
-
-\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 
 The reproducibility of the replicates (rep) for the Control and the
 RNase group is calculated separately by computing the pearson
@@ -200,8 +194,6 @@ preserved without loosing too many proteins.
 \hypertarget{normalization-methods-and-reduction}{%
 \subsubsection{2.3. Normalization methods and
 Reduction}\label{normalization-methods-and-reduction}}
-
-\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 
 Since each normalisation method has advantages and disadvantages, we
 apply three different methods to the dataframe. The \textbf{mean-value
@@ -232,8 +224,6 @@ the graph cannot be normalized.
 \hypertarget{gaussian-fit}{%
 \subsubsection{2.4. Gaussian fit}\label{gaussian-fit}}
 
-\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
-
 Goal of the gaussian fit is to fit a gaussian function to the data
 points, in our case the protein amount in each fraction of one protein.
 Therefore, we establish a list in which the parameters, which describe
@@ -244,8 +234,6 @@ the optim() function implemented in R.
 \subsubsection{2.6. Data description via
 Parameters}\label{data-description-via-parameters}}
 
-\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
-
 To identify whether a Protein is RNA dependent or not each protein is
 tested on 4 parameters. The goal of those 4 parameters is the
 identification of significant differences between the Control and RNase
@@ -255,8 +243,6 @@ sample. In the following sections the parameters will be elaborated.
 \subsubsection{2.6.1. Parameter 1: Significant change of protein amount
 under global
 peak}\label{parameter-1-significant-change-of-protein-amount-under-global-peak}}
-
-\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 
 The first parameter identifies a significant change of the protein
 amount under the global peak for each protein. The global maximum
@@ -270,8 +256,6 @@ the other sample, we defined it as a significant change.
 \subsubsection{2.6.2. Parameter 2: Significant change of protein amount
 under local
 peaks}\label{parameter-2-significant-change-of-protein-amount-under-local-peaks}}
-
-\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 
 The next parameter recognizes a significant change in the total protein
 amount under the local peaks between the Control and RNase sample for
@@ -297,8 +281,6 @@ local peak is present.
 \subsubsection{2.6.3. Parameter 3: Significant fraction-shift of global
 peak}\label{parameter-3-significant-fraction-shift-of-global-peak}}
 
-\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
-
 The third parameter focuses on the x-axis depicting the fractions. If
 the fraction of the global peak in either the Control or RNase sample
 differs more than two fractions in the positive or negative x-direction
@@ -308,8 +290,6 @@ It lost or gained an interaction partner due to the RNase treatment.
 \hypertarget{parameter-4-significant-difference-in-position-of-shoulderregions}{%
 \subsubsection{2.6.4. Parameter 4: Significant difference in position of
 shoulderregions}\label{parameter-4-significant-difference-in-position-of-shoulderregions}}
-
-\renewcommand{\section}{\titlespacing*{\section}{0pt}{0.3\baselineskip}{0.2\baselineskip}\section}
 
 At last it is observed if shoulderregions occur or disappear after the
 RNase treatment. A shoulderregion contains more than 2 consecutive
@@ -412,8 +392,6 @@ classified as RNA-dependent.
 
 \includegraphics[width=0.5\linewidth]{final_files/figure-latex/unnamed-chunk-3-1}
 \includegraphics[width=0.5\linewidth]{final_files/figure-latex/unnamed-chunk-3-2}
-\includegraphics[width=0.5\linewidth]{final_files/figure-latex/unnamed-chunk-3-3}
-\includegraphics[width=0.5\linewidth]{final_files/figure-latex/unnamed-chunk-3-4}
 
 \hypertarget{k-means-clustering-1}{%
 \subsubsection{3.3. K-means clustering}\label{k-means-clustering-1}}
