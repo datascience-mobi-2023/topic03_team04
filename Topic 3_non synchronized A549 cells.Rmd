@@ -2800,6 +2800,134 @@ parameters.mms <- cbind(signifikante_reihen_local_mms, shift_mms_named, Shoulder
 # View(parameters.mvm)
 ```
 
+### 7.6 t-test for protein amount shift under global peak
+Adding values in 0.25 steps between existing fractions for zt scaling 
+```{r}
+
+rnase.zt.1 <- seq(1, ncol(rnase.zt), by = 1)
+rnase.zt.0.25 <- seq(1, ncol(rnase.zt), by = 0.25)
+rnase.zt_erweitert <- t(apply(rnase.zt, 1, function(y) approx(rnase.zt.1, y, xout =rnase.zt.0.25)$y))
+row.names(rnase.zt_erweitert) <- row.names(rnase.zt)
+ctrl.zt.1 <- seq(1, ncol(ctrl.zt), by = 1)
+ctrl.zt.0.25 <- seq(1, ncol(ctrl.zt), by = 0.25)
+ctrl.zt_erweitert <- t(apply(ctrl.zt, 1, function(y) approx(ctrl.zt.1, y, xout = ctrl.zt.0.25)$y))
+row.names(ctrl.zt_erweitert) <- row.names(ctrl.zt)
+
+```
+
+y-values of global peak and neighbors for zt
+```{r}
+globalpeak.neighbors.values.rnase.zt <- apply(rnase.zt_erweitert[, 2:96], 1, function(x) {
+  peak_indices <- which(x == max(x))
+  x[c(peak_indices - 1, peak_indices, peak_indices + 1)]
+})
+
+globalpeak.neighbors.values.ctrl.zt <- apply(ctrl.zt_erweitert[,2:96], 1, function(x) {
+  peak_indices <- which(x == max(x))
+  x[c(peak_indices - 1, peak_indices, peak_indices + 1)]
+})
+```
+
+welch´s t-test andoverlap with parameter A for zt
+```{r}
+t.test.zt <- numeric(length(globalpeak.neighbors.values.rnase.zt))
+for (i in seq_along(globalpeak.neighbors.values.rnase.zt)) {
+    test <- t.test(globalpeak.neighbors.values.rnase.zt[[i]], globalpeak.neighbors.values.ctrl.zt[[i]], var.equal = FALSE)
+   t.test.zt[[i]] <- c(test$p.value)
+  }
+t.test.zt <- as.list(t.test.zt)
+t.test.zt <- lapply(t.test.zt, function(x)
+  if( x <= 0.025) {
+    return(1)
+  }else{
+    return(0)
+  }) b 
+View(t.test.zt)
+signi.global.pa.zt2 <- liste <- apply(signi.global.pa.zt, 1, function(x) as.numeric(x))
+View(signi.global.pa.zt2)
+
+overlap.y.shift_t.test.zt <- numeric(length(t.test.zt))
+for (i in seq_along(t.test.zt)) {
+  if (all(t.test.zt[[i]] == 0) || all(signi.global.pa.zt2[[i]] == 0)) {
+    overlap.y.shift_t.test.zt[i] <- 0
+  } else {
+   overlap.y.shift_t.test.zt[i] <- 1
+  }
+}
+result <- sum(rnase.zt_erweitert > 100)
+result
+
+sum(overlap.y.shift_t.test.zt)
+sum(unlist(t.test.zt))
+numeric(0) <=0.025
+```
+
+
+
+
+Adding values in 0.25 steps between existing fractions for mvm scaling 
+```{r}
+
+rnase.mvm.1 <- seq(1, ncol(rnase.mvm), by = 1)
+rnase.mvm.0.25 <- seq(1, ncol(rnase.mvm), by = 0.25)
+rnase.mvm_erweitert <- t(apply(rnase.mvm, 1, function(y) approx(rnase.mvm.1, y, xout =rnase.mvm.0.25)$y))
+row.names(rnase.mvm_erweitert) <- row.names(rnase.mvm)
+ctrl.mvm.1 <- seq(1, ncol(ctrl.mvm), by = 1)
+ctrl.mvm.0.25 <- seq(1, ncol(ctrl.mvm), by = 0.25)
+ctrl.mvm_erweitert <- t(apply(ctrl.mvm, 1, function(y) approx(ctrl.mvm.1, y, xout = ctrl.mvm.0.25)$y))
+row.names(ctrl.mvm_erweitert) <- row.names(ctrl.mvm)
+```
+
+y-values of global peak and neighbors for mvm
+```{r}
+globalpeak.neighbors.values.rnase.mvm <- apply(rnase.mvm_erweitert[, 2:96], 1, function(x) {
+  peak_indices <- which(x == max(x))
+  x[c(peak_indices - 1, peak_indices, peak_indices + 1)]
+})
+
+globalpeak.neighbors.values.ctrl.mvm <- apply(ctrl.mvm_erweitert[,2:96], 1, function(x) {
+  peak_indices <- which(x == max(x))
+  x[c(peak_indices - 1, peak_indices, peak_indices + 1)]
+})
+```
+
+welch´s t-test andoverlap with parameter A for mvm
+
+```{r}
+t.test.mvm <- numeric(length(globalpeak.neighbors.values.rnase.mvm))
+for (i in seq_along(globalpeak.neighbors.values.rnase.mvm)) {
+  
+    test <- t.test(globalpeak.neighbors.values.rnase.mvm[[i]], globalpeak.neighbors.values.ctrl.mvm[[i]], var.equal = FALSE)
+    t.test.mvm[[i]] <- c(test$p.value)
+  }
+
+t.test.mvm <- as.list(t.test.mvm)
+t.test.mvm <- lapply(t.test.mvm, function(x)
+  if( x <= 0.025) {
+    return(1)
+  }else{
+    return(0)
+  })
+View(t.test.mvm)
+signi.global.pa.mvm2 <- liste <- apply(signi.global.pa.mvm, 1, function(x) as.numeric(x))
+names(signi.global.pa.mvm2) <- 1:length(signi.global.pa.mvm2)
+print(t.test.mvm)
+View(signi.global.pa.mvm2)
+
+overlap.y.shift_t.test.mvm <- numeric(length(t.test.mvm))
+for (i in seq_along(t.test.mvm)) {
+  if (all(t.test.mvm[[i]] == 0) || all(signi.global.pa.mvm2[[i]] == 0)) {
+    overlap.y.shift_t.test.mvm[i] <- 0
+  } else {
+   overlap.y.shift_t.test.mvm[i] <- 1
+  }
+}
+
+sum(overlap.y.shift_t.test.mvm)
+sum(unlist(t.test.mvm))
+
+```
+
 
 ## 8. Visualization of Results
 
