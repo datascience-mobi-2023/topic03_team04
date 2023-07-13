@@ -4291,6 +4291,12 @@ number.non.comparable.kmeans <- data.frame(mvm = length(non.comparable.mvm.kmean
 
 #View(non.comparable.parameters)
 #View(non.comparable.kmeans)
+
+#a data frame that sums it all up
+non.comparable.all <- cbind(non.comparable.parameters[,c(1, 2, 4, 6)], non.comparable.kmeans[,c(2, 4, 6)])
+colnames(non.comparable.all) <- c("Name", "Shift according to parameters mvm", "Shift according to parameters zt", "Shift according to parameters mms", "Shift according to kmeans mvm", "Shift according to kmeans zt", "Shift according to kmeans mms")
+rownames(non.comparable.all) <- c(1:13,"total")
+#View(non.comparable.all)
 ```
 Its always the same 13 proteins that are not in the database
 

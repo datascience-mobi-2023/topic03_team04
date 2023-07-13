@@ -298,18 +298,9 @@ The following tables show the names of these proteins and whether they are consi
 On the left side are the results using our parameters, on the right side the ones obtained by kmeans:
 ```{r, warning=FALSE, results='asis',out.width="50%"}
 library("kableExtra")
-non.comparable.parameters0 <- kable(non.comparable.parameters)
-table.non.comparable.parameters <- kable_styling(non.comparable.parameters0, "striped", full_width = FALSE)
+non.comparable.all0 <- kable(non.comparable.all, align = "c")
+table.non.comparable.all <- kable_styling(non.comparable.all0, "striped", full_width = FALSE)
 
-non.comparable.kmeans0 <- kable(non.comparable.kmeans)
-table.non.comparable.kmeans <- kable_styling(non.comparable.kmeans0, "striped", full_width = FALSE)
+print(table.non.comparable.all, row.names = FALSE)
 
-cat("<div class='row'>\n")
-cat("<div class='column'>\n")
-print(table.non.comparable.parameters, row.names = FALSE)
-cat("</div>\n")
-cat("<div class='column'>\n")
-print(table.non.comparable.kmeans, row.names = FALSE)
-cat("</div>\n")
-cat("</div>\n")
 ```
