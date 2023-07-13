@@ -3221,7 +3221,7 @@ for (x in 1:3){
                   ylab = "Global RNase Peaks",
                   main = title[x],
                   ggtheme = theme_bw()) +
-                  scale_fill_manual(values = c("lightsteelblue2", "darkseagreen3","tomato1", "lightsteelblue4" ))
+                  palette = c("lightsteelblue2", "darkseagreen3","tomato1", "lightsteelblue4" )
                   
 plot.cluster.fractions[[x]] <- g + theme(axis.text.x = element_blank(),
           axis.text.y = element_blank(),
