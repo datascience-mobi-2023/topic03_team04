@@ -87,7 +87,7 @@ The third parameter focuses on the x-axis depicting the fractions. If the fracti
 ### 2.6.4. Parameter D: Significant difference in position of shoulderregions
 At last it is observed if shoulderregions occur or disappear after the RNase treatment. A shoulderregion contains more than 2 consecutive fractions with a sd less than the *sd.threshold*. On the contrary to the local peak identification the fractions with small fluctuations are sorted. Of interest are those fractions belonging to shoulderregions which either occur in the Control or RNase sample but not in both.Often parts of the shoulderregions are overlapping, resulting in shoulderregions of interest with less than 3 consecutive fractions. So, a shoulderregion of interest is only significant if it has three or more consecutive fractions.
 
-```{r, warning=FALSE}
+```{r, message=FALSE}
 library(ggplot2)
 
 num_rows <- nrow(ctrl.zt)
@@ -188,7 +188,7 @@ print(plot.cluster.fractions[[1]])
 The two already described regression models show both a p-value below 0.05 and therefore they can be used for further analysis. The highest R-squared values are detected for the z-transformed data: the model based on the parameters shows a R-squared value of 0.43, while in the model using the global shift amount the R-squared value is 0.66.
 The model with the higher R-squared value is visualized in the plot below. Each protein is depicted as a dot. As expected the majority of the trained data, marked in grey shows a high correlation and a shift under 2 fractions. On the other hand those with a small correlation have a shift upwards of 2 fractions. As already decided for the parameter **Significant fraction-shift of global peak**: a protein is classified as RNA-dependent protein if it has a shift higher than two fractions. The threshold is marked as a green line in the plot.
 
-```{r,out.width="100%"}
+```{r,out.width="70%"}
 shift.amount.plot = abs(data.frame(shift_zt_global))
 
 train_zt_plot <- data.frame(Korrelation_plot = correlation.zt[1:2500, ], Shift_plot = shift.amount.plot[1:2500, ])
@@ -223,37 +223,11 @@ legend("topright", legend = c("Trained Data", "Predicted Data", "Regression Curv
 ```
 
 ### 3.6. Comparison with Database
-We compared our results with the RDeep Database. Table 1 gives an overview of the identified Rdeeps compared to the database. Its show how many true positives, false positives, true negatives and false negatives proteins per identification and normalization method are found.
-
-**Table 1:**  Overview of identified Rdeeps compared to database - numbers.
-```{r, warning=FALSE, results='asis',out.width="30%"}
-library("kableExtra")
-summary.numbers.all0 <- kable(summary.numbers.all, align = "c")
-table.summary.numbers.all <- kable_styling(summary.numbers.all0, "striped", full_width = FALSE)
-
-summary.rates.all.rounded <- round(summary.rates.all,4)
-summary.rates.all0 <- kable(summary.rates.all.rounded, align = "c")
-table.summary.rates.all <- kable_styling(summary.rates.all0, "striped", full_width = FALSE)
-
-print(table.summary.numbers.all, row.names = FALSE)
-```
-
-Table 2 provides an overview of how good each method works by depicting the the false negative rate (FNR), the false positive rate (FPR) and the precision.
-
-**Table 2:**  Overview of identified Rdeeps compared to database - rates.
-```{r, warning=FALSE, results='asis',out.width="30%"}
-library("kableExtra")
-summary.numbers.all0 <- kable(summary.numbers.all, align = "c")
-table.summary.numbers.all <- kable_styling(summary.numbers.all0, "striped", full_width = FALSE)
-
-summary.rates.all.rounded <- round(summary.rates.all,4)
-summary.rates.all0 <- kable(summary.rates.all.rounded, align = "c")
-table.summary.rates.all <- kable_styling(summary.rates.all0, "striped", full_width = FALSE)
-
-print(table.summary.rates.all, row.names = FALSE)
-```
-
-There are thirteen proteins, that are not present in the RDeep dataset. Whether they are RNA-associated or not is shown in table 3 in the appendix. 
+We compared our results with the RDeep Database.
+The following table shows how well the Method via our parameters worked.
+The table on the left shows the number of true positives, false positives, true negatives and false negatives.
+The table on the right shows the false negative rate (FNR), the false positive rate (FPR) and the precision.
+There are thirteen proteins, that are not present neither in the RDeep data set, nor the table containing non-RNA-associated Proteins from the paper.
 
 ## 4. Discussion
 
@@ -302,10 +276,8 @@ legend("topright", legend = c("Control", "RNase"), col = c("palegreen2", "violet
 ```
 
 
-The following table shows the names of the 13 proteins not included in the Rdeep database and whether they are considered as RNA-dependent by our analysis or not.
-On the left side are the results using our parameters, on the right side the ones obtained by kmeans.
-
-**Table 3:** Proteins not included in Rdeep database. 
+The following tables show the names of these proteins and whether they are considered as RNA-dependent by our analysis or not.
+On the left side are the results using our parameters, on the right side the ones obtained by kmeans:
 ```{r, warning=FALSE, results='asis',out.width="50%"}
 library("kableExtra")
 non.comparable.parameters0 <- kable(non.comparable.parameters)
@@ -319,12 +291,3 @@ print(table.non.comparable.parameters, row.names = FALSE)
 
 print(table.non.comparable.kmeans, row.names = FALSE)
 ```
-```{r}
-non.comparable.all0 <- kable(non.comparable.all, align = "c")
-table.non.comparable.all <- kable_styling(non.comparable.all0, "striped", full_width = FALSE)
-
-print(table.non.comparable.all, row.names = FALSE)
-
-```
-
-
