@@ -159,7 +159,7 @@ Because, we use the optim() function and to not implement further parameters our
 Therefore,the gaussian fit is only used for visualisation not for further analysis.
 
 ### 3.2. Analysis of significant y-shift using t-test
-For the z-transformed dataset the t-test identifies 305 significant y-shifts (p-value ≤ 0.025) where as the parameter 1 based version recognizes 196 y-shifts. 128 proteins are in common.  The t-test furthermore finds 195 y-shifting proteins for the dataset using the mean-value method. The parameter based version identified 253 significant y-shifts. For 108 proteins both methods returned a significant shift. Using the min-max scaling every global peak has the protein amount of 100 no matter if Control or RNase making a comparison not possible.
+For the z-transformed dataset the t-test identifies 301 significant y-shifts (p-value ≤ 0.025) where as the parameter 1 based version recognizes 196 y-shifts. 127 proteins are in common.  The t-test furthermore finds 192 y-shifting proteins for the dataset using the mean-value method. The parameter based version identified 253 significant y-shifts. For 106 proteins both methods returned a significant shift. Using the min-max scaling every global peak has the protein amount of 100 no matter if Control or RNase making a comparison not possible.
 
 ### 3.3. RNA-dependent Proteins
 Using just parameter C (global shift), we were able to characterize the shifttype, so whether the peaks show no shift, a right shift, a left shift, or are precipitated.
