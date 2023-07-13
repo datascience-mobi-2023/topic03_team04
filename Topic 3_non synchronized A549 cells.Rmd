@@ -1895,20 +1895,22 @@ for (i in 1:num_rows) {
 ####6.4.2 example how to plot the Control and RNase curve of one specific protein
 
 ```{r}
-#=81  #Number of protein you want to see
-#x <- c(1:25)
-#a1<- parameter_gaussian_ctrl.zt_table[n, 1 ]
-#mu1 <- parameter_gaussian_ctrl.zt_table[n, 2]
-#sigma1 <- parameter_gaussian_ctrl.zt_table[n,3]
+n <- 9 # Number of protein you want to see
+x <- c(1:25)
+a1 <- parameter_gaussian_ctrl.zt_table[n, 1]
+mu1 <- parameter_gaussian_ctrl.zt_table[n, 2]
+sigma1 <- parameter_gaussian_ctrl.zt_table[n, 3]
 
-#a2<- parameter_gaussian_rnase.zt_table[n, 1 ]
-#mu2 <- parameter_gaussian_rnase.zt_table[n, 2]
-#sigma2 <- parameter_gaussian_rnase.zt_table[n,3]
+a2 <- parameter_gaussian_rnase.zt_table[n, 1]
+mu2 <- parameter_gaussian_rnase.zt_table[n, 2]
+sigma2 <- parameter_gaussian_rnase.zt_table[n, 3]
 
-#plot(x, type = "n", ylim= c(0,50))
+plot(x, type = "n", ylim = c(0, 20), xlab = "Fractions", ylab = "Protein amount")
+title(main = "Gaussian fit MYOME_HUMAN")
 
-#curve(gauss(x, a=a1, mu=mu1, sigma=sigma1), from = min(x), to = max(x), add = TRUE, col = "palegreen2", lwd = 2)+
-#curve(gauss(x, a=a2, mu=mu2, sigma=sigma2), from = min(x), to = max(x), add = TRUE, col = "violet", lwd = 2)
+curve(gauss(x, a = as.numeric(a1), mu = as.numeric(mu1), sigma = as.numeric(sigma1)), add = TRUE, col = "palegreen2", lwd = 2)
+curve(gauss(x, a = as.numeric(a2), mu = as.numeric(mu2), sigma = as.numeric(sigma2)), add = TRUE, col = "violet", lwd = 2)
+
 ```
 
 Hinweis: Um die Graphen einer anderen Normalisierungsmethode zu sehen, kann zt in mvm oder mms abgeändert werden.

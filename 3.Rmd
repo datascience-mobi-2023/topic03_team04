@@ -1,24 +1,23 @@
 ---
-title: |
-  | \Huge\ **Final Report:** Proteome-wide Screen for RNA-dependent Proteins
-  | *non-synchronized A549 cells*
+title: "| \\Huge\\ **Final Report:** Proteome-wide Screen for RNA-dependent Proteins\n|
+  *non-synchronized A549 cells*\n"
 author: "Anastasia Möller, Johannes Schadt, Sylviane Verschaeve, Tine Limberg"
 date: "17.07.2023"
 output:
-  pdf_document: 
+  word_document:
+    toc: yes
+  pdf_document:
     latex_engine: xelatex
     toc: yes
-    pandoc_args: [
-      "--variable=parskip:half"
-    ]
+    pandoc_args: "--variable=parskip:half"
 header-includes:
-  - \usepackage{fontspec}
-  - \setmainfont{Cambria}
-  - \usepackage{setspace}
-  - \setstretch{1.15}
+- \usepackage{fontspec}
+- \setmainfont{Cambria}
+- \usepackage{setspace}
+- \setstretch{1.15}
 fontsize: 12pt
-editor_options: 
-  markdown: 
+editor_options:
+  markdown:
     wrap: sentence
 ---
 
@@ -315,6 +314,27 @@ Caudron-Herger et al., R-DeeP: Proteome-wide and Quantitative Identification of 
 Corley et al., How RNA-Binding Proteins Interact with RNA: Molecules and Mechanisms, 2020, Molecular Cell
 
 ## 7. Appendix
+
+```{r}
+n <- 9 # Number of protein you want to see
+x <- c(1:25)
+a1 <- parameter_gaussian_ctrl.zt_table[n, 1]
+mu1 <- parameter_gaussian_ctrl.zt_table[n, 2]
+sigma1 <- parameter_gaussian_ctrl.zt_table[n, 3]
+
+a2 <- parameter_gaussian_rnase.zt_table[n, 1]
+mu2 <- parameter_gaussian_rnase.zt_table[n, 2]
+sigma2 <- parameter_gaussian_rnase.zt_table[n, 3]
+
+plot(x, type = "n", ylim = c(0, 20), xlab = "Fractions", ylab = "Protein amount", col = "darkgrey")
+title(main = "Gaussian fit MYOME_HUMAN")
+
+curve(gauss(x, a = as.numeric(a1), mu = as.numeric(mu1), sigma = as.numeric(sigma1)), add = TRUE, col = "palegreen2", lwd = 2)
+curve(gauss(x, a = as.numeric(a2), mu = as.numeric(mu2), sigma = as.numeric(sigma2)), add = TRUE, col = "violet", lwd = 2)
+
+```
+
+
 The following tables show the names of these proteins and whether they are considered as RNA-dependent by our analysis or not.
 On the left side are the results using our parameters, on the right side the ones obtained by kmeans:
 ```{r, warning=FALSE, results='asis',out.width="50%"}
