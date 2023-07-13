@@ -3187,6 +3187,9 @@ ggplot(wss.df, aes(x = 1:length(wss), y = values))+
 If we follow the results of the elbow method, the optimal number of clusters would be 2. But this would not lead to any useful results. So we force kmeans to create four clusters...
 
 ```{r, warning = False}
+library("ggpubr")
+library("factoextra")
+library("ggplot2")
 df.peaks <- data.frame(cbind(globalpeak.ctrl.mvm, globalpeak.rnase.mvm, globalpeak.ctrl.zt, globalpeak.rnase.zt, globalpeak.ctrl.mms, globalpeak.rnase.mms))
 
 plot.cluster.fractions <- list()
@@ -3202,24 +3205,14 @@ for (x in 1:3){
   set.seed(666)
   res.km[[x]] <- kmeans(scale(df[, -5]), 4, nstart = 25)
   
-  g <- ggplot(data = df, aes(x = globalpeak.ctrl, y = globalpeak.rnase)) +
-    geom_point(aes(fill = factor(res.km[[x]]$cluster)),  
-               shape = 19, 
-               size = 3,  
-               color = c("lightsteelblue2", "darkseagreen3","tomato1", "lightsteelblue4" )) +  
-    labs(x = "Global Control Peaks",
-         y = "Global RNase Peaks",
-         title = title[x]) +
-    scale_fill_manual(values = c("lightsteelblue2", "darkseagreen3","tomato1", "lightsteelblue4" )) +  
-    theme_bw()
 
   g <- fviz_cluster(res.km[[x]], data = df,
                   geom = "point",
                   xlab = "Global Control Peaks",
                   ylab = "Global RNase Peaks",
                   main = title[x],
-                  ggtheme = theme_bw()) +
-                  palette = c("lightsteelblue2", "darkseagreen3","tomato1", "lightsteelblue4" )
+                  ggtheme = theme_bw(),
+                  palette = c("lightsteelblue2", "darkseagreen3","tomato1", "lightsteelblue4" ))
                   
 plot.cluster.fractions[[x]] <- g + theme(axis.text.x = element_blank(),
           axis.text.y = element_blank(),
@@ -3229,42 +3222,7 @@ print(plot.cluster.fractions[[x]])
 }
 
 ```
-```{r}
-df.peaks <- data.frame(cbind(globalpeak.ctrl.mvm, globalpeak.rnase.mvm, globalpeak.ctrl.zt, globalpeak.rnase.zt, globalpeak.ctrl.mms, globalpeak.rnase.mms))
 
-plot.cluster.fractions <- list()
-
-title <- c("Clusters of Peaks calculated after MVM", "Clusters of Peaks calculated after z-Transformation", "Clusters of Peaks calculated after MMS")
-
-res.km <- list()
-
-colors <- c("lightsteelblue2", "darkseagreen3", "tomato1", "lightsteelblue4")
-
-for (x in 1:3) {
-
-  df <- df.peaks[, (2*x - 1):(2*x)]
-
-  set.seed(666)
-  res.km[[x]] <- kmeans(scale(df[, -5]), 4, nstart = 25)
-
-  g <- ggplot(data = df, aes(x = globalpeak.ctrl, y = globalpeak.rnase)) +
-    geom_point(aes(fill = factor(res.km[[x]]$cluster), color = factor(res.km[[x]]$cluster)),  
-               shape = 16, 
-               size = 3) +
-    labs(x = "Global Control Peaks",
-         y = "Global RNase Peaks",
-         title = title[x]) +
-    scale_fill_manual(values = colors) +
-    scale_color_manual(values = colors) +
-    theme_bw()
-
-  plot.cluster.fractions[[x]] <- g + theme(axis.text.x = element_blank(),
-                                           axis.text.y = element_blank(),
-                                           axis.ticks = element_blank()) 
-
-  print(plot.cluster.fractions[[x]])
-}
-```
 
 We select the cluster at the bottom right to be RNA-associated. For MVM this would be cluster 2, for z-transformation cluster 3 and for MMS cluster 4 (first three rows of code below should be adapted if this is not the case).
 

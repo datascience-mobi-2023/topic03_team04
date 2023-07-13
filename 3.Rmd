@@ -230,66 +230,21 @@ The table on the right shows the false negative rate (FNR), the false positive r
 
 ```{r, warning=FALSE, results='asis',out.width="50%"}
 library("kableExtra")
-summary.numbers.parameters0 <- kable(summary.numbers.parameters)
-table.summary.numbers.parameters <- kable_styling(summary.numbers.parameters0, "striped", full_width = FALSE)
+summary.numbers.all0 <- kable(summary.numbers.all, align = "c")
+table.summary.numbers.all <- kable_styling(summary.numbers.all0, "striped", full_width = FALSE)
 
-summary.rates.parameters.rounded <- round(summary.rates.parameters,4)
-summary.rates.parameters0 <- kable(summary.rates.parameters.rounded)
-table.summary.rates.parameters <- kable_styling(summary.rates.parameters0, "striped", full_width = FALSE)
+summary.rates.all.rounded <- round(summary.rates.all,4)
+summary.rates.all0 <- kable(summary.rates.all.rounded, align = "c")
+table.summary.rates.all <- kable_styling(summary.rates.all0, "striped", full_width = FALSE)
 
-cat("<div class='row'>\n")
-cat("<div class='column'>\n")
-print(table.summary.numbers.parameters, row.names = FALSE)
-cat("</div>\n")
-cat("<div class='column'>\n")
-print(table.summary.rates.parameters, row.names = FALSE)
-cat("</div>\n")
-cat("</div>\n")
+
+print(table.summary.numbers.all, row.names = FALSE)
+print(table.summary.rates.all, row.names = FALSE)
+
 ```
 
-The following tables do the same for our kmeans results:
 
-```{r, warning=FALSE, results='asis',out.width="50%"}
-library("kableExtra")
-summary.numbers.kmeans0 <- kable(summary.numbers.kmeans, caption = "Tabelle 1")
-table.summary.numbers.kmeans <- kable_styling(summary.numbers.kmeans0, "striped", full_width = FALSE)
-
-summary.rates.kmeans.rounded <- round(summary.rates.kmeans,4)
-summary.rates.kmeans0 <- kable(summary.rates.kmeans.rounded)
-table.summary.rates.kmeans <- kable_styling(summary.rates.kmeans0, "striped", full_width = FALSE)
-
-cat("<div class='row'>\n")
-cat("<div class='column'>\n")
-print(table.summary.numbers.kmeans, row.names = FALSE)
-cat("</div>\n")
-cat("<div class='column'>\n")
-print(table.summary.rates.kmeans, row.names = FALSE)
-cat("</div>\n")
-cat("</div>\n")
-```
-
-The following tables do the same for our results that only depended on out global shift:
-
-```{r, warning=FALSE, results='asis',out.width="50%"}
-library("kableExtra")
-summary.numbers.global0 <- kable(summary.numbers.glob)
-table.summary.numbers.global <- kable_styling(summary.numbers.global0, "striped", full_width = FALSE)
-
-summary.rates.global.rounded <- round(summary.rates.glob,4)
-summary.rates.global0 <- kable(summary.rates.global.rounded)
-table.summary.rates.global <- kable_styling(summary.rates.global0, "striped", full_width = FALSE)
-
-cat("<div class='row'>\n")
-cat("<div class='column'>\n")
-print(table.summary.numbers.global, row.names = FALSE)
-cat("</div>\n")
-cat("<div class='column'>\n")
-print(table.summary.rates.global, row.names = FALSE)
-cat("</div>\n")
-cat("</div>\n")
-```
-
-There are thirteen proteins, that are not present neither in the RDeep data set, nor the table containing non-RNA-associated Proteins from the paper.
+There are thirteen proteins, that are not present neither in the RDeep data set, nor the table containing non-RNA-associated Proteins from the paper. Whether they are RNA-associated or not is shown in table **x** in the appendix. 
 
 ## 4. Discussion
 
