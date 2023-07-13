@@ -87,7 +87,7 @@ The third parameter focuses on the x-axis depicting the fractions. If the fracti
 ### 2.6.4. Parameter D: Significant difference in position of shoulderregions
 At last it is observed if shoulderregions occur or disappear after the RNase treatment. A shoulderregion contains more than 2 consecutive fractions with a sd less than the *sd.threshold*. On the contrary to the local peak identification the fractions with small fluctuations are sorted. Of interest are those fractions belonging to shoulderregions which either occur in the Control or RNase sample but not in both.Often parts of the shoulderregions are overlapping, resulting in shoulderregions of interest with less than 3 consecutive fractions. So, a shoulderregion of interest is only significant if it has three or more consecutive fractions.
 
-```{r}
+```{r, message=FALSE}
 library(ggplot2)
 
 num_rows <- nrow(ctrl.zt)
@@ -188,7 +188,7 @@ print(plot.cluster.fractions[[1]])
 The two already described regression models show both a p-value below 0.05 and therefore they can be used for further analysis. The highest R-squared values are detected for the z-transformed data: the model based on the parameters shows a R-squared value of 0.43, while in the model using the global shift amount the R-squared value is 0.66.
 The model with the higher R-squared value is visualized in the plot below. Each protein is depicted as a dot. As expected the majority of the trained data, marked in grey shows a high correlation and a shift under 2 fractions. On the other hand those with a small correlation have a shift upwards of 2 fractions. As already decided for the parameter **Significant fraction-shift of global peak**: a protein is classified as RNA-dependent protein if it has a shift higher than two fractions. The threshold is marked as a green line in the plot.
 
-```{r,out.width="50%"}
+```{r,out.width="70%"}
 shift.amount.plot = abs(data.frame(shift_zt_global))
 
 train_zt_plot <- data.frame(Korrelation_plot = correlation.zt[1:2500, ], Shift_plot = shift.amount.plot[1:2500, ])
@@ -265,11 +265,14 @@ mu2 <- parameter_gaussian_rnase.zt_table[n, 2]
 sigma2 <- parameter_gaussian_rnase.zt_table[n, 3]
 
 plot(x, type = "n", ylim = c(0, 20), xlab = "Fractions", ylab = "Protein amount", col = "darkgrey")
+
 title(main = "Gaussian fit MYOME_HUMAN")
+rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = "gray97", border = NA)
 
 curve(gauss(x, a = as.numeric(a1), mu = as.numeric(mu1), sigma = as.numeric(sigma1)), add = TRUE, col = "palegreen2", lwd = 2)
 curve(gauss(x, a = as.numeric(a2), mu = as.numeric(mu2), sigma = as.numeric(sigma2)), add = TRUE, col = "violet", lwd = 2)
 
+legend("topright", legend = c("Control", "RNase"), col = c("palegreen2", "violet"), lwd = 2, bg = "gray98")
 ```
 
 
