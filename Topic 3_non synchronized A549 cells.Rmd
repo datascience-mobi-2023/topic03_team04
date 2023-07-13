@@ -4294,6 +4294,17 @@ rownames(summary.rates.glob) = c("FNR", "FPR", "Precision")
 #View(summary.numbers.glob)
 #View(summary.rates.glob)
 
+
+#a data frame that sums it all up
+summary.numbers.all <- cbind(summary.numbers.glob, summary.numbers.parameters, summary.numbers.kmeans)
+colnames(summary.numbers.all) <- c("global shift mvm", "global shift zt", "global shift mms", "parameters mvm", "parameters zt", "parameters mms", "kmeans mvm", "kmeans zt", "kmeans mms")
+
+summary.rates.all <- cbind(summary.rates.glob, summary.rates.parameters, summary.rates.kmeans)
+colnames(summary.rates.all) <- c("global shift mvm", "global shift zt", "global shift mms", "parameters mvm", "parameters zt", "parameters mms", "kmeans mvm", "kmeans zt", "kmeans mms")
+
+#View(summary.numbers.all)
+#View(summary.rates.all)
+
 ```
 
 
