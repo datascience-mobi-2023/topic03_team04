@@ -4,23 +4,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Proteome-wide Screen for RNA-dependent Proteins: *non-synchronized A549 cells*
 
-Zum PDF exportieren
-
-```{r}
-#tinytex::install_tinytex()
-```
-
 Loading the data:
 
 ```{r}
 MS_Table <- read.csv('https://www.dropbox.com/s/r417vauyr7cku8s/A549dataset.csv?dl=1', header=TRUE, row.names=1, sep = ",")
 ```
 
-## 0. Data description
-
 ## 1. Preparing data for analysis
 
 ### 1.1. Check for missing values
+
+Here we check whether there are any missing values in our data. There are none.
 
 ```{r}
 sum(apply(MS_Table, 1, anyNA)) == 0
@@ -29,22 +23,24 @@ sum(is.na(MS_Table)) == 0
 
 ### 1.2. Check data format
 
+Here we check whether all data is numeric. This is the case is.
+
 ```{r}
 sum(apply(MS_Table, 1, is.numeric)) == nrow(MS_Table)
 ```
 
 ### 1.3. Deleting rows with only zeros
 
+Here we check whether there are rows that only have zeros. This is not the case. 
 ```{r}
-min(MS_Table)
 sum(apply(MS_Table,1,sum)==0)
 ```
-
--\> da die Summe der Zeileneinträge keines Proteins 0 entspricht, wurde ein Dataframe aus False erstellt. Einträge ausschließlich False, werden durch die sum Funktion als 0 aufaddiert.
 
 ### 1.4. Rearranging of Data
 
 #### 1.4.1. Reordering columns
+
+We rearrange our data frame, so that we can work with it more easily. 
 
 ```{r}
 MS_Table_reordered <- MS_Table[, c(
@@ -56,10 +52,11 @@ MS_Table_reordered <- MS_Table[, c(
   paste0("Fraction", 1:25, "_RNase_Rep3")
 )]
 # View(MS_Table_reordered)
-sum(apply(MS_Table_reordered, 2, is.numeric)) == ncol(MS_Table)
 ```
 
 #### 1.4.2. Separate Ctrl and RNase
+
+To work with the RNase and Control data separately, we create two new data frames. 
 
 ```{r}
 MS_Table_Ctrl <-MS_Table_reordered[,1:75]
@@ -90,19 +87,25 @@ Here we calculate the correlation between the replicates and put them together i
 ```{r, echo=FALSE, warning = FALSE}
 ctrl.cor <- 
   cbind(ctrl.cor.rep1.rep2 <- 
-          sapply(seq.int(dim(ctrl.rep1.reprod)[1]), function(x) cor(as.numeric(ctrl.rep1.reprod[x,]), as.numeric(ctrl.rep2.reprod[x,]))),
+          sapply(seq.int(dim(ctrl.rep1.reprod)[1]), 
+                 function(x) cor(as.numeric(ctrl.rep1.reprod[x,]), as.numeric(ctrl.rep2.reprod[x,]))),
         ctrl.cor.rep2.rep3 <- 
-          sapply(seq.int(dim(ctrl.rep1.reprod)[1]), function(x) cor(as.numeric(ctrl.rep2.reprod[x,]), as.numeric(ctrl.rep3.reprod[x,]))), 
+          sapply(seq.int(dim(ctrl.rep1.reprod)[1]), 
+                 function(x) cor(as.numeric(ctrl.rep2.reprod[x,]), as.numeric(ctrl.rep3.reprod[x,]))), 
         ctrl.cor.rep1.rep3 <- 
-          sapply(seq.int(dim(ctrl.rep1.reprod)[1]), function(x) cor(as.numeric(ctrl.rep1.reprod[x,]), as.numeric(ctrl.rep3.reprod[x,]))))
+          sapply(seq.int(dim(ctrl.rep1.reprod)[1]), 
+                 function(x) cor(as.numeric(ctrl.rep1.reprod[x,]), as.numeric(ctrl.rep3.reprod[x,]))))
 
 rnase.cor <- 
   cbind(rnase.cor.rep1.rep2 <- 
-         sapply(seq.int(dim(rnase.rep1.reprod)[1]), function(x) cor(as.numeric(rnase.rep1.reprod[x,]), as.numeric(rnase.rep2.reprod[x,]))),
+         sapply(seq.int(dim(rnase.rep1.reprod)[1]), 
+                function(x) cor(as.numeric(rnase.rep1.reprod[x,]), as.numeric(rnase.rep2.reprod[x,]))),
         rnase.cor.rep2.rep3 <- 
-          sapply(seq.int(dim(rnase.rep1.reprod)[1]), function(x) cor(as.numeric(rnase.rep2.reprod[x,]), as.numeric(rnase.rep3.reprod[x,]))), 
+          sapply(seq.int(dim(rnase.rep1.reprod)[1]), 
+                 function(x) cor(as.numeric(rnase.rep2.reprod[x,]), as.numeric(rnase.rep3.reprod[x,]))), 
         rnase.cor.rep1.rep3 <- 
-          sapply(seq.int(dim(rnase.rep1.reprod)[1]), function(x) cor(as.numeric(rnase.rep1.reprod[x,]), as.numeric(rnase.rep3.reprod[x,]))))
+          sapply(seq.int(dim(rnase.rep1.reprod)[1]), 
+                 function(x) cor(as.numeric(rnase.rep1.reprod[x,]), as.numeric(rnase.rep3.reprod[x,]))))
 
 ctrl.rnase.cor <- cbind(ctrl.cor,rnase.cor)
 ```
@@ -112,7 +115,6 @@ Now we eliminate proteins which have NA-correlations (this happens when they con
 
 ```{r}
 total.na <- which(rowSums(is.na(ctrl.rnase.cor)) > 0)
-length(total.na)
 MS.Table.naremoved <- MS_Table_reordered[-total.na,]
 
 ctrl.rep1.naremoved <- MS.Table.naremoved[,1:25]
@@ -123,16 +125,19 @@ rnase.rep2.naremoved <- MS.Table.naremoved[,101:125]
 rnase.rep3.naremoved <- MS.Table.naremoved[,126:150]
 ```
 
-Now we calculate the correlation of the replicates. This time the proteins that containes replicates with only 0 are eliminated, so there should be no NAs anymore.
+Now we calculate the correlation of the replicates. This time the proteins that contain replicates with only 0 are already eliminated, so there shouldn't be any NAs anymore.
 
 ```{r}
 ctrl.cor.naremoved <- 
   cbind(ctrl.cor.rep1.rep2.naremoved <- 
-          sapply(seq.int(dim(ctrl.rep1.naremoved)[1]), function(x) cor(as.numeric(ctrl.rep1.naremoved[x,]), as.numeric(ctrl.rep2.naremoved[x,]))),
+          sapply(seq.int(dim(ctrl.rep1.naremoved)[1]), 
+                 function(x) cor(as.numeric(ctrl.rep1.naremoved[x,]), as.numeric(ctrl.rep2.naremoved[x,]))),
         ctrl.cor.rep2.rep3.naremoved <- 
-          sapply(seq.int(dim(ctrl.rep1.naremoved)[1]), function(x) cor(as.numeric(ctrl.rep2.naremoved[x,]), as.numeric(ctrl.rep3.naremoved[x,]))), 
+          sapply(seq.int(dim(ctrl.rep1.naremoved)[1]), 
+                 function(x) cor(as.numeric(ctrl.rep2.naremoved[x,]), as.numeric(ctrl.rep3.naremoved[x,]))),
         ctrl.cor.rep1.rep3.naremoved <- 
-          sapply(seq.int(dim(ctrl.rep1.naremoved)[1]), function(x) cor(as.numeric(ctrl.rep1.naremoved[x,]), as.numeric(ctrl.rep3.naremoved[x,]))))
+          sapply(seq.int(dim(ctrl.rep1.naremoved)[1]), 
+                 function(x) cor(as.numeric(ctrl.rep1.naremoved[x,]), as.numeric(ctrl.rep3.naremoved[x,]))))
 
 rnase.cor.naremoved <- 
   cbind(rnase.cor.rep1.rep2.naremoved <- 
@@ -146,7 +151,7 @@ rnase.cor.naremoved <-
 
 The following plot shows us the general distribution of correlation.
 
-In total we look at 3\*(3680-83) correlations This has to be taken into account, when looking at the graphs. It is import to figure out if the 3 cor are for one protein or for 3 different ones.
+In total we look at 3\*(3680-83) = 10 791 correlations. This has to be taken into account, when looking at the graphs. It is import to figure out if the 3 correlations are for one protein or for 3 different ones.
 
 ```{r}
 library(ggplot2)
@@ -169,41 +174,24 @@ Now we select the proteins which have correlations beneath 0.9. Those are not re
 First we determine the proteins that only have correlations under 0.9.
 
 ```{r}
-
 non.reproducible.ctrl <- which(rowSums(ctrl.cor.naremoved<0.9)>2)
-#length(non.reproducible.ctrl)
-
 non.reproducible.rnase <- which(rowSums(rnase.cor.naremoved<0.9)>2)
-#length(non.reproducible.rnase)
-
 non.reproducible <- unique(c(non.reproducible.ctrl, non.reproducible.rnase))
-#length(non.reproducible)
-
-length(non.reproducible.rnase)
-length(non.reproducible.ctrl)
 ```
 
 Now we eliminate the proteins that only have correlations under 0.9.
 
 ```{r}
-
 ctrl.rep <- MS.Table.naremoved[-non.reproducible,1:75]
 rnase.rep <- MS.Table.naremoved[-non.reproducible,76:150]
 
 ctrl.cor.removed <- ctrl.cor.naremoved [-non.reproducible,]
 rnase.cor.removed <- rnase.cor.naremoved [-non.reproducible,]
-
-
-length(non.reproducible)
-#View(ctrl.rep)
-#View(MS.Table.naremoved[,1:75])
-#View(non.reproducible)
 ```
 
-Other proteins are a bit trickier. Some proteins have two replicates similar to each other (correlation \< 0.9) and a third one that completely differs. These Proteins have one very high and two smaller correlations. The different replicate is often the third one (mabye batch effect). To avoid loosing too many proteins and still to still have safe data, we try to ignore the bad replicates. For this we first set them to NA: After the normalization-set we can ignore them.
+Other proteins are a bit trickier. Some proteins have two replicates similar to each other (correlation < 0.9) and a third one that completely differs. These Proteins have one very high and two smaller correlations. The different replicate is often the third one. To avoid loosing too many proteins, but still have safe data, we ignore the bad replicates. For this we first set them to NA. After the normalization-set we can ignore them when uniting the replicates.
 
 ```{r}
-
 for (x in 1:dim(ctrl.rep)[1]){
   if (ctrl.cor.removed[x, 1] < 0.9) {
     if (ctrl.cor.removed[x, 3] < 0.9){
@@ -235,24 +223,16 @@ for (x in 1:dim(rnase.rep)[1]){
     }
   }
 }
-
-Nr <- c(1:dim(rnase.rep)[1])
-rnase.with.proteinnumbers <- cbind(Nr, rnase.rep[,1:25], Nr, rnase.rep[,26:50], Nr, rnase.rep[,51:75])
-#View(rnase.with.proteinnumbers)
-#View(rnase.cor.removed)
-
-ctrl.with.proteinnumbers <- cbind(Nr, ctrl.rep[,1:25], Nr, ctrl.rep[,26:50], Nr, ctrl.rep[,51:75])
-#View(ctrl.with.proteinnumbers)
-
 ```
 
-We now have 3074 Proteins left. They are stored in new variables:
-
+We now have 3074 Proteins left. 
 We now have clean data, with proteins that have reproducible data we can use for further analysis.
 
 ## 3. Scaled and Reduced Dataset
 
-For the normalization each replicate has to be separated, therefore we design 6 separate dataframes.
+We use three different normalization methods: Mean-Value-Method, z-Transformation and Min-Max-scaling.  At the end of the project we will be able to compare them and determine which one is the best. 
+
+For the normalization each replicate has to be separated, therefore we design 6 separate data frames. 
 
 ```{r}
 ctrl.rep1 <- ctrl.rep[,1:25]
@@ -267,7 +247,7 @@ rnase.rep3 <- rnase.rep[,51:75]
 
 #### 3.1.1. Normalization
 
-We perform the mean-value-method (mvm) on each replicate, both control and RNase:
+We perform the mean-value-method (MVM) on each replicate, both Control and RNase:
 
 ```{r}
 # Control Replicate 1 MVM
@@ -277,8 +257,6 @@ ctrl.rep1.mvm.norm <- t(apply(ctrl.rep1, 1, function(x) {
   scaled <- normalized * (100 / sum(normalized))
   return(scaled)
 }))
-
-# View(ctrl.rep1.mvm.norm)
 
 # Control Replicate 2 MVM
 ctrl.rep2.mvm.norm <- t(apply(ctrl.rep2, 1, function(x) {
@@ -319,15 +297,13 @@ rnase.rep3.mvm.norm <- t(apply(rnase.rep3, 1, function(x) {
   scaled <- normalized * (100 / sum(normalized))
   return(scaled)
 }))
-
 ```
 
 #### 3.1.2. Reduction
 
-To reduce we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates.
+To unite the replicates and thus reduce the data, we take the mean values of the replicates. Here we must consider the NA-values of non-reproducible replicates.
 
 ```{r}
-
 r1c <- ctrl.rep1.mvm.norm
 r2c <- ctrl.rep2.mvm.norm
 r3c <- ctrl.rep3.mvm.norm
@@ -340,13 +316,11 @@ r1c0[is.na(r1c)] <- 0
 r2c0[is.na(r2c)] <- 0
 r3c0[is.na(r3c)] <- 0
 
-
 ctrl.mvm.reduced <-  (r1c0 + r2c0 + r3c0)/(3-((sum(is.na(r1c[x,]) + is.na(r2c[x,]) + is.na(r3c[x,])))/25))
 
 ```
 
 ```{r}
-
 r1r <- rnase.rep1.mvm.norm
 r2r <- rnase.rep2.mvm.norm
 r3r <- rnase.rep3.mvm.norm
@@ -360,19 +334,26 @@ r2r0[is.na(r2r)] <- 0
 r3r0[is.na(r3r)] <- 0
 
 rnase.mvm.reduced <-  (r1r0 + r2r0 + r3r0)/(3 - ((sum(is.na(r1r[x,]) + is.na(r2r[x,]) + is.na(r3r[x,])))/25))
-                        
 
-#View(rnase.mvm.reduced)
 ```
 
 #### 3.1.3. Scaling
 
-To test whether we have "lost" our scaling during the merge, and find out whether scaling back to 100 is necessary, we scale the control to 100 and compare it with the original control.
+-\> scaling back to 100 is necessary
+
+Because scaling back to 100 is necessary, we do it for both, Control and RNase:
 
 ```{r}
 ctrl.mvm.scaled = 
   sweep(ctrl.mvm.reduced,1,100/rowSums(ctrl.mvm.reduced),'*')
 
+rnase.mvm.scaled = 
+  sweep(rnase.mvm.reduced,1,100/rowSums(rnase.mvm.reduced),'*')
+```
+
+To test whether we have "lost" our scaling during the merge, and find out whether the scaling back to 100 performed in the previous chunk is necessary, we scale the control to 100 and compare it with the original control.
+
+```{r}
 # Check if the two data frames are identical
 is_identical <- identical(ctrl.mvm.reduced, ctrl.mvm.scaled)
 
@@ -384,17 +365,7 @@ if (is_identical) {
  }
 ```
 
--\> scaling back to 100 is necessary
-
-Because scaling back to 100 is necessary, we do it for the RNase too:
-
-```{r}
-rnase.mvm.scaled = 
-  sweep(rnase.mvm.reduced,1,100/rowSums(rnase.mvm.reduced),'*')
-
-```
-
-Now we have normalized our data using the mean-value-method, and scaled it to 100. The two variables that will be used later on either contain the normalized (mvm) and scaled data of the control: **ctrl.mvm** or the normalized (mvm) and scaled data of the rnase: **rnase.mvm**
+Now we have normalized our data using the mean-value-method, and scaled it to 100. The two variables that will be used later on either contain the normalized (MVM) and scaled data of the control: **ctrl.mvm** or the normalized (MVM) and scaled data of the rnase: **rnase.mvm**
 
 ```{r}
 new.colnames.ctrl <- c("Fraction_1_Ctrl","Fraction_2_Ctrl","Fraction_3_Ctrl","Fraction_4_Ctrl","Fraction_5_Ctrl","Fraction_6_Ctrl","Fraction_7_Ctrl","Fraction_8_Ctrl","Fraction_9_Ctrl","Fraction_10_Ctrl","Fraction_11_Ctrl","Fraction_12_Ctrl","Fraction_13_Ctrl","Fraction_14_Ctrl","Fraction_15_Ctrl","Fraction_16_Ctrl","Fraction_17_Ctrl","Fraction_18_Ctrl","Fraction_19_Ctrl","Fraction_20_Ctrl","Fraction_21_Ctrl","Fraction_22_Ctrl","Fraction_23_Ctrl","Fraction_24_Ctrl","Fraction_25_Ctrl")
@@ -412,7 +383,7 @@ colnames(rnase.mvm) <- new.colnames.rnase
 
 #### 3.2.1. Normalization
 
-The z-Transformation does not work with df that have NA-values. This means we cannot use the ctrl.clean and rnase.clean df. We have to use the old ctrl.rep or the MS.Table.naremoved[-non.reproducible,1:75] dfs. On these we first perform z-Transformation and then we use the same algorithms as before to reduce the dataset in regards to reproducibility. (boah mein Elglisch)
+The z-Transformation does not work with df that have NA-values. This means we cannot use the ctrl.clean and rnase.clean df. We have to use the old ctrl.rep or the MS.Table.naremoved[-non.reproducible,1:75] dfs. On these we first perform z-Transformation and then we use the same algorithms as before to reduce the data set in regards to reproducibility. 
 
 ```{r}
 ctrl.rep.zt <- MS.Table.naremoved[-non.reproducible,1:75]
@@ -430,11 +401,11 @@ rnase.rep3z <- rnase.rep.zt[,51:75]
 rnase.repz <- cbind(rnase.rep1z,rnase.rep2z,rnase.rep3z)
 ```
 
-First the normalization for the Ctrl: 
+First the normalization for the Ctrl:
 
 Since the protein amount in each replicate is different, it is better to calculate the mean for each replicate separately. However the sd-value does not have to be adapted. Because the replicates have the same variance (same procedure for every replicate in the wet lab), we don't have to calculate the standard devidation for the replicates in each fraction extra. We can calculate the sd-value for one row /sd.
 
-*sd-values and mean values of Ctrl:*
+sd-values and mean values of Ctrl:
 
 ```{r}
 sd.ctrl <- apply(ctrl.repz, 1, sd)
@@ -444,7 +415,7 @@ mean.ctrl.rep2 <- apply(ctrl.rep2z, 1, mean)
 mean.ctrl.rep3 <- apply(ctrl.rep3z, 1, mean)
 ```
 
-*Normalization of Ctrl:*
+Normalization of Ctrl:
 
 ```{r}
 ctrl.rep1.meanvalue <- sweep(ctrl.rep1z,1,mean.ctrl.rep1,'-')
@@ -467,7 +438,7 @@ ctrl.rep2.zt.norm.pos <- sweep(ctrl.rep2.zt.norm,1,min.ctrl.rep2.zt.norm,FUN = '
 ctrl.rep3.zt.norm.pos <- sweep(ctrl.rep3.zt.norm,1,min.ctrl.rep3.zt.norm,FUN = '-')
 ```
 
-*sd-values and mean values of RNase:*
+sd-values and mean values of RNase:
 
 ```{r}
 sd.rnase = apply(rnase.repz, 1, sd)
@@ -477,7 +448,7 @@ mean.rnase.rep2 <- apply(rnase.rep2z, 1, mean)
 mean.rnase.rep3 <- apply(rnase.rep3z, 1, mean)
 ```
 
-*Normalization of RNase:*
+Normalization of RNase:
 
 ```{r}
 rnase.rep1.meanvalue <- sweep(rnase.rep1z,1,mean.rnase.rep1,'-')
@@ -503,34 +474,32 @@ rnase.rep3.zt.norm.pos <- sweep(rnase.rep3.zt.norm,1,min.rnase.rep3.zt.norm,FUN 
 
 #### 3.2.2. Scaling
 
-Each Replicate of Ctrl:
+We now scale the protein amount (= are under the curve) of each Replicate of Control to 100:
 
 ```{r}
 ctrl.rep1.zt.scaled = 
   sweep(ctrl.rep1.zt.norm.pos,1,100/rowSums(ctrl.rep1.zt.norm.pos),'*')
-# rowSums(ctrl.rep1.zt.scaled)
+
 ctrl.rep2.zt.scaled = 
   sweep(ctrl.rep2.zt.norm.pos,1,100/rowSums(ctrl.rep2.zt.norm.pos),'*')
-# rowSums(ctrl.rep2.zt.scaled)
+
 ctrl.rep3.zt.scaled = 
   sweep(ctrl.rep3.zt.norm.pos,1,100/rowSums(ctrl.rep3.zt.norm.pos),'*')
-# rowSums(ctrl.rep3.zt.scaled)
 
 ctrl.rep.zt.scaled = cbind(ctrl.rep1.zt.scaled,ctrl.rep2.zt.scaled,ctrl.rep3.zt.scaled)
 ```
 
-Each Replicate of RNAse:
+And the protein amount (= are under the curve) of each Replicate of RNAse to 100:
 
 ```{r}
 rnase.rep1.zt.scaled = 
   sweep(rnase.rep1.zt.norm.pos,1,100/rowSums(rnase.rep1.zt.norm.pos),'*')
-# rowSums(rnase.rep1.zt.scaled)
+
 rnase.rep2.zt.scaled = 
   sweep(rnase.rep2.zt.norm.pos,1,100/rowSums(rnase.rep2.zt.norm.pos),'*')
-# rowSums(rnase.rep2.zt.scaled)
+
 rnase.rep3.zt.scaled = 
   sweep(rnase.rep3.zt.norm.pos,1,100/rowSums(rnase.rep3.zt.norm.pos),'*')
-# rowSums(rnase.rep3.zt.scaled)
 
 rnase.rep.zt.scaled = cbind(rnase.rep1.zt.scaled,rnase.rep2.zt.scaled,rnase.rep3.zt.scaled)
 ```
@@ -573,16 +542,9 @@ for (x in 1:dim(rnase.rep.zt.scaled)[1]){
   }
 }
 
-
-Nr <- c(1:dim(rnase.rep.zt.scaled)[1])
-rnase.with.proteinnumbers <- cbind(Nr, rnase.rep.zt.scaled[, 1:25], Nr, rnase.rep.zt.scaled[, 26:50], Nr, rnase.rep.zt.scaled[, 51:75])
-View(rnase.with.proteinnumbers)
-
-ctrl.with.proteinnumbers <- cbind(Nr, ctrl.rep[,1:25], Nr, ctrl.rep[,26:50], Nr, ctrl.rep[,51:75])
-View(ctrl.with.proteinnumbers)
 ```
 
-To reduce we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates.
+To unite the replicates we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates.
 
 ```{r}
 
@@ -597,7 +559,6 @@ r3c0 <- ctrl.rep3.zt.scaled
 r1c0[is.na(r1c)] <- 0
 r2c0[is.na(r2c)] <- 0
 r3c0[is.na(r3c)] <- 0
-
 
 ctrl.zt.reduced.ns <-  (r1c0 + r2c0 + r3c0)/(3-((sum(is.na(r1c[x,]) + is.na(r2c[x,]) + is.na(r3c[x,])))/25))
 ```
@@ -619,7 +580,7 @@ r3r0[is.na(r3r)] <- 0
 rnase.zt.reduced.ns <-  (r1r0 + r2r0 + r3r0)/(3-((sum(is.na(r1r[x,]) + is.na(r2r[x,]) + is.na(r3r[x,])))/25))
 ```
 
-Scaling of the reduced dataset.
+Scaling of the reduced data set to 100.
 
 ```{r}
 ctrl.zt.scaled = 
@@ -648,7 +609,7 @@ colnames(rnase.zt) <- new.colnames.rnase
 
 #### 3.3.1. Normalization
 
-We perform min-max-scaling (mms) on each replicate, both control and RNase:
+We perform Min-Max-scaling (MMS) on each replicate, both control and RNase:
 
 ```{r}
 
@@ -683,22 +644,10 @@ rnase.rep3.mms.norm <- t(apply(rnase.rep3, 1, function(x) {
 }))
 ```
 
-To prove that the algorithm works we use is on a test matrix:
-
-```{r}
-test_matrix <- matrix(c(1,45,3,8,27,4,79,30,0,100,99,50,0,76,1,4,6,3,8,7,3), byrow = TRUE, nrow = 3)
-
-test_normalized <- t(apply(test_matrix, 1, function(x){
-  normalized <- (x-min(x))/(max(x)-min(x))
-}))
-
-#test_matrix
-#test_normalized
-```
 
 #### 3.3.2. Reduction
 
-To reduce we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates.
+To unite the replicates, we take the mean value between each replicate. Here we must consider the NA-values of non-reproducible replicates.
 
 ```{r}
 
@@ -716,8 +665,6 @@ r3c0[is.na(r3c)] <- 0
 
 ctrl.mms.reduced <-  (r1c0 + r2c0 + r3c0)/(3-((sum(as.numeric(is.na(r1c[x,])) + as.numeric(is.na(r2c[x,])) + as.numeric(is.na(r3c[x,]))))/25))
 
-
-#View(ctrl.mms.reduced)
 ```
 
 ```{r}
@@ -735,9 +682,7 @@ r2r0[is.na(r2r)] <- 0
 r3r0[is.na(r3r)] <- 0
 
 rnase.mms.reduced <-  (r1r0 + r2r0 + r3r0)/(3 - ((sum(as.numeric(is.na(r1r[x,])) + as.numeric(is.na(r2r[x,])) + as.numeric(is.na(r3r[x,]))))/25))
-                        
 
-#View(rnase.mms.reduced)
 ```
 
 #### 3.3.3. Scaling
@@ -754,23 +699,6 @@ rnase.mms.scaled <- t(apply(rnase.mms.reduced, 1, function(x){
 }))
 ```
 
-Now we can plot graphs that show the result of the merge and second scaling. This is only an example (RNase sample of the first protein), the plotting of all proteins will be done later on:
-
-```{r}
-##plots of the scaled replicates
-
-plot(rnase.rep1.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
-plot(rnase.rep2.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
-#plot(rnase.rep3.mms.norm[1,], xlab="fraction", ylab="protein amount", col="green", pch=20)
-
-##plot of the merged ctrl
-
-plot(rnase.mms.reduced[1,], xlab="fraction", ylab="protein amount", col="red", pch=20)
-
-##plot of the merged and scaled ctrl
-plot(rnase.mms.scaled[1,], xlab="fraction", ylab="protein amount", col="blue", pch=20)
-```
-
 Now we have normalized/scaled our data using min-max-scaling. The two variables that will be used later on either contain the normalized/scaled (mms) of the control: **ctrl.mms** or the normalized/scaled (mms) and scaled data of the rnase: **rnase.mms**
 
 ```{r}
@@ -782,331 +710,93 @@ colnames(ctrl.mms) <- new.colnames.ctrl
 rnase.mms <- rnase.mms.scaled
 colnames(rnase.mms) <- new.colnames.rnase
 
-# View(ctrl.mms)
-# View(rnase.mms)
 ```
 
 The result of this part are three times (Methods) two (Ctrl and RNase) normalized and scaled data frames: **ctrl.mvm**, **rnase.mvm**, **ctrl.zt**, **rnase.zt**, **ctrl.mms**, **rnase.mms**
 
-Safe the normalized data:
 
-```{r}
-saveRDS(ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_ctrl.mvm")
-saveRDS(rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_rnase.mvm")
+## 4. Line Graphs
 
-saveRDS(ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_ctrl.zt")
-saveRDS(rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_rnase.zt")
-
-saveRDS(ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_ctrl.mms")
-saveRDS(rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_rnase.mms")
-```
-
-## 4. Line Graph
-
-```{r}
-ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mvm")
-rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mvm")
-
-ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.zt")
-rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.zt")
-
-ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mms")
-rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mms")
-```
-
-### 4.1. Line Graphs for the mean value method - normalization
-
-We start by plotting the amount of each protein in the 25 fractions for the RNase group.
-
-```{r}
-library(ggplot2)
-
-num_rows <- nrow(rnase.mvm)
-
-plots_rnase.mvm <- list()
-
-for (i in 1:num_rows) {
-  row_data_rnase <- rnase.mvm[i, ]
-  
-   if (sum(!is.na(row_data_rnase)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
-    
-        p <- ggplot(df, aes(x = x, y = yrnase)) +
-      geom_line(color = "tomato") +
-      geom_point(color = "tomato") +
-      xlab("Fractions") +
-      ylab("Protein amount")+
-      labs(title = "RNase MVM")
-    
-    
-    
-    plots_rnase.mvm[[i]] <- p
-  } else {
-    
-    plots_rnase.mvm[[i]] <- NULL
-  }
-}
-
-```
-
-Next we create the plots for the Control group.
-
-```{r}
-library(ggplot2)
-
-num_rows <- nrow(ctrl.mvm)
-
-plots_ctrl.mvm <- list()
-
-for (i in 1:num_rows) {
-  row_data_ctrl <- ctrl.mvm[i, ]
-  
-    if (sum(!is.na(row_data_ctrl)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
-    
-    # Erstelle den Plot mit ggplot2 
-    p <- ggplot(df, aes(x = x, y = yctrl)) +
-      geom_line(color = "skyblue2") +
-      geom_point(color = "skyblue2") +
-      xlab("Fractions") +
-      ylab("Protein amount") +
-      labs(title = "Control MVM")
-    
-    
-    
-    plots_ctrl.mvm[[i]] <- p
-  } else {
-    
-    plots_ctrl.mvm[[i]] <- NULL
-  }
-}
-```
-
-The following code creates two plots in one diagram, so that the Control and RNase group can be compared.
-
-```{r}
-library(ggplot2)
-
-num_rows <- nrow(ctrl.mvm)
-
-names.as.colum <- ctrl.mvm
-protein.names <- rownames(names.as.colum)
-
-plots_ctrl_rnase.mvm <- list()
-
-for (i in 1:num_rows) {
-  row_data_ctrl <- ctrl.mvm[i, ]
-  row_data_rnase <- rnase.mvm[i, ]
-  
-  if (sum(!is.na(row_data_ctrl)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_ctrl),yctrl= as.numeric(row_data_ctrl),yrnase= as.numeric(row_data_rnase))
-
-    
-    
-    p <- ggplot(df, aes(x = x))+
-      geom_line(aes(y=yrnase,color="RNASE"))+
-      geom_point(aes(y=yrnase,color="RNASE"))+
-      geom_line(aes(y=yctrl, color="CTRL"))+
-      geom_point(aes(y=yctrl, color="CTRL"))+
-      xlab("Fractions") +
-      ylab("Protein amount") +
-      labs(title = paste("Mean Value Method -",protein.names[i]))+
-      scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
-    
-    
-    
-    plots_ctrl_rnase.mvm[[i]] <- p
-  } else {
-     
-    plots_ctrl_rnase.mvm[[i]] <- NULL
-  }
-}
-```
-
-Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
-
-```{r}
-print( plots_ctrl_rnase.mvm[[116]])
-```
-
-### 4.2. Line Graphs for the z_transformation - normalization
-
-We start by plotting the amount of each protein in the 25 fractions for the RNase group.
-
-```{r}
-library(ggplot2)
-
-num_rows <- nrow(rnase.zt)
-
-plots_rnase.zt <- list()
-
-for (i in 1:num_rows) {
-  row_data_rnase <- rnase.zt[i, ]
-  
-  
-   if (sum(!is.na(row_data_rnase)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
-    
-      p <- ggplot(df, aes(x = x, y = yrnase)) +
-      geom_line(color = "tomato") +
-      geom_point(color = "tomato") +
-      xlab("Fractions") +
-      ylab("Protein amount") +
-      labs(title = "RNase zT")
-      
-    
-    plots_rnase.zt[[i]] <- p
-  } else {
-    
-    plots_rnase.zt[[i]] <- NULL
-  }
-}
-```
-
-Next we create the plots for the Control group.
-
-```{r}
-library(ggplot2)
-
-num_rows <- nrow(ctrl.zt)
-
-plots_ctrl.zt <- list()
-
-for (i in 1:num_rows) {
-  row_data_ctrl <- ctrl.zt[i, ]
-  
-    if (sum(!is.na(row_data_ctrl)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
-    
-      p <- ggplot(df, aes(x = x, y = yctrl)) +
-      geom_line(color = "skyblue2") +
-      geom_point(color = "skyblue2") +
-      xlab("Fractions") +
-      ylab("Protein amount") +
-      labs(title = "Control zT")
-    
-    
-    plots_ctrl.zt[[i]] <- p
-  } else {
-    
-    plots_ctrl.zt[[i]] <- NULL
-  }
-}
-```
-
-The following code creates two plots in one diagram, so that the Control and RNase group can be compared.
-
-```{r}
-library(ggplot2)
-
-num_rows <- nrow(ctrl.zt)
-
-names.as.colum <- ctrl.zt
-protein.names <- rownames(names.as.colum)
-
-plots_ctrl_rnase.zt <- list()
-
-for (i in 1:num_rows) {
-  row_data_ctrl <- ctrl.zt[i, ]
-  row_data_rnase <- rnase.zt[i, ]
-  
-  if (sum(!is.na(row_data_ctrl)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_ctrl),yctrl= as.numeric(row_data_ctrl),yrnase= as.numeric(row_data_rnase))
-    
-    
-    p <- ggplot(df, aes(x = x))+
-      geom_line(aes(y=yrnase,color="RNASE"))+
-      geom_point(aes(y=yrnase,color="RNASE"))+
-      geom_line(aes(y=yctrl, color="CTRL"))+
-      geom_point(aes(y=yctrl, color="CTRL"))+
-      xlab("Fractions") +
-      ylab("Protein amount") +
-      labs(title = paste("z Transformation -",protein.names[i])) +
-      scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
-    
-    
-    
-    plots_ctrl_rnase.zt[[i]] <- p
-  } else {
-     
-    plots_ctrl_rnase.zt[[i]] <- NULL
-  }
-}
-```
-
-```{r}
-plots_ctrl_rnase.zt[[5]]
-```
-
-
-Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
-
-```{r}
-print(plots_ctrl_rnase.zt[[116]])
-```
-
-### 4.3. Line Graphs for the min - max - scaling
-
-We start by plotting the amount of each protein in the 25 fractions for the RNase group.
+We start by plotting the amount of each protein in the 25 fractions for the RNase group. The plots are stored in plots_rnase.mvm, plots_rnase.zt, plots_rnase.mms.
 
 ```{r}
 library(ggplot2)
 
 num_rows <- nrow(rnase.mms)
 
+plots_rnase.mvm <- list()
+plots_rnase.zt <- list()
 plots_rnase.mms <- list()
+title = c("RNase MVM", "RNase z-Transformation", "RNase MMS")
 
-for (i in 1:num_rows) {
-  row_data_rnase <- rnase.mms[i, ]
-  
-   if (sum(!is.na(row_data_rnase)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
+row_data_rnase_all <- list(rnase.mvm, rnase.zt, rnase.mms)
+
+for (d in 1:3){
+  for (i in 1:num_rows) {
+    row_data_rnase <- row_data_rnase_all[[d]][i,]
     
+     if (sum(!is.na(row_data_rnase)) >= 2) {
+      df <- data.frame(x = 1:length(row_data_rnase), yrnase = as.numeric(row_data_rnase))
+      
       p <- ggplot(df, aes(x = x, y = yrnase)) +
       geom_line(color = "tomato") +
       geom_point(color = "tomato") +
       xlab("Fractions") +
       ylab("Protein amount")+
-      labs(title = "RNase MMS")
-    
-    
-    plots_rnase.mms[[i]] <- p
-  } else {
-    
-    plots_rnase.mms[[i]] <- NULL
+      labs(title = title[d])
+      
+      if (d == 3){plots_rnase.mms[[i]] <- p}
+      if (d == 2){plots_rnase.zt[[i]] <- p}
+      if (d == 1){plots_rnase.mvm[[i]] <- p}
+    } else {
+      if (d == 3){plots_rnase.mms[[i]] <- NULL}
+      if (d == 2){plots_rnase.zt[[i]] <- NULL}
+      if (d == 1){plots_rnase.mvm[[i]] <- NULL}
+
+    }
   }
 }
 ```
 
-Next we create the plots for the Control group.
+Next we create the plots for the Control. The plots are stored in plots_ctrl.mvm, plots_ctrl.zt, plots_ctrl.mms. 
 
 ```{r}
 library(ggplot2)
 
 num_rows <- nrow(ctrl.mms)
 
+plots_ctrl.mvm <- list()
+plots_ctrl.zt <- list()
 plots_ctrl.mms <- list()
 
-for (i in 1:num_rows) {
-  row_data_ctrl <- ctrl.mms[i, ]
-  
-    if (sum(!is.na(row_data_ctrl)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
-    
-      p <- ggplot(df, aes(x = x, y = yctrl)) +
-      geom_line(color = "skyblue2") +
-      geom_point(color = "skyblue2") +
-      xlab("Fractions") +
-      ylab("Protein amount") +
-      labs(title = "Control MMS")
+row_data_ctrl_all <- list(ctrl.mvm, ctrl.zt, ctrl.mms)
+title <- c("Control MVM", "Control z-Transformation", "Control MMS")
 
+for (d in 1:3) {
+  for (i in 1:num_rows) {
+    row_data_ctrl <- row_data_ctrl_all[[d]][i, ]
     
-    plots_ctrl.mms[[i]] <- p
-  } else {
-    
-    plots_ctrl.mms[[i]] <- NULL
+    if (sum(!is.na(row_data_ctrl)) >= 2) {
+      df <- data.frame(x = 1:length(row_data_ctrl), yctrl = as.numeric(row_data_ctrl))
+      
+      p <- ggplot(df, aes(x = x, y = yctrl)) +
+        geom_line(color = "skyblue2") +
+        geom_point(color = "skyblue2") +
+        xlab("Fractions") +
+        ylab("Protein amount") +
+        labs(title = title[d])
+      
+      if (d == 3) {plots_ctrl.mms[[i]] <- p}
+      if (d == 2) { plots_ctrl.zt[[i]] <- p}
+      if (d == 1) {plots_ctrl.mvm[[i]] <- p}
+    } else {
+      if (d == 3) {plots_ctrl.mms[[i]] <- NULL}
+      if (d == 2) {plots_ctrl.zt[[i]] <- NULL}
+      if (d == 1) {plots_ctrl.mvm[[i]] <- NULL}
+    }
   }
 }
+
 ```
 
 The following code creates two plots in one diagram, so that the Control and RNase group can be compared.
@@ -1119,58 +809,61 @@ num_rows <- nrow(ctrl.mms)
 names.as.colum <- ctrl.mms
 protein.names <- rownames(names.as.colum)
 
+plots_ctrl_rnase.mvm <- list()
+plots_ctrl_rnase.zt <- list()
 plots_ctrl_rnase.mms <- list()
 
-for (i in 1:num_rows) {
-  row_data_ctrl <- ctrl.mms[i, ]
-  row_data_rnase <- rnase.mms[i, ]
-  
-  if (sum(!is.na(row_data_ctrl)) >= 2) {
-    df <- data.frame(x = 1:length(row_data_ctrl),yctrl= as.numeric(row_data_ctrl),yrnase= as.numeric(row_data_rnase))
+row_data_ctrl_all <- list(ctrl.mvm, ctrl.zt, ctrl.mms)
+row_data_rnase_all <- list(rnase.mvm, rnase.zt, rnase.mms)
+
+title <- c("Mean Value Method -", "z-Transformation -", "Min Max Scaling -")
+
+for(b in 1:3){
+  for (i in 1:num_rows) {
+    row_data_ctrl <- row_data_ctrl_all[[b]][i, ]
+    row_data_rnase <- row_data_rnase_all[[b]][i, ]
     
-    
-    p <- ggplot(df, aes(x = x))+
-      geom_line(aes(y=yrnase,color="RNASE"))+
-      geom_point(aes(y=yrnase,color="RNASE"))+
-      geom_line(aes(y=yctrl, color="CTRL"))+
-      geom_point(aes(y=yctrl, color="CTRL"))+
-      xlab("Fractions") +
-      ylab("Protein amount") +
-      labs(title = paste("Min Max Scaling -",protein.names[i])) +
-      scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
-    
-    
-    
-    plots_ctrl_rnase.mms[[i]] <- p
-  } else {
-     
-    plots_ctrl_rnase.mms[[i]] <- NULL
+    if (sum(!is.na(row_data_ctrl)) >= 2) {
+      df <- data.frame(x = 1:length(row_data_ctrl),yctrl= as.numeric(row_data_ctrl),yrnase= as.numeric(row_data_rnase))
+      
+      
+      p <- ggplot(df, aes(x = x))+
+        geom_line(aes(y=yrnase,color="RNASE"))+
+        geom_point(aes(y=yrnase,color="RNASE"))+
+        geom_line(aes(y=yctrl, color="CTRL"))+
+        geom_point(aes(y=yctrl, color="CTRL"))+
+        xlab("Fractions") +
+        ylab("Protein amount") +
+        labs(title = paste(title[b],protein.names[i])) +
+        scale_color_manual(values = c("RNASE" = "tomato", "CTRL" = "skyblue2"))
+      
+      if (b == 3) {plots_ctrl_rnase.mms[[i]] <- p}
+      if (b == 2) {plots_ctrl_rnase.zt[[i]] <- p}
+      if (b == 1) {plots_ctrl_rnase.mvm[[i]] <- p}
+    } else {
+      if (b == 3) {plots_ctrl_rnase.mms[[i]] <- NULL}
+      if (b == 2) {plots_ctrl_rnase.zt[[i]] <- NULL}
+      if (b == 1) {plots_ctrl_rnase.mvm[[i]] <- NULL}
+    }
   }
 }
 ```
 
-Damit der richtige Name ausgespuckt wird, muss der Code drüber immer neu geladen werden!
+Here the plots can be printed. To print a specific protein, the row number it has in all the data frames must be written in the brackets. 
 
 ```{r}
-# print(plots_ctrl_rnase.mms[[7]])
+plots_ctrl_rnase.mvm[[1030]]
+plots_ctrl_rnase.zt[[100]]
+plots_ctrl_rnase.mms[[10]]
 ```
+
+
 
 ## 5. Peak Identification
 
-```{r}
-ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mvm")
-rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mvm")
-
-ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.zt")
-rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.zt")
-
-ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mms")
-rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mms")
-```
-
 ### 5.1. Peaks for data set with mean value method - normalization
 
-#### 5.1.1. Global Peak
+#### 5.1.1. Global Peaks
 
 First the global peak identification for the control data set. We calculate the fraction and the protein amount under the global peak. Second we do the same for the rnase data set.
 
@@ -1214,6 +907,8 @@ for (i in seq_along(localpeaks.ctrl.mvm)) {localpeaks.ctrl.mvm[[i]] <- localpeak
 localpeaks.values.ctrl.mvm <- lapply(seq_along(localpeaks.ctrl.mvm), function(i) peakidentif.ctrl.mvm[i, localpeaks.ctrl.mvm[[i]]])
 ```
 
+Here we do the same for the RNase group. 
+
 ```{r}
 colnames(peakidentif.rnase.mvm) <- paste0("Rnase_Fraction", seq_along(colnames(peakidentif.rnase.mvm)) - 1)
 
@@ -1236,18 +931,18 @@ Futhermore, we have to look if there are peaks in fraction 1 or fraction 25. Aga
 
 ```{r}
 fraction1.peak.ctrl.mvm <- which(peakidentif.ctrl.mvm[, 1] > peakidentif.ctrl.mvm[, 2] & peakidentif.ctrl.mvm[, 1] > peakidentif.ctrl.mvm[, 3])
-# length(fraction1.peak.ctrl.mvm)
 
-fraction25.peak.ctrl.mvm <- which(peakidentif.ctrl.mvm[, 25] > peakidentif.ctrl.mvm[, 24] & peakidentif.ctrl.mvm[, 25] > peakidentif.ctrl.mvm[, 23] & peakidentif.ctrl.mvm[, 25] + peakidentif.ctrl.mvm[, 24] +peakidentif.ctrl.mvm[, 23] > 10) # wenn der peak am Ende nicht insgesamt 10 überschreitet, ist es relativ unrelevant. Scheinbar fallen viele Proteine am Ende etwas aus.
-# length(fraction25.peak.ctrl.mvm)
+
+fraction25.peak.ctrl.mvm <- which(peakidentif.ctrl.mvm[, 25] > peakidentif.ctrl.mvm[, 24] & peakidentif.ctrl.mvm[, 25] > peakidentif.ctrl.mvm[, 23] & peakidentif.ctrl.mvm[, 25] + peakidentif.ctrl.mvm[, 24] +peakidentif.ctrl.mvm[, 23] > 10) 
 ```
+
+And now the same for the RNase group. 
 
 ```{r}
 fraction1.peak.rnase.mvm <- which(peakidentif.rnase.mvm[, 1] > peakidentif.rnase.mvm[, 2] & peakidentif.rnase.mvm[, 1] > peakidentif.rnase.mvm[, 3])
-# length(fraction1.peak.rnase.mvm)
 
 fraction25.peak.rnase.mvm <- which(peakidentif.rnase.mvm[, 25] > peakidentif.rnase.mvm[, 24] & peakidentif.rnase.mvm[, 25] > peakidentif.rnase.mvm[, 23] & peakidentif.rnase.mvm[, 25] + peakidentif.rnase.mvm[, 24] + peakidentif.rnase.mvm[, 23] > 10)
-# length(fraction25.peak.rnase.mvm)
+
 ```
 
 #### 5.1.4. Precipitated Proteins
@@ -1266,7 +961,7 @@ precipitated.mvm <- unique(c(precipitated.ctrl.mvm,precipitated.rnase.mvm))
 
 #### 5.2.1. Global Peak
 
-First the global peak identification for the control data set. We calculate the fraction and the protein amount under the global peak. Second we do the same for the rnase data set.
+First the global peak identification for the control data set. We calculate the fraction and the protein amount under the global peak. Second we do the same for the RNase data set.
 
 ```{r}
 globalpeak.ctrl.zt <- apply(ctrl.zt, 1, function(x){which.max(x)})
@@ -1308,6 +1003,8 @@ for (i in seq_along(localpeaks.ctrl.zt)) {localpeaks.ctrl.zt[[i]] <- localpeaks.
 localpeaks.values.ctrl.zt <- lapply(seq_along(localpeaks.ctrl.zt), function(i) peakidentif.ctrl.zt[i, localpeaks.ctrl.zt[[i]]])
 ```
 
+Now the same for the RNase group.
+
 ```{r}
 colnames(peakidentif.rnase.zt) <- paste0("Rnase_Fraction", seq_along(colnames(peakidentif.rnase.zt)) - 1)
 
@@ -1330,18 +1027,14 @@ Futhermore, we have to look if there are peaks in fraction 1 or fraction 25. Aga
 
 ```{r}
 fraction1.peak.ctrl.zt <- which(peakidentif.ctrl.zt[, 1] > peakidentif.ctrl.zt[, 2] & peakidentif.ctrl.zt[, 1] > peakidentif.ctrl.zt[, 3])
-# length(fraction1.peak.ctrl.zt)
 
-fraction25.peak.ctrl.zt <- which(peakidentif.ctrl.zt[, 25] > peakidentif.ctrl.zt[, 24] & peakidentif.ctrl.zt[, 25] > peakidentif.ctrl.zt[, 23] & peakidentif.ctrl.zt[, 25] + peakidentif.ctrl.zt[, 24] +peakidentif.ctrl.zt[, 23] > 10) # wenn der peak am Ende nicht insgesamt 10 überschreitet, ist es relativ unrelevant. Scheinbar fallen viele Proteine am Ende etwas aus.
-# length(fraction25.peak.ctrl.zt)
+fraction25.peak.ctrl.zt <- which(peakidentif.ctrl.zt[, 25] > peakidentif.ctrl.zt[, 24] & peakidentif.ctrl.zt[, 25] > peakidentif.ctrl.zt[, 23] & peakidentif.ctrl.zt[, 25] + peakidentif.ctrl.zt[, 24] +peakidentif.ctrl.zt[, 23] > 10) 
 ```
 
 ```{r}
 fraction1.peak.rnase.zt <- which(peakidentif.rnase.zt[, 1] > peakidentif.rnase.zt[, 2] & peakidentif.rnase.zt[, 1] > peakidentif.rnase.zt[, 3])
-# length(fraction1.peak.rnase.zt)
 
 fraction25.peak.rnase.zt <- which(peakidentif.rnase.zt[, 25] > peakidentif.rnase.zt[, 24] & peakidentif.rnase.zt[, 25] > peakidentif.rnase.zt[, 23] & peakidentif.rnase.zt[, 25] + peakidentif.rnase.zt[, 24] + peakidentif.rnase.zt[, 23] > 10)
-# length(fraction25.peak.rnase.zt)
 ```
 
 #### 5.2.4. Precipitated Proteins
@@ -1402,6 +1095,8 @@ for (i in seq_along(localpeaks.ctrl.mms)) {localpeaks.ctrl.mms[[i]] <- localpeak
 localpeaks.values.ctrl.mms <- lapply(seq_along(localpeaks.ctrl.mms), function(i) peakidentif.ctrl.mms[i, localpeaks.ctrl.mms[[i]]])
 ```
 
+And the same for the RNase group:
+
 ```{r}
 colnames(peakidentif.rnase.mms) <- paste0("Rnase_Fraction", seq_along(colnames(peakidentif.rnase.mms)) - 1)
 
@@ -1425,18 +1120,14 @@ Futhermore, we have to look if there are peaks in fraction 1 or fraction 25. Aga
 
 ```{r}
 fraction1.peak.ctrl.mms <- which(peakidentif.ctrl.mms[, 1] > peakidentif.ctrl.mms[, 2] & peakidentif.ctrl.mms[, 1] > peakidentif.ctrl.mms[, 3])
-# length(fraction1.peak.ctrl.mms)
 
-fraction25.peak.ctrl.mms <- which(peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 24] & peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 23] & peakidentif.ctrl.mms[, 25] + peakidentif.ctrl.mms[, 24] +peakidentif.ctrl.mms[, 23] > 10) # wenn der peak am Ende nicht insgesamt 10 überschreitet, ist es relativ unrelevant. Scheinbar fallen viele Proteine am Ende etwas aus.
-# length(fraction25.peak.ctrl.mms)
+fraction25.peak.ctrl.mms <- which(peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 24] & peakidentif.ctrl.mms[, 25] > peakidentif.ctrl.mms[, 23] & peakidentif.ctrl.mms[, 25] + peakidentif.ctrl.mms[, 24] +peakidentif.ctrl.mms[, 23] > 10)
 ```
 
 ```{r}
 fraction1.peak.rnase.mms <- which(peakidentif.rnase.mms[, 1] > peakidentif.rnase.mms[, 2] & peakidentif.rnase.mms[, 1] > peakidentif.rnase.mms[, 3])
-# length(fraction1.peak.rnase.mms)
 
 fraction25.peak.rnase.mms <- which(peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 24] & peakidentif.rnase.mms[, 25] > peakidentif.rnase.mms[, 23] & peakidentif.rnase.mms[, 25] + peakidentif.rnase.mms[, 24] + peakidentif.rnase.mms[, 23] > 10)
-# length(fraction25.peak.rnase.mms)
 ```
 
 #### 5.3.4. Precipitated Proteins
@@ -1451,230 +1142,39 @@ precipitated.rnase.mms <- which(peakidentif.rnase.mms[, 25] > peakidentif.rnase.
 precipitated.mms <- unique(c(precipitated.ctrl.mms,precipitated.rnase.mms))
 ```
 
-Save all relevant data:
-
-```{r}
-# mvm
-saveRDS(sd.mean.ctrl.mvm, file = "Non_synchronized_A549_sd.mean.ctrl.mvm ")
-saveRDS(sd.mean.rnase.mvm , file = "Non_synchronized_A549_sd.mean.rnase.mvm")
-
-saveRDS(globalpeak.ctrl.mvm, file = "Non_synchronized_A549_globalpeak.ctrl.mvm")
-saveRDS(globalpeak.value.ctrl.mvm, file = "Non_synchronized_A549_globalpeak.value.ctrl.mvm")
-
-saveRDS(globalpeak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mvm")
-saveRDS(globalpeak.value.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mvm")
-
-saveRDS(globalpeak.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mvm")
-saveRDS(globalpeak.value.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mvm")
-
-saveRDS(localpeaks.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mvm")
-saveRDS(localpeaks.values.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mvm")
-
-saveRDS(localpeaks.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mvm")
-saveRDS(localpeaks.values.rnase.mvm, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mvm")
-
-saveRDS(fraction1.peak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-saveRDS(fraction25.peak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
-
-saveRDS(fraction1.peak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-saveRDS(fraction25.peak.ctrl.mvm, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
-
-saveRDS(precipitated.mvm, file = "gespeicherteDaten/Non_synchronized_A549_precipitated.mvm")
-```
-
-```{r}
-# zt
-saveRDS(sd.mean.ctrl.zt, file = "Non_synchronized_A549_sd.mean.ctrl.zt ")
-saveRDS(sd.mean.rnase.zt , file = "Non_synchronized_A549_sd.mean.rnase.zt")
-
-saveRDS(globalpeak.ctrl.zt, file = "Non_synchronized_A549_globalpeak.ctrl.zt")
-saveRDS(globalpeak.value.ctrl.zt, file = "Non_synchronized_A549_globalpeak.value.ctrl.zt")
-
-saveRDS(globalpeak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.zt")
-saveRDS(globalpeak.value.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.zt")
-
-saveRDS(globalpeak.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.zt")
-saveRDS(globalpeak.value.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.zt")
-
-saveRDS(localpeaks.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.zt")
-saveRDS(localpeaks.values.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.zt")
-
-saveRDS(localpeaks.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.zt")
-saveRDS(localpeaks.values.rnase.zt, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.zt")
-
-saveRDS(fraction1.peak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
-saveRDS(fraction25.peak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
-
-saveRDS(fraction1.peak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
-saveRDS(fraction25.peak.ctrl.zt, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
-
-saveRDS(precipitated.zt, file = "gespeicherteDaten/Non_synchronized_A549_precipitated.zt")
-```
-
-```{r}
-# mms
-
-saveRDS(sd.mean.ctrl.mms, file = "Non_synchronized_A549_sd.mean.ctrl.mms ")
-saveRDS(sd.mean.rnase.mms , file = "Non_synchronized_A549_sd.mean.rnase.mms")
-
-saveRDS(globalpeak.ctrl.mms, file = "Non_synchronized_A549_globalpeak.ctrl.mms")
-saveRDS(globalpeak.value.ctrl.mms, file = "Non_synchronized_A549_globalpeak.value.ctrl.mms")
-
-saveRDS(globalpeak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mms")
-saveRDS(globalpeak.value.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mms")
-
-saveRDS(globalpeak.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mms")
-saveRDS(globalpeak.value.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mms")
-
-saveRDS(localpeaks.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mms")
-saveRDS(localpeaks.values.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mms")
-
-saveRDS(localpeaks.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mms")
-saveRDS(localpeaks.values.rnase.mms, file = "gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mms")
-
-saveRDS(fraction1.peak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
-saveRDS(fraction25.peak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
-
-saveRDS(fraction1.peak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
-saveRDS(fraction25.peak.ctrl.mms, file = "gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
-
-saveRDS(precipitated.mms, file = "gespeicherteDaten/Non_synchronized_A549_precipitated.mms")
-```
 
 ## 6. Gaussian fit
-
-Load the relevant data:
-
-```{r}
-ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mvm")
-rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mvm")
-
-ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.zt")
-rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.zt")
-
-ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mms")
-rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mms")
-```
-
-```{r}
-#mvm
-sd.mean.ctrl.mvm <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mvm ")
-sd.mean.rnase.mvm <- readRDS("Non_synchronized_A549_sd.mean.rnase.mvm ")
-
-globalpeak.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mvm")
-globalpeak.value.ctrl.mvm <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mvm")
-
-globalpeak.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mvm")
-globalpeak.value.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mvm")
-
-localpeaks.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mvm")
-localpeaks.values.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mvm")
-
-localpeaks.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mvm")
-localpeaks.values.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mvm")
-
-fraction1.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-fraction25.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
-
-fraction1.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-fraction25.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
-
-precipitated.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.mvm")
-```
-
-```{r}
-#zt
-sd.mean.ctrl.zt <- readRDS("Non_synchronized_A549_sd.mean.ctrl.zt ")
-sd.mean.rnase.zt <- readRDS("Non_synchronized_A549_sd.mean.rnase.zt ")
-
-globalpeak.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.ctrl.zt")
-globalpeak.value.ctrl.zt <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.zt")
-
-globalpeak.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.zt")
-globalpeak.value.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.zt")
-
-localpeaks.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.zt")
-localpeaks.values.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.zt")
-
-localpeaks.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.zt")
-localpeaks.values.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.zt")
-
-fraction1.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
-fraction25.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
-
-fraction1.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
-fraction25.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
-
-precipitated.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.zt")
-```
-
-```{r}
-#mms
-sd.mean.ctrl.mms <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mms")
-sd.mean.rnase.mms <- readRDS("Non_synchronized_A549_sd.mean.rnase.mms")
-
-globalpeak.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.ctrl.mms")
-globalpeak.value.ctrl.mms <- readRDS("Non_synchronized_A549_globalpeak.value.ctrl.mms")
-
-globalpeak.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mms")
-globalpeak.value.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mms")
-
-localpeaks.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mms")
-localpeaks.values.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mms")
-
-localpeaks.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mms")
-localpeaks.values.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mms")
-
-fraction1.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
-fraction25.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
-
-fraction1.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
-fraction25.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
-
-precipitated.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.mms")
-```
 
 ### 6.1 Gaussian fit for Mean Value Method normalized data
 
 Defining relevant parameters for the gauss curve for all proteins of the Control group.
 
 ```{r}
-# Anzahl der Zeilen im Dataframe
 num_rows <- nrow(ctrl.mvm)
 
-# Tabelle zum Speichern der Parameter
 parameter_gaussian_ctrl.mvm_table <- data.frame(a = numeric(),
                               mu = numeric(),
                               sigma = numeric())
 
-# Iteriere über jede Zeile 
 for (i in 1:num_rows) {
   x <- c(1:25)
   y <- as.numeric(ctrl.mvm[i,])
-
-  # Gaussfunktion: f(x) = a * exp(-((x - mu)^2) / (2 * sigma^2))
   gauss <- function(x, a, mu, sigma) {
     return(a * exp(-((x - mu)^2) / (2 * sigma^2)))
   }
-
-  #Finden der besten Parameter für die Gaussfunktion, um die Datenpunkte anzupassen
   fit_function <- function(params) {
     a <- params[1]
     mu <- params[2]
     sigma <- params[3]
-
-    # Berechne die Summe der quadrierten Abweichungen zwischen der Gaussfunktion und den Datenpunkten
     squared_diff <- (gauss(x, a, mu, sigma) - y)^2
     sum_squared_diff <- sum(squared_diff)
 
     return(sum_squared_diff)
   }
 
-  # Schätze die Parameter, die die besten Anpassungswerte liefern
-  initial_params <- c(1, 3, 1)  # Startwerte für die Parameter a, mu und sigma
+  initial_params <- c(1, 3, 1) 
   optimized_params <- optim(initial_params, fit_function)$par
 
-  # Speichere die geschätzten Parameter in der Tabelle
   parameter_gaussian_ctrl.mvm_table <- rbind(parameter_gaussian_ctrl.mvm_table, optimized_params)
 }
 ```
@@ -1862,37 +1362,38 @@ for (i in 1:num_rows) {
 
 ####6.4.1 example of how to plot the curves for all proteins of the Control group
 
-```{r}
-#num_rows <- nrow(parameter_gaussian_ctrl.zt_table)
-#plots_gaussian_ctrl.zt <- list()
-#x <- c(1:25)
-#for (i in 1:num_rows) {
-  #a <- parameter_gaussian_ctrl.zt_table[i, 1]
-  #mu <- parameter_gaussian_ctrl.zt_table[i, 2]
-  #sigma <- parameter_gaussian_ctrl.zt_table[i, 3]
-  #row_data_gaussian_ctrl.zt <- parameter_gaussian_ctrl.zt_table[i, ]
+```{r}#
+num_rows <- nrow(parameter_gaussian_ctrl.zt_table)
+plots_gaussian_ctrl.zt <- list()
+x <- c(1:25)
+for (i in 1:num_rows) {
+  a <- parameter_gaussian_ctrl.zt_table[i, 1]
+  mu <- parameter_gaussian_ctrl.zt_table[i, 2]
+  sigma <- parameter_gaussian_ctrl.zt_table[i, 3]
+  row_data_gaussian_ctrl.zt <- parameter_gaussian_ctrl.zt_table[i, ]
 
-  #if (sum(!is.na(row_data_gaussian_ctrl.zt)) >= 2) {
-   # df <- data.frame(x = 1:length(row_data_gaussian_ctrl.zt), y = as.numeric(row_data_gaussian_ctrl.zt))
+  if (sum(!is.na(row_data_gaussian_ctrl.zt)) >= 2) {
+    df <- data.frame(x = 1:length(row_data_gaussian_ctrl.zt), y = as.numeric(row_data_gaussian_ctrl.zt))
 
-    # Erstellen eines neuen leeren Plots
-    #plot_new <- plot(NULL, xlim = c(min(x), max(x)), ylim = c(min(df$y), max(df$y)), 
-                    # xlab = "Fraction", ylab = "Protein amount", col = "palegreen2", lwd = 2)
+     #Erstellen eines neuen leeren Plots
+    plot_new <- plot(NULL, xlim = c(min(x), max(x)), ylim = c(min(df$y), max(df$y)), 
+                     xlab = "Fraction", ylab = "Protein amount", col = "palegreen2", lwd = 2)
 
-    # Zeichnen der Kurve auf dem neuen Plot
-    #curve(gauss(x, a, mu, sigma), from = min(x), to = max(x), add = TRUE, col = "palegreen2", lwd = 2)
+     #Zeichnen der Kurve auf dem neuen Plot
+    curve(gauss(x, a, mu, sigma), from = min(x), to = max(x), add = TRUE, col = "palegreen2", lwd = 2)
 
     # Speichern des neuen Plots in der Liste
-   # plots_gaussian_ctrl.zt[[i]] <- plot_new
+    plots_gaussian_ctrl.zt[[i]] <- plot_new
     
- # } else {
- #   plots_gaussian_ctrl.zt[[i]] <- NULL
-#  }
+  } else {
+    plots_gaussian_ctrl.zt[[i]] <- NULL
+  }
 
-#}
+}
 ```
 
-####6.4.2 example how to plot the Control and RNase curve of one specific protein
+
+Here the Gaussian curves of control and RNase (z-transformation) are shown as an example. 
 
 ```{r}
 n <- 9 # Number of protein you want to see
@@ -1906,113 +1407,22 @@ mu2 <- parameter_gaussian_rnase.zt_table[n, 2]
 sigma2 <- parameter_gaussian_rnase.zt_table[n, 3]
 
 plot(x, type = "n", ylim = c(0, 20), xlab = "Fractions", ylab = "Protein amount", col = "darkgrey")
-title(main = "Gaussian fit MYOME_HUMAN")
+title(main = paste("Gaussian fit ", rownames(rnase.zt)[n]))
 
 curve(gauss(x, a = as.numeric(a1), mu = as.numeric(mu1), sigma = as.numeric(sigma1)), add = TRUE, col = "palegreen2", lwd = 2)
 curve(gauss(x, a = as.numeric(a2), mu = as.numeric(mu2), sigma = as.numeric(sigma2)), add = TRUE, col = "violet", lwd = 2)
 
 ```
 
-Hinweis: Um die Graphen einer anderen Normalisierungsmethode zu sehen, kann zt in mvm oder mms abgeändert werden.
+
 
 ## 7. Parameters to identify RNA-dependent or RNA-binding Proteins 
-
-Load the relevant data:
-
-```{r}
-ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mvm")
-rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mvm")
-
-ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.zt")
-rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.zt")
-
-ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_ctrl.mms")
-rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_rnase.mms")
-```
-
-```{r}
-#mvm
-sd.mean.ctrl.mvm <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mvm ")
-sd.mean.rnase.mvm <- readRDS("Non_synchronized_A549_sd.mean.rnase.mvm ")
-
-globalpeak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mvm")
-globalpeak.value.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mvm")
-
-globalpeak.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mvm")
-globalpeak.value.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mvm")
-
-localpeaks.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mvm")
-localpeaks.values.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mvm")
-
-localpeaks.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mvm")
-localpeaks.values.rnase.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mvm")
-
-fraction1.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-fraction25.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
-
-fraction1.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mvm")
-fraction25.peak.ctrl.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mvm")
-
-precipitated.mvm <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.mvm")
-```
-
-```{r}
-#zt
-sd.mean.ctrl.zt <- readRDS("Non_synchronized_A549_sd.mean.ctrl.zt ")
-sd.mean.rnase.zt <- readRDS("Non_synchronized_A549_sd.mean.rnase.zt ")
-
-globalpeak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.zt")
-globalpeak.value.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.zt")
-
-globalpeak.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.zt")
-globalpeak.value.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.zt")
-
-localpeaks.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.zt")
-localpeaks.values.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.zt")
-
-localpeaks.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.zt")
-localpeaks.values.rnase.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.zt")
-
-fraction1.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
-fraction25.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
-
-fraction1.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.zt")
-fraction25.peak.ctrl.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.zt")
-
-precipitated.zt <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.zt")
-```
-
-```{r}
-#mms
-sd.mean.ctrl.mms <- readRDS("Non_synchronized_A549_sd.mean.ctrl.mms")
-sd.mean.rnase.mms <- readRDS("Non_synchronized_A549_sd.mean.rnase.mms")
-
-globalpeak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.ctrl.mms")
-globalpeak.value.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.ctrl.mms")
-
-globalpeak.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.rnase.mms")
-globalpeak.value.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_globalpeak.value.rnase.mms")
-
-localpeaks.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.ctrl.mms")
-localpeaks.values.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.ctrl.mms")
-
-localpeaks.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.rnase.mms")
-localpeaks.values.rnase.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_localpeaks.values.rnase.mms")
-
-fraction1.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
-fraction25.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
-
-fraction1.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction1.peak.ctrl.mms")
-fraction25.peak.ctrl.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_fraction25.peak.ctrl.mms")
-
-precipitated.mms <- readRDS("gespeicherteDaten/Non_synchronized_A549_precipitated.mms")
-```
 
 ### 7.1. Shifts
 
 #### 7.1.1. Shifts with Mean Value Method
 
-In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
+Here we identify the shifting proteins. In this case a shift of more than 2 Fraction is counted as RNA-dependent or RNA-binding.
 
 ```{r}
 n = 2
@@ -2026,13 +1436,11 @@ for (i in 1:nrow(rnase.mvm)) {
   else (shift_mvm_named [i] <- "no shift")
 }
 
-# View(shift_mvm_named)
 ```
 
 To be able to use the data whether a protein is clustered or not, we need to put it in a vector
-```{r}
-precipitated.mvm
 
+```{r}
 precipitated.mvm.v <- vector(mode = "numeric", length = dim(ctrl.mvm)[1])
 
 for (i in 1:dim(ctrl.mvm)[1]){
@@ -2043,7 +1451,6 @@ for (i in 1:dim(ctrl.mvm)[1]){
     precipitated.mvm.v[i] <- 0
   }
 }
-
 ```
 
 #### 7.1.2. Shifts with z-Transformation
@@ -2063,13 +1470,10 @@ for (i in 1:nrow(ctrl.zt)) {
   else (shift_zt_named [i] <- "no shift")
 }
 
-# View(shift_zt_named)
 ```
 
 To be able to use the data whether a protein is clustered or not, we need to put it in a vector
 ```{r}
-precipitated.zt
-
 precipitated.zt.v <- vector(mode = "numeric", length = dim(ctrl.zt)[1])
 
 for (i in 1:dim(ctrl.zt)[1]){
@@ -2099,13 +1503,10 @@ for (i in 1:nrow(ctrl.mms)) {
   else (shift_mms_named [i] <- "no shift")
 }
 
-# View(shift_mms_named)
 ```
 
 To be able to use the data whether a protein is clustered or not, we need to put it in a vector
 ```{r}
-precipitated.mms
-
 precipitated.mms.v <- vector(mode = "numeric", length = dim(ctrl.mms)[1])
 
 for (i in 1:dim(ctrl.mms)[1]){
@@ -2130,7 +1531,8 @@ shreg.rnase.mvm <- rnase.mvm
 ```
 
 
-First, we identify fraction (regions) of proteins with high protein amount. 
+First, we identify fractions (regions) of proteins with high protein amount. 
+
 ```{r}
 largevalues.rnase.mvm <- apply(shreg.rnase.mvm[,2:24], 1, function(x) {
   largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
@@ -2141,6 +1543,7 @@ largevalues.rnase.mvm <- apply(shreg.rnase.mvm[,2:24], 1, function(x) {
 ```
 
 Now, all regions (= 3 fractions) with a sd smaller then the sd for our normal fluctuation used by peak identification are selected.
+
 ```{r}
 closereg.rnase.mvm <- list()
 for (i in 1:nrow(shreg.rnase.mvm)) {
@@ -2160,12 +1563,15 @@ for (i in 1:nrow(shreg.rnase.mvm)) {
 ```
 
 We just want to have the large values which also occur in close value.
+
 ```{r}
 largevalues.closereg.rnase.mvm <- largevalues.rnase.mvm
 for (i in seq_along(largevalues.closereg.rnase.mvm)) {
     largevalues.closereg.rnase.mvm[[i]] <- largevalues.closereg.rnase.mvm[[i]][largevalues.closereg.rnase.mvm[[i]] %in% closereg.rnase.mvm[[i]]]}
 ordered.largevalues.closereg.rnase.mvm <- lapply(largevalues.closereg.rnase.mvm,function(row){sort(row)})
 ```
+
+Here, the shoulderregions are identified, using the previously defined variables.
 
 ```{r}
 shoulderregion.rnase.mvm <- lapply(ordered.largevalues.closereg.rnase.mvm,function(x) {
@@ -2182,11 +1588,13 @@ shoulderregion.rnase.mvm <- lapply(ordered.largevalues.closereg.rnase.mvm,functi
 ```
 
 We continue with the ctrl group.
+
 ```{r}
 shreg.ctrl.mvm <- ctrl.mvm
 ```
 
 First, we identify fraction (regions) of proteins with high protein amount. 
+
 ```{r}
 largevalues.ctrl.mvm <- apply(shreg.ctrl.mvm[,2:24], 1, function(x) {
   largevalues_indices <- which(x > 4.5) + 1 # to start again with 2
@@ -2215,12 +1623,15 @@ for (i in 1:nrow(shreg.ctrl.mvm)) {
 ```
 
 We just want to have the large values which also occur in close value.
+
 ```{r}
 largevalues.closereg.ctrl.mvm <- largevalues.ctrl.mvm
 for (i in seq_along(largevalues.closereg.ctrl.mvm)) {
     largevalues.closereg.ctrl.mvm[[i]] <- largevalues.closereg.ctrl.mvm[[i]][largevalues.closereg.ctrl.mvm[[i]] %in% closereg.ctrl.mvm[[i]]]}
 ordered.largevalues.closereg.ctrl.mvm <- lapply(largevalues.closereg.ctrl.mvm,function(row){sort(row)})
 ```
+
+Here, the shoulderregions are identified, using the previously defined variables.
 
 ```{r}
 shoulderregion.ctrl.mvm <- lapply(ordered.largevalues.closereg.ctrl.mvm,function(x) {
@@ -2237,6 +1648,7 @@ shoulderregion.ctrl.mvm <- lapply(ordered.largevalues.closereg.ctrl.mvm,function
 ```
 
 Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
+
 ```{r}
 shoulderregion.a.mvm <- lapply(names(shoulderregion.ctrl.mvm), function(x) setdiff(shoulderregion.ctrl.mvm[[x]], shoulderregion.rnase.mvm[[x]]))
 names(shoulderregion.a.mvm) <- names(shoulderregion.ctrl.mvm)
@@ -2246,6 +1658,7 @@ names(shoulderregion.b.mvm) <- names(shoulderregion.rnase.mvm)
 ```
 
 At last, we only want does proteins with entries more than 2. The others have no significant difference.
+
 ```{r}
 selec.shoulderregion.a.mvm <- lapply(shoulderregion.a.mvm, function(x) 
   if (length(x) < 3) {return(numeric(0))} 
@@ -2257,6 +1670,7 @@ selec.shoulderregion.b.mvm <- lapply(shoulderregion.b.mvm, function(x)
 ```
 
 To include the shoulder regions into the dataframe with parameters, we create a new dataframe with 0 for shoulderregion and 1 with shoulderregion.
+
 ```{r}
 selec.shoulderregion.a.1.mvm <- lapply(shoulderregion.a.mvm, function(x) 
   if (length(x) > 2) {return (1)} 
@@ -2298,6 +1712,7 @@ largevalues.rnase.zt <- apply(shreg.rnase.zt[,2:24], 1, function(x) {
 ```
 
 Identification of regions around the peaks.
+
 ```{r}
 neighpeaks.rnase.zt <- apply(shreg.rnase.zt, 1,
             function(x) { peak_indices <- which(diff(sign(diff(x))) == -2 & x[-c(1, length(x))] > 3) + 1
@@ -2307,6 +1722,7 @@ neighpeaks.rnase.zt <- apply(shreg.rnase.zt, 1,
 ```
 
 Now we identify the boundaries again, but safe them in a list.
+
 ```{r}
 boundary1.rnase.zt <- lapply(1:nrow(shreg.rnase.zt), function(i) {
   if (shreg.rnase.zt[i, 1] > shreg.rnase.zt[i, 2] & shreg.rnase.zt[i, 1] > shreg.rnase.zt[i, 3] & (shreg.rnase.zt[i, 1] + shreg.rnase.zt[i, 2] + shreg.rnase.zt[i, 3]) > 10) {
@@ -2324,6 +1740,7 @@ boundary25.rnase.zt <-lapply(1:nrow(shreg.rnase.zt), function(i) {
 ```
 
 Now, all regions (= 3 fractions) with a sd smaller then the sd for our normal fluctuation used by peak identification are selected.
+
 ```{r}
 closereg.rnase.zt <- list()
 for (i in 1:nrow(shreg.rnase.zt)) {
@@ -2343,12 +1760,15 @@ for (i in 1:nrow(shreg.rnase.zt)) {
 ```
 
 We just want to have the large values which also occur in close value.
+
 ```{r}
 largevalues.closereg.rnase.zt <- largevalues.rnase.zt
 for (i in seq_along(largevalues.closereg.rnase.zt)) {
     largevalues.closereg.rnase.zt[[i]] <- largevalues.closereg.rnase.zt[[i]][largevalues.closereg.rnase.zt[[i]] %in% closereg.rnase.zt[[i]]]}
 ordered.largevalues.closereg.rnase.zt <- lapply(largevalues.closereg.rnase.zt,function(row){sort(row)})
 ```
+
+Here, the shoulderregions are identified, using the previously defined variables.
 
 ```{r}
 shoulderregion.rnase.zt <- lapply(ordered.largevalues.closereg.rnase.zt,function(x) {
@@ -2363,8 +1783,6 @@ shoulderregion.rnase.zt <- lapply(ordered.largevalues.closereg.rnase.zt,function
     return(shoulderregion)
 })
 ```
-Interessante Proteine: AAAT_HUMAN
-Bad Proteins: ADA10_HUMAN
 
 
 We continue with the ctrl group.
@@ -2401,12 +1819,15 @@ for (i in 1:nrow(shreg.ctrl.zt)) {
 ```
 
 We just want to have the large values which also occur in close value.
+
 ```{r}
 largevalues.closereg.ctrl.zt <- largevalues.ctrl.zt
 for (i in seq_along(largevalues.closereg.ctrl.zt)) {
     largevalues.closereg.ctrl.zt[[i]] <- largevalues.closereg.ctrl.zt[[i]][largevalues.closereg.ctrl.zt[[i]] %in% closereg.ctrl.zt[[i]]]}
 ordered.largevalues.closereg.ctrl.zt <- lapply(largevalues.closereg.ctrl.zt,function(row){sort(row)})
 ```
+
+Here, the shoulderregions are identified, using the previously defined variables.
 
 ```{r}
 shoulderregion.ctrl.zt <- lapply(ordered.largevalues.closereg.ctrl.zt,function(x) {
@@ -2423,6 +1844,7 @@ shoulderregion.ctrl.zt <- lapply(ordered.largevalues.closereg.ctrl.zt,function(x
 ```
 
 Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
+
 ```{r}
 shoulderregion.a.zt <- lapply(names(shoulderregion.ctrl.zt), function(x) setdiff(shoulderregion.ctrl.zt[[x]], shoulderregion.rnase.zt[[x]]))
 names(shoulderregion.a.zt) <- names(shoulderregion.ctrl.zt)
@@ -2432,6 +1854,7 @@ names(shoulderregion.b.zt) <- names(shoulderregion.rnase.zt)
 ```
 
 At last, we only want does proteins with entries more than 2. The others have no significant difference.
+
 ```{r}
 selec.shoulderregion.a.zt <- lapply(shoulderregion.a.zt, function(x) 
   if (length(x) < 3) {return(numeric(0))} 
@@ -2443,6 +1866,7 @@ selec.shoulderregion.b.zt <- lapply(shoulderregion.b.zt, function(x)
 ```
 
 To include the shoulder regions into the dataframe with parameters, we create a new dataframe with 0 for shoulderregion and 1 with shoulderregion.
+
 ```{r}
 selec.shoulderregion.a.1.zt <- lapply(shoulderregion.a.zt, function(x) 
   if (length(x) > 2) {return (1)} 
@@ -2461,7 +1885,6 @@ shoulderregion.zt.nt.nt <- data.frame(lapply(shoulderregion.zt.nt, function(x) i
 
 ShoulderRegion_zt <- t(shoulderregion.zt.nt.nt)
 
-# View(ShoulderRegion_zt)
 ```
 
 #### 7.2.3 Shoulderregions based on Min-Max-Scaling
@@ -2509,6 +1932,8 @@ for (i in seq_along(largevalues.closereg.rnase.mms)) {
     largevalues.closereg.rnase.mms[[i]] <- largevalues.closereg.rnase.mms[[i]][largevalues.closereg.rnase.mms[[i]] %in% closereg.rnase.mms[[i]]]}
 ordered.largevalues.closereg.rnase.mms <- lapply(largevalues.closereg.rnase.mms,function(row){sort(row)})
 ```
+
+Here, the shoulderregions are identified, using the previously defined variables.
 
 ```{r}
 shoulderregion.rnase.mms <- lapply(ordered.largevalues.closereg.rnase.mms,function(x) {
@@ -2558,12 +1983,15 @@ for (i in 1:nrow(shreg.ctrl.mms)) {
 ```
 
 We just want to have the large values which also occur in close value.
+
 ```{r}
 largevalues.closereg.ctrl.mms <- largevalues.ctrl.mms
 for (i in seq_along(largevalues.closereg.ctrl.mms)) {
     largevalues.closereg.ctrl.mms[[i]] <- largevalues.closereg.ctrl.mms[[i]][largevalues.closereg.ctrl.mms[[i]] %in% closereg.ctrl.mms[[i]]]}
 ordered.largevalues.closereg.ctrl.mms <- lapply(largevalues.closereg.ctrl.mms,function(row){sort(row)})
 ```
+
+Here, the shoulderregions are identified, using the previously defined variables.
 
 ```{r}
 shoulderregion.ctrl.mms <- lapply(ordered.largevalues.closereg.ctrl.mms,function(x) {
@@ -2580,6 +2008,7 @@ shoulderregion.ctrl.mms <- lapply(ordered.largevalues.closereg.ctrl.mms,function
 ```
 
 Now we can find shoulderregions which only occur in one sample (ctrl or rnase). 
+
 ```{r}
 shoulderregion.a.mms <- lapply(names(shoulderregion.ctrl.mms), function(x) setdiff(shoulderregion.ctrl.mms[[x]], shoulderregion.rnase.mms[[x]]))
 names(shoulderregion.a.mms) <- names(shoulderregion.ctrl.mms)
@@ -2589,6 +2018,7 @@ names(shoulderregion.b.mms) <- names(shoulderregion.rnase.mms)
 ```
 
 At last, we only want does proteins with entries more than 2. The others have no significant difference.
+
 ```{r}
 selec.shoulderregion.a.mms <- lapply(shoulderregion.a.mms, function(x) 
   if (length(x) < 3) {return(numeric(0))} 
@@ -2600,6 +2030,7 @@ selec.shoulderregion.b.mms <- lapply(shoulderregion.b.mms, function(x)
 ```
 
 To include the shoulder regions into the dataframe with parameters, we create a new dataframe with 0 for shoulderregion and 1 with shoulderregion.
+
 ```{r}
 selec.shoulderregion.a.1.mms <- lapply(shoulderregion.a.mvm, function(x) 
   if (length(x) > 2) {return (1)} 
@@ -2618,13 +2049,13 @@ shoulderregion.mms.nt.nt <- data.frame(lapply(shoulderregion.mms.nt, function(x)
 
 ShoulderRegion_mms <- t(shoulderregion.mms.nt.nt)
 
- View(ShoulderRegion_mms)
 ```
 
 
 ### 7.3 Protein amount under global peak
 
 #### 7.3.1 protein amount under global peak based on Mean-Value-Methode
+
 We can test for proteins with a significant higher protein amount under the global peaks in the RNase group.
 
 ```{r}
@@ -2632,26 +2063,16 @@ signi.global.pa.mvm <- data.frame(PA_global = ifelse(globalpeak.value.rnase.mvm 
 
 rownames(signi.global.pa.mvm) <- rownames(rnase.mvm)
 
-#View(signi.global.pa.mvm)
-# dim(signi.global.pa.mvm)
-
-length(which(signi.global.pa.mvm==1))
 ```
 #### 7.3.2 protein amount under global peaks shift based on z-Transformation
 
-```{r}
-Nr <- c(1:dim(rnase.rep.zt.scaled)[1])
-rnase.zt.nr <- cbind(Nr,rnase.zt)
-```
+We can do the the same for z-transformation.
 
 ```{r}
 signi.global.pa.zt <- data.frame(PA_global = ifelse(globalpeak.value.rnase.zt > 1.7 * globalpeak.value.ctrl.zt | globalpeak.value.ctrl.zt > 1.7 * globalpeak.value.rnase.zt, 1, 0))
 
 rownames(signi.global.pa.zt) <- rownames(rnase.zt)
 
-View(signi.global.pa.zt)
-
-length(which(signi.global.pa.zt==1))
 ```
 
 #### 7.3.3 protein amount under global peaks shift based on Min-Max-Scaling
@@ -2664,6 +2085,7 @@ With this method we can´t find any Rdeeps for the mms normalized data because a
 #### 7.4.1 Protein amount under local peaks shift based on Mean-Value-Method
 
 First we have to sum up the protein amount under all local peaks - for the control group.
+
 ```{r}
 localpeaks.sumvalues.ctrl.mvm <- data.frame(sum_values = numeric(length(localpeaks.values.ctrl.mvm)))
 
@@ -2671,18 +2093,17 @@ for (i in seq_along(localpeaks.values.ctrl.mvm)) {
   sum_values <- sum(localpeaks.values.ctrl.mvm[[i]])
   localpeaks.sumvalues.ctrl.mvm[i, "sum_values"] <- sum_values}
 
-# View(localpeaks.sumvalues.ctrl.mvm)
 ```
 
-Protein amount under all local peaks - for the RNase group 
+Protein amount under all local peaks - for the RNase group. 
+
 ```{r}
 localpeaks.sumvalues.rnase.mvm <- data.frame(sum_values = numeric(length(localpeaks.values.rnase.mvm)))
 
 for (i in seq_along(localpeaks.values.rnase.mvm)) {
   sum_values <- sum(localpeaks.values.rnase.mvm[[i]])
   localpeaks.sumvalues.rnase.mvm[i, "sum_values"] <- sum_values}
-
-#View(localpeaks.sumvalues.rnase.mvm)  
+ 
 ```
 
 Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
@@ -2699,12 +2120,12 @@ for (i in 1:nrow(localpeaks.sumvalues.rnase.mvm)) {
 
 rownames(signi.local.pa.mvm) <- rownames(rnase.mvm)
 
-length(which(signi.local.pa.mvm==1))
-#View(signi.local.pa.mvm)
-#dim(signi.local.pa.mvm)
 ```
 
 #### 7.4.2 protein amount under local peaks shift based on z-Transformation
+
+First we have to sum up the protein amount under all local peaks - for the control group.
+
 ```{r}
 localpeaks.sumvalues.ctrl.zt <- data.frame(Summed_Values = numeric(length(localpeaks.values.ctrl.zt)))
 
@@ -2713,8 +2134,9 @@ for (i in seq_along(localpeaks.values.ctrl.zt)) {
   localpeaks.sumvalues.ctrl.zt[i, "Summed_Values"] <- summed_values
 }
 
-#View(localpeaks.sumvalues.ctrl.zt)
 ```
+
+Protein amount under all local peaks - for the RNase group. 
 
 ```{r}
 localpeaks.sumvalues.rnase.zt <- data.frame(Summed_Values = numeric(length(localpeaks.values.rnase.zt)))
@@ -2724,28 +2146,28 @@ for (i in seq_along(localpeaks.values.rnase.zt)) {
   localpeaks.sumvalues.rnase.zt[i, "Summed_Values"] <- summed_values
 }
 
-#View(localpeaks.sumvalues.rnase.zt)
 ```
 
+Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
+
 ```{r}
-signifikante_reihen_local_zt <- data.frame(Zustimmung_local = rep(0, nrow(localpeaks.sumvalues.rnase.zt)))
+signi.local.pa.zt <- data.frame(Zustimmung_local = rep(0, nrow(localpeaks.sumvalues.rnase.zt)))
 
 for (i in 1:nrow(localpeaks.sumvalues.rnase.zt)) {
   if (abs(localpeaks.sumvalues.rnase.zt$Summed_Values[i] - localpeaks.sumvalues.ctrl.zt$Summed_Values[i]) > 7.5)
   {
-    signifikante_reihen_local_zt$Zustimmung_local[i] <- 1
+    signi.local.pa.zt$Zustimmung_local[i] <- 1
   }
 }
 
-rownames(signifikante_reihen_local_zt) <- rownames(rnase.zt)
+rownames(signi.local.pa.zt) <- rownames(rnase.zt)
 
-length(which(signifikante_reihen_local_zt==1))
-
-#View(signifikante_reihen_local_zt)
-#dim(signifikante_reihen_local_zt)
 ```
 
 #### 7.4.3 protein amount under local peaks shift based on MMS
+
+First we have to sum up the protein amount under all local peaks - for the control group.
+
 ```{r}
 localpeaks.sumvalues.ctrl.mms <- data.frame(Summed_Values = numeric(length(localpeaks.values.ctrl.mms)))
 
@@ -2754,8 +2176,9 @@ for (i in seq_along(localpeaks.values.ctrl.mms)) {
   localpeaks.sumvalues.ctrl.mms[i, "Summed_Values"] <- summed_values
 }
 
-#View(localpeaks.sumvalues.ctrl.mms)
 ```
+
+Protein amount under all local peaks - for the RNase group. 
 
 ```{r}
 localpeaks.sumvalues.rnase.mms <- data.frame(Summed_Values = numeric(length(localpeaks.values.rnase.mms)))
@@ -2765,43 +2188,29 @@ for (i in seq_along(localpeaks.values.rnase.mms)) {
   localpeaks.sumvalues.rnase.mms[i, "Summed_Values"] <- summed_values
 }
 
-#View(localpeaks.sumvalues.rnase.mms)
 ```
 
+Then we can test for proteins with a significant higher protein amount under the local peaks in the RNase group.
+
 ```{r}
-signifikante_reihen_local_mms <- data.frame(Zustimmung_local = rep(0, nrow(localpeaks.sumvalues.rnase.mms)))
+signi.local.pa.mms <- data.frame(Zustimmung_local = rep(0, nrow(localpeaks.sumvalues.rnase.mms)))
 
 for (i in 1:nrow(localpeaks.sumvalues.rnase.mms)) {
   if (abs(localpeaks.sumvalues.rnase.mms$Summed_Values[i] - localpeaks.sumvalues.ctrl.mms$Summed_Values[i]) > 7.5)
   {
-    signifikante_reihen_local_mms$Zustimmung_local[i] <- 1
+    signi.local.pa.mms$Zustimmung_local[i] <- 1
   }
 }
 
-rownames(signifikante_reihen_local_mms) <- rownames(rnase.mms)
+rownames(signi.local.pa.mms) <- rownames(rnase.mms)
 
-#View(signifikante_reihen_local_mms)
-#dim(signifikante_reihen_local_mms)
 ```
 
-### 7.5 Dataframe with all parameters
 
-```{r}
-parameters.mvm <- cbind(signi.global.pa.mvm, signi.local.pa.mvm, shift_mvm_named, ShoulderRegion_mvm)
+### 7.5 t-test for protein amount shift under global peak
 
-parameters.zt <- cbind(signi.global.pa.zt, signifikante_reihen_local_zt, shift_zt_named, ShoulderRegion_zt)
-
-parameters.mms <- cbind(signifikante_reihen_local_mms, shift_mms_named, ShoulderRegion_mms)
-
-#View(parameters.mms)
-```
-
-```{r}
-# View(parameters.mvm)
-```
-
-### 7.6 t-test for protein amount shift under global peak
 Adding values in 0.25 steps between existing fractions for zt scaling 
+
 ```{r}
 
 rnase.zt.1 <- seq(1, ncol(rnase.zt), by = 1)
@@ -2816,6 +2225,7 @@ row.names(ctrl.zt_erweitert) <- row.names(ctrl.zt)
 ```
 
 y-values of global peak and neighbors for zt
+
 ```{r}
 globalpeak.neighbors.values.rnase.zt <- apply(rnase.zt_erweitert, 1, function(x) {
 peak_indices <- which(x == max(x))
@@ -2843,6 +2253,7 @@ x[c(peak_indices - 1, peak_indices, peak_indices + 1)]
 ```
 
 welch´s t-test andoverlap with parameter A for zt
+
 ```{r}
 t.test.zt <- numeric(length(globalpeak.neighbors.values.rnase.zt))
 for (i in seq_along(globalpeak.neighbors.values.rnase.zt)) {
@@ -2856,7 +2267,7 @@ t.test.zt <- lapply(t.test.zt, function(x)
   }else{
     return(0)
   }) 
-View(t.test.zt)
+#View(t.test.zt)
 signi.global.pa.zt2 <- liste <- apply(signi.global.pa.zt, 1, function(x) as.numeric(x))
 View(signi.global.pa.zt2)
 
@@ -2876,9 +2287,8 @@ sum(unlist(t.test.zt))
 ```
 
 
-
-
 Adding values in 0.25 steps between existing fractions for mvm scaling 
+
 ```{r}
 
 rnase.mvm.1 <- seq(1, ncol(rnase.mvm), by = 1)
@@ -2892,6 +2302,7 @@ row.names(ctrl.mvm_erweitert) <- row.names(ctrl.mvm)
 ```
 
 y-values of global peak and neighbors for mvm
+
 ```{r}
 globalpeak.neighbors.values.rnase.mvm <- apply(rnase.mvm_erweitert, 1, function(x) {
 peak_indices <- which(x == max(x))
@@ -2934,11 +2345,11 @@ t.test.mvm <- lapply(t.test.mvm, function(x)
   }else{
     return(0)
   })
-View(t.test.mvm)
+#View(t.test.mvm)
 signi.global.pa.mvm2 <- liste <- apply(signi.global.pa.mvm, 1, function(x) as.numeric(x))
 names(signi.global.pa.mvm2) <- 1:length(signi.global.pa.mvm2)
-print(t.test.mvm)
-View(signi.global.pa.mvm2)
+#print(t.test.mvm)
+#View(signi.global.pa.mvm2)
 
 overlap.y.shift_t.test.mvm <- numeric(length(t.test.mvm))
 for (i in seq_along(t.test.mvm)) {
@@ -2949,8 +2360,22 @@ for (i in seq_along(t.test.mvm)) {
   }
 }
 
-sum(overlap.y.shift_t.test.mvm)
-sum(unlist(t.test.mvm))
+#sum(overlap.y.shift_t.test.mvm)
+#sum(unlist(t.test.mvm))
+
+```
+
+
+### 7.6. Dataframe with all parameters
+
+Here we combine all parameters in to one data.frame. (For each method)
+
+```{r}
+parameters.mvm <- cbind(signi.global.pa.mvm, signi.local.pa.mvm, shift_mvm_named, ShoulderRegion_mvm)
+
+parameters.zt <- cbind(signi.global.pa.zt, signi.local.pa.zt, shift_zt_named, ShoulderRegion_zt)
+
+parameters.mms <- cbind(signi.local.pa.mms, shift_mms_named, ShoulderRegion_mms)
 
 ```
 
@@ -2959,68 +2384,73 @@ sum(unlist(t.test.mvm))
 
 With the previously identified parameters we can identify which proteins are RNA-associated.
 
-The following plots visualize our results. (Only considering the global shifts):
+The following plots visualize our results. (Only considering global shifts, and precipitation):
 
 ```{r, warning = False}
 shift_named <- cbind(shift_mvm_named, shift_zt_named, shift_mms_named)
 plots_RBP <- list()
+peak.ctrl.all <- list(globalpeak.ctrl.mvm, globalpeak.ctrl.zt, globalpeak.ctrl.mms)
+peak.rnase.all <- list(globalpeak.rnase.mvm, globalpeak.rnase.zt, globalpeak.rnase.mms)
 
 library("ggplot2")
 
 for (x in 1:3){
 
-col <- c("skyblue2", "darkseagreen3","tomato1", "lightsteelblue4" )
-vjust <- c(-0.5, 1, -0.5, -0.5)
-labels <- c("left shift", "no shift", "precipitated", "right shift")
-
-title <- c("Shifttypes", "Shifttypes z-Transformation", "Shifttypes Min-Max-Scaling")
-
-
-peaks <- data.frame(peak.ctrl, peak.rnase, shift_named[,1])
-number.of.clusters <- data.frame(value = shift_named[,1])
-peaks$cluster <- factor(shift_named[,1])
-
-
-dot.plot <- ggplot(peaks, aes(peak.ctrl,peak.rnase)) + 
-  geom_point(aes(colour = shift_named[,1]), 
-             shape = 19, 
-             alpha = 0.5, size = 1.5, 
-             position = position_jitter(width = 0.2, height = 0.2))+
-  labs(x = "Fraction of Control Peak", 
-       y = "Fraction of RNase Peak", 
-       title = title[1])+
-  coord_equal()+
-  scale_colour_manual(values = col,labels = labels, name = "shifttypes")+
-  theme_light()
-
-
-bar.plot <- ggplot(number.of.clusters, aes(factor(value)))+
-  geom_bar(fill = col, width = 0.7)+
-  theme_minimal()+
-  theme(axis.text.x = element_blank(), 
-        axis.text.y = element_blank(),
-        axis.title.x = element_blank(), 
-        axis.title.y = element_blank(),
-        panel.grid = element_blank(),
-        panel.border = element_rect(color = "grey", fill = NA),
-        panel.background = element_rect(fill = "white", colour = NA))+
-  geom_text(stat = 'count', 
-            aes(label = after_stat(count)), 
-            vjust = vjust, 
-            size = 2.7)
-
-
-plot_RBP[[1]] <- dot.plot + annotation_custom(grob = ggplotGrob(bar.plot), 
-                    xmin = 15, 
-                    xmax = 26.75, 
-                    ymin = -1, 
-                    ymax = 8)
-print(plot_RBP[[1]])+ labs(subtitle = paste("Figure 5: Categorization into shifting behaviour based on global shift.")) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97")) + theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98"))
+  col <- c("skyblue2", "darkseagreen3","tomato1", "lightsteelblue4" )
+  vjust <- c(-0.5, 1, -0.5, -0.5)
+  labels <- c("left shift", "no shift", "precipitated", "right shift")
+  
+  title <- c("Shifttypes", "Shifttypes z-Transformation", "Shifttypes Min-Max-Scaling")
+  
+  peak.ctrl <- peak.ctrl.all[[x]]
+  peak.rnase <- peak.rnase.all[[x]]
+  
+  peaks <- data.frame(peak.ctrl, peak.rnase, shift_named[,1])
+  number.of.clusters <- data.frame(value = shift_named[,1])
+  peaks$cluster <- factor(shift_named[,1])
+  
+  
+  dot.plot <- ggplot(peaks, aes(peak.ctrl,peak.rnase)) + 
+    geom_point(aes(colour = shift_named[,1]), 
+               shape = 19, 
+               alpha = 0.5, size = 1.5, 
+               position = position_jitter(width = 0.2, height = 0.2))+
+    labs(x = "Fraction of Control Peak", 
+         y = "Fraction of RNase Peak", 
+         title = title[1])+
+    coord_equal()+
+    scale_colour_manual(values = col,labels = labels, name = "shifttypes")+
+    theme_light()
+  
+  
+  bar.plot <- ggplot(number.of.clusters, aes(factor(value)))+
+    geom_bar(fill = col, width = 0.7)+
+    theme_minimal()+
+    theme(axis.text.x = element_blank(), 
+          axis.text.y = element_blank(),
+          axis.title.x = element_blank(), 
+          axis.title.y = element_blank(),
+          panel.grid = element_blank(),
+          panel.border = element_rect(color = "grey", fill = NA),
+          panel.background = element_rect(fill = "white", colour = NA))+
+    geom_text(stat = 'count', 
+              aes(label = after_stat(count)), 
+              vjust = vjust, 
+              size = 2.7)
+  
+  
+  plots_RBP[[x]] <- dot.plot + annotation_custom(grob = ggplotGrob(bar.plot), 
+                      xmin = 15, 
+                      xmax = 26.75, 
+                      ymin = -1, 
+                      ymax = 8)
+  print(plots_RBP[[x]])
 }
 ```
+This beautiful visualization makes the plot ready for our report.
 
 ```{r}
-print(plot_RBP[[1]] + labs(subtitle = paste("Figure 5: Categorization into shifting behaviour based on global shift.")) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97")) + theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98")))
+print(plots_RBP[[1]] + labs(subtitle = paste("Figure 5: Categorization into shifting behaviour based on global shift.")) + theme(panel.background = element_rect(fill = "gray98")) + theme(plot.background = element_rect(fill = "gray97")) + theme(legend.background = element_rect(fill = "gray97")) + theme(legend.key = element_rect(fill = "gray98")))
 ```
 
 
@@ -3070,6 +2500,7 @@ for (z in 1:3){
 }
 
 ```
+This barplot shows us how many proteins are RNA associated according to how many parameters. Additionally it shows which parameters were present. 
 
 ```{r}
 library(ggplot2)
@@ -3175,6 +2606,7 @@ for (z in 1:3){
 }
 ```
 
+This makes it ready for our report.
 
 ```{r}
 print(plot.parameters.detail[[1]] + labs(subtitle = 
@@ -3191,6 +2623,7 @@ Here we cluster the peaks after different parameters. This helps to visualize th
 
 Here we cluster the Proteins depending on the fractions in which the peaks are. 
 First we test the optimal number of clusters
+
 ```{r}
 df.peaks <- data.frame(cbind(globalpeak.ctrl.mvm, globalpeak.rnase.mvm, globalpeak.ctrl.zt, globalpeak.rnase.zt, globalpeak.ctrl.mms, globalpeak.rnase.mms))
 
@@ -3210,7 +2643,7 @@ ggplot(wss.df, aes(x = 1:length(wss), y = values))+
 
 ```
 
-If we follow the results of the elbow method, the optimal number of clusters would be 2. But this would not lead to any useful results. So we force kmeans to create four clusters...
+If we follow the results of the elbow method, the optimal number of clusters would be 2. But this would not lead to any useful results. So we force kmeans to create 4 clusters...
 
 ```{r, warning = False}
 library("ggpubr")
@@ -3276,7 +2709,6 @@ for(y in 1:3){
   colnames(shift.kmeans[[y]]) = colnames[y]
   }
 
-#View(shift.kmeans)
 #sum(shift.kmeans[[1]][,1] == 1)
 #sum(shift.kmeans[[2]][,1] == 1)
 #sum(shift.kmeans[[3]][,1] == 1)
@@ -3287,7 +2719,7 @@ With this method we could identify 160 RNA-associated Proteins for MVM, 155 for 
 
 ## 10. Regression analysis 
 
-Erstellen der Dataframes mit Parametern für Regressions analyse
+Here we create data frames for the regression analysis.
 
 ```{r}
 parameters.all <- list(parameters.mvm, parameters.zt, parameters.mms)
@@ -3338,10 +2770,8 @@ shift.vector.mvm <- shift.vector.all[[1]]
 shift.vector.zt <- shift.vector.all[[2]]
 shift.vector.mms <- shift.vector.all[[3]]  
 
-sum(shift.vector.mvm ==1)
-sum(shift.vector.zt ==1)
-sum(shift.vector.mms ==1)
 ```
+Here they are converted to data frames.
 
 ```{r}
 shift_mvm <- as.data.frame(shift.vector.mvm)
@@ -3355,6 +2785,7 @@ shift_mms <- as.data.frame(shift.vector.mms)
 #### 10.1.1 Regression analysis based on the shift amount
 
 The two parameters for the regression analysis are the global shift amount and the correlation between the Ctrl and RNase dataset. The global shift amount is already calculated and saved as dataframe in absolute numbers under *shift.amount*. First we determine the correlation.
+
 ```{r}
 shift.amount = data.frame(shift_mvm_global)
 
@@ -3363,6 +2794,7 @@ rownames(correlation.mvm) <- rownames(rnase.mvm)
 ```
 
 Afterwards we perform the linear Regression to predict the global shift based on the correlation. Proteins with a right shift have an entry of 1, those with a left shift of -1 and the no shifters of 0.
+
 ```{r}
 train_mvm_2 <- data.frame(Korrelation_2 = correlation.mvm[1:2500, ], Shift_2 = shift.amount[1:2500, ])
 
@@ -3452,6 +2884,7 @@ legend("topright", legend = c("Trained Data", "Predicted Data", "Regression Curv
 ```
 
 #### 10.1.2 Regression analysis using all parameters 
+
 ```{r}
 train_mvm <- data.frame(Korrelation = correlation.mvm[1:2500, ], Shift = shift_mvm[1:2500, ])
 
@@ -3469,12 +2902,13 @@ print(summary(model_mvm_all))
 #print(rounded_predictions_mvm_all)
 
 ```
+
 ### 10.2 Regression analysis z-Transformation
 
 #### 10.2.1 Regression analysis based on fraction shift
 
-
 The two parameters for the regression analysis are the global shift amount and the correlation between the Ctrl and RNase dataset. The global shift amount is already calculated and saved as dataframe in absolute numbers under *shift.amount*. First we determine the correlation.
+
 ```{r}
 shift.amount = data.frame(shift_mvm_global)
 
@@ -3483,6 +2917,7 @@ rownames(correlation.zt) <- rownames(rnase.zt)
 ```
 
 Afterwards we perform the linear Regression to predict the global shift based on the correlation. Proteins with a right shift have an entry of 1, those with a left shift of -1 and the no shifters of 0.
+
 ```{r}
 train_zt_2 <- data.frame(Korrelation_2 = correlation.zt[1:2500, ], Shift_2 = shift.amount[1:2500, ])
 
@@ -3572,6 +3007,7 @@ legend("topright", legend = c("Trained Data", "Predicted Data", "Regression Curv
 ```
 
 #### 10.2.2 Regression analysis using all parameters 
+
 ```{r}
 train_zt <- data.frame(Korrelation_zt = correlation.zt[1:2500, ], Shift = shift_zt[1:2500, ])
 
@@ -3688,7 +3124,9 @@ points(test_px, predicted_py, col = "lightblue", pch = 16, cex = 0.9)
 
 legend("topright", legend = c("Trained Data", "Predicted Data", "Regression Curve", "Threshold"),col = c("darkgrey", "lightblue", "red", "green4"), pch = c(16, 16, NA, NA), lty = c(NA, NA, 1, 1), cex = 0.8)
 ```
+
 #### 10.3.2 Regression analysis using all parameters 
+
 ```{r}
 train_mms <- data.frame(Korrelation = correlation.mms[1:2500, ], Shift = shift_mms[1:2500, ])
 
@@ -3705,9 +3143,12 @@ print(summary(model_mms_all))
 #print(rounded_predictions_mms_all)
 ```
 
-#### 10.4.1 Comparison of trained data based on global shift amount with RDeep
+### 10.4. Comparison of trained data based on global shift amount with RDeep
 
-Regression based on global shift amount
+#### 10.4.1. Data preparation
+
+Regression based on global shift amount.
+
 ```{r}
 predictions_mms_rdeep_shift <- matrix(0, nrow = nrow(predictions_mms_plot), ncol = ncol(predictions_mms_plot))
 
@@ -3755,6 +3196,8 @@ for(i in 1:nrow(predictions_mvm_plot)) {
 rownames(predictions_mvm_rdeep_shift) <- rownames(rnase.mvm[2501:3074, ])
 ```
 
+Preparing the results for comparison. 
+
 ```{r}
 names.rdp.mvm.regression <- rownames(predictions_mvm_rdeep_shift)[which(predictions_mvm_rdeep_shift == 1)]
 names.rdp.zt.regression <- rownames(predictions_zt_rdeep_shift)[which(predictions_zt_rdeep_shift == 1)]
@@ -3772,158 +3215,14 @@ names.nrdp.regression <- list(names.nrdp.mvm.regression, names.nrdp.zt.regressio
 number.observed.nonRBPs.regression <- c(length(names.nrdp.mvm.regression), length(names.nrdp.zt.regression), length(names.nrdp.mms.regression))
 ```
 
-### 10.4.2 True Positives - regression
-
-Check how many of our proteins really are RNA-dependent:
-
-```{r}
-# number.observed.RBPs.regression
-```
-
-
-```{r}
-#Number of correctly assigned (true positives) RBPs with parameters
-true.positives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
-for(z in 1:3){
-  counter <- 0
-  for (i in names.rdp.regression[[z]]) {
-    if (i %in% rownames(rdeep)) {
-      counter <- counter + 1
-    }
-  }
-  true.positives.regression.shift[z] <- counter
-}
-# true.positives.regression.shift
-```
-
-
-### 10.4.3 False positives - regression
-
-
-```{r}
-# Number of wrongly assigned (false positives) RBPs with parameters
-
-false.positives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
-for(z in 1:3){
-  counter <- 0
-  for (i in names.rdp.regression[[z]]) {
-    if (i %in% non.rdeep$Entry_Name) {
-      counter <- counter + 1
-    }
-  }
-  false.positives.regression.shift[z] <- counter
-}
-false.positives.regression.shift
-```
-
-### 10.4.4 True negatives - regression
-
-```{r}
-number.observed.nonRBPs.regression
-```
-
-```{r}
-# Number of correctly assigned non-RBPs (true negatives) with parameters
-
-true.negatives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
-for(z in 1:3){
-  counter <- 0
-  for (i in names.nrdp.regression[[z]]) {
-    if (i %in% non.rdeep$Entry_Name) {
-      counter <- counter + 1
-    }
-  }
-  true.negatives.regression.shift[z] <- counter
-}
-true.negatives.regression.shift
-```
-
-
-### 10.4.5 False negatives - regression
-
-```{r}
-# Number of wrongly assigned non-RBPs (true negatives) with parameters
-false.negatives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
-for(z in 1:3){
-  counter <- 0
-  for (i in names.nrdp.regression[[z]]) {
-    if (i %in% rownames(rdeep)) {
-      counter <- counter + 1
-    }
-  }
-  false.negatives.regression.shift[z] <- counter
-}
-# false.negatives.regression.shift
-```
-### 10.4.6 false-negative-rate (FNR) - regression
-
-FNR = FN/(FN + TP)
-```{r}
-fnr.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
-for(x in 1:3){
-  fnr.regression.shift[x] <- false.negatives.regression.shift[x]/(false.negatives.regression.shift[x] + true.positives.regression.shift[x])
-}
-fnr.regression.shift
-```
-
-
-
-### 10.4.7 false-positive-rate (FPR) - regression
-
-FPR = FP/(FP + TN)
-```{r}
-fpr.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
-for(x in 1:3){
-  fpr.regression.shift[x] <- false.positives.regression.shift[x]/(false.positives.regression.shift[x]+true.negatives.regression.shift[x])
-}
-fpr.regression.shift
-```
-
-
-
-### 10.4.8 Precision - regression
-
-precision = TP/(TP + FP)
-```{r}
-precision.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
-for(x in 1:3){
-  precision.regression.shift[x] <- true.positives.regression.shift[x]/(true.positives.regression.shift[x] + false.positives.regression.shift[x])
-}
-precision.regression.shift
-```
-#### 10.4.2 Comparison of trained data based on parameters amount with RDeep
-
-```{r}
-names.rdp.mvm.regression.para <- rownames(rounded_predictions_mvm_all)[which(rounded_predictions_mvm_all == 1)]
-names.rdp.zt.regression.para <- rownames(rounded_predictions_zt_all)[which(rounded_predictions_zt_all == 1)]
-names.rdp.mms.regression.para <- rownames(rounded_predictions_mms_all)[which(rounded_predictions_mms_all == 1)]
-
-names.rdp.regression.para <- list(names.rdp.mvm.regression.para, names.rdp.zt.regression.para, names.rdp.mms.regression.para)
-number.observed.RBPs.regression.para <- c(length(names.rdp.mvm.regression.para), length(names.rdp.zt.regression.para), length(names.rdp.mms.regression.para))
-
-
-names.nrdp.mvm.regression.para <- rownames(rounded_predictions_mvm_all)[which(rounded_predictions_mvm_all == 0)]
-names.nrdp.zt.regression.para <- rownames(rounded_predictions_zt_all)[which(rounded_predictions_zt_all == 0)]
-names.nrdp.mms.regression.para <- rownames(rounded_predictions_mms_all)[which(rounded_predictions_mms_all == 0)]
-
-names.nrdp.regression.para <- list(names.nrdp.mvm.regression.para, names.nrdp.zt.regression.para, names.nrdp.mms.regression.para)
-number.observed.nonRBPs.regression.para <- c(length(names.nrdp.mvm.regression.para), length(names.nrdp.zt.regression.para), length(names.nrdp.mms.regression.para))
-```
-
-Check how many of our proteins really are RNA-dependent:
-
-```{r}
-number.observed.RBPs.regression.para
-```
-
-
-
-## 12. Comparison with RDeep
+Here we load the Rdeep data we want to compare our results to.
 
 ```{r}
 rdeep <- read.csv('RBP2GO_Human_database_RBPs.csv', header=TRUE, row.names=1, sep = ";")
 #View(rdeep)
 ```
+
+Here we convert a table, containing non-RNA dependent proteins to a usefull format.
 
 ```{r}
 text <- "Table_HS_Non_RBP.txt"
@@ -3940,8 +3239,166 @@ non.rdeep <- read.csv(csv)
 ```
 
 
+#### 10.4.2 True Positives - regression
 
-We have the following results we want to look at:
+Check how many of our proteins really are RNA-dependent:
+
+```{r}
+# number.observed.RBPs.regression
+```
+
+Number of correctly assigned (true positives) RBPs with parameters
+
+```{r}
+true.positives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.rdp.regression[[z]]) {
+    if (i %in% rownames(rdeep)) {
+      counter <- counter + 1
+    }
+  }
+  true.positives.regression.shift[z] <- counter
+}
+
+```
+
+
+#### 10.4.3 False positives - regression
+
+Number of wrongly assigned (false positives) RBPs with parameters
+
+```{r}
+
+false.positives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.rdp.regression[[z]]) {
+    if (i %in% non.rdeep$Entry_Name) {
+      counter <- counter + 1
+    }
+  }
+  false.positives.regression.shift[z] <- counter
+}
+
+```
+
+#### 10.4.4 True negatives - regression
+
+```{r}
+#number.observed.nonRBPs.regression
+```
+
+Number of correctly assigned non-RBPs (true negatives) with parameters
+
+```{r}
+
+
+true.negatives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.nrdp.regression[[z]]) {
+    if (i %in% non.rdeep$Entry_Name) {
+      counter <- counter + 1
+    }
+  }
+  true.negatives.regression.shift[z] <- counter
+}
+
+```
+
+
+#### 10.4.5 False negatives - regression
+
+Number of wrongly assigned non-RBPs (true negatives) with parameters
+
+```{r}
+false.negatives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(z in 1:3){
+  counter <- 0
+  for (i in names.nrdp.regression[[z]]) {
+    if (i %in% rownames(rdeep)) {
+      counter <- counter + 1
+    }
+  }
+  false.negatives.regression.shift[z] <- counter
+}
+# false.negatives.regression.shift
+```
+
+#### 10.4.6 false-negative-rate (FNR) - regression
+
+FNR = FN/(FN + TP)
+
+```{r}
+fnr.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(x in 1:3){
+  fnr.regression.shift[x] <- false.negatives.regression.shift[x]/(false.negatives.regression.shift[x] + true.positives.regression.shift[x])
+}
+fnr.regression.shift
+```
+
+
+
+#### 10.4.7 false-positive-rate (FPR) - regression
+
+FPR = FP/(FP + TN)
+
+```{r}
+fpr.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(x in 1:3){
+  fpr.regression.shift[x] <- false.positives.regression.shift[x]/(false.positives.regression.shift[x]+true.negatives.regression.shift[x])
+}
+fpr.regression.shift
+```
+
+
+
+#### 10.4.8 Precision - regression
+
+precision = TP/(TP + FP)
+
+```{r}
+precision.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
+for(x in 1:3){
+  precision.regression.shift[x] <- true.positives.regression.shift[x]/(true.positives.regression.shift[x] + false.positives.regression.shift[x])
+}
+precision.regression.shift
+```
+
+#### 10.4.9 Comparison of trained data based on parameters amount with RDeep
+
+
+```{r}
+names.rdp.mvm.regression.para <- rownames(rounded_predictions_mvm_all)[which(rounded_predictions_mvm_all == 1)]
+names.rdp.zt.regression.para <- rownames(rounded_predictions_zt_all)[which(rounded_predictions_zt_all == 1)]
+names.rdp.mms.regression.para <- rownames(rounded_predictions_mms_all)[which(rounded_predictions_mms_all == 1)]
+
+names.rdp.regression.para <- list(names.rdp.mvm.regression.para, names.rdp.zt.regression.para, names.rdp.mms.regression.para)
+number.observed.RBPs.regression.para <- c(length(names.rdp.mvm.regression.para), length(names.rdp.zt.regression.para), length(names.rdp.mms.regression.para))
+
+
+names.nrdp.mvm.regression.para <- rownames(rounded_predictions_mvm_all)[which(rounded_predictions_mvm_all == 0)]
+names.nrdp.zt.regression.para <- rownames(rounded_predictions_zt_all)[which(rounded_predictions_zt_all == 0)]
+names.nrdp.mms.regression.para <- rownames(rounded_predictions_mms_all)[which(rounded_predictions_mms_all == 0)]
+
+names.nrdp.regression.para <- list(names.nrdp.mvm.regression.para, names.nrdp.zt.regression.para, names.nrdp.mms.regression.para)
+number.observed.nonRBPs.regression.para <- c(length(names.nrdp.mvm.regression.para), length(names.nrdp.zt.regression.para), length(names.nrdp.mms.regression.para))
+
+```
+
+Check how many of our proteins really are RNA-dependent:
+
+```{r}
+number.observed.RBPs.regression.para
+```
+
+
+## 11. Comparison with RDeep
+
+Since the data we want to compare our results to was already loaded in 10.4.1. we don't have to do this again here.
+
+Here we prepare our parameters, kmeans and global shift results, for comparison. 
 
 ```{r}
 # the proteins identified as RNA-dependent by our four parameters:
@@ -4018,20 +3475,13 @@ names.nrdp.glob <- list(names.nrdp.mvm.glob, names.nrdp.zt.glob, names.nrdp.mms.
 
 number.observed.non.RBPs.glob <- c(length(names.nrdp.mvm.glob), length(names.nrdp.zt.glob), length(names.nrdp.mms.glob))
 
-
-
 ```
+
 Using the parameters we have identified 464 RNA-associated Proteins with MVM, 468 with z-transformation and 396 with MMS.
 Using the kmeans we have identified 160 RNA-associated Proteins with MVM, 155 with z-transformation and 159 with MMS.
 
-Now we are going to look whether they are in these:
-```{r}
-#View(rdeep)
-#View(non.rdeep)
-#View(non.rdeep$Entry_Name)
-```
 
-### 12.1. True Positives
+### 11.1. True Positives
 
 Check how many of our proteins really are RNA-dependent:
 
@@ -4074,7 +3524,9 @@ for(z in 1:3){
 ```
 
 
-### 12.2. False positives
+### 11.2. False positives
+
+Check how many of our RNA-dependent proteins aren't really RNA-dependent:
 
 ```{r}
 # Number of wrongly assigned (false positives) RBPs with parameters
@@ -4116,7 +3568,9 @@ for(z in 1:3){
 ```
 
 
-### 12.3. True negatives
+### 11.3. True negatives
+
+Check how many of our non-RNA-dependent proteins really are non-RNA-dependent:
 
 ```{r}
 # Number of correctly assigned non-RBPs (true negatives) with parameters
@@ -4158,7 +3612,9 @@ for(z in 1:3){
 ```
 
 
-### 12.4. False negatives
+### 11.4. False negatives
+
+Check how many of our non-RNA-dependent proteins aren't real non-RNA-dependent proteins:
 
 ```{r}
 # Number of wrongly assigned non-RBPs (true negatives) with parameters
@@ -4199,9 +3655,10 @@ for(z in 1:3){
 ```
 
 
-### 12.5. false-negative-rate (FNR)
+### 11.5. false-negative-rate (FNR)
 
 FNR = FN/(FN + TP)
+
 ```{r}
 fnr.parameters <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(x in 1:3){
@@ -4221,9 +3678,10 @@ for(x in 1:3){
 
 
 
-### 12.6. false-positive-rate (FPR)
+### 11.6. false-positive-rate (FPR)
 
 FPR = FP/(FP + TN)
+
 ```{r}
 fpr.parameters <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(x in 1:3){
@@ -4243,9 +3701,10 @@ for(x in 1:3){
 
 
 
-### 12.7. Precision
+### 11.7. Precision
 
 precision = TP/(TP + FP)
+
 ```{r}
 precision.parameters <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(x in 1:3){
@@ -4264,7 +3723,9 @@ for(x in 1:3){
 ```
 
 
-### 12.8. non-comparable Proteins
+### 11.8. non-comparable Proteins
+
+Here we identify those proteins that are neither in the Rdeep-data base, nor the table. 
 
 ```{r}
 non.comparable.mvm.parameters <- rownames(comp.mvm.parameters)[which(!(rownames(comp.mvm.parameters) %in% non.rdeep$Entry_Name) & (!(rownames(comp.mvm.parameters) %in% rownames(rdeep))))]
@@ -4327,7 +3788,10 @@ rownames(non.comparable.all) <- c(1:13,"total")
 Its always the same 13 proteins that are not in the database
 
 
-### 12.9. Summary
+### 11.9. Summary
+
+These data frames show all results of the comparison. 
+
 ```{r}
 #for the results of our parameters
 summary.numbers.parameters <- rbind(true.positives.parameters, false.positives.parameters, true.negatives.parameters, false.negatives.parameters)
