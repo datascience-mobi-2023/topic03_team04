@@ -1431,8 +1431,8 @@ shift_mvm_global <- globalpeak.rnase.mvm - globalpeak.ctrl.mvm
 shift_mvm_named <- shift_mvm_global
 for (i in 1:nrow(rnase.mvm)) {
   if (i %in% precipitated.mvm) {shift_mvm_named[i] <- "precipitated"}
-  else if (shift_mvm_global [i] < (-n)){shift_mvm_named [i] <- "right shift"}
-  else if (shift_mvm_global [i] > n){shift_mvm_named [i] <- "left shift"}
+  else if (shift_mvm_global [i] < (-n)){shift_mvm_named [i] <- "left shift"}
+  else if (shift_mvm_global [i] > n){shift_mvm_named [i] <- "right shift"}
   else (shift_mvm_named [i] <- "no shift")
 }
 
@@ -1465,8 +1465,8 @@ shift_zt_global <- globalpeak.rnase.zt - globalpeak.ctrl.zt
 shift_zt_named <- shift_zt_global
 for (i in 1:nrow(ctrl.zt)) {
   if (i %in% precipitated.zt) {shift_zt_named[i] <- "precipitated"}
-  else if (shift_zt_global [i] < (-n)){shift_zt_named [i] <- "right shift"}
-  else if (shift_zt_global [i] > n){shift_zt_named [i] <- "left shift"}
+  else if (shift_zt_global [i] < (-n)){shift_zt_named [i] <- "left shift"}
+  else if (shift_zt_global [i] > n){shift_zt_named [i] <- "right shift"}
   else (shift_zt_named [i] <- "no shift")
 }
 
@@ -1498,11 +1498,11 @@ shift_mms_global <- globalpeak.rnase.mms - globalpeak.ctrl.mms
 shift_mms_named <- shift_mms_global
 for (i in 1:nrow(ctrl.mms)) {
   if (i %in% precipitated.mms) {shift_mms_named[i] <- "precipitated"}
-  else if (shift_mms_global [i] < (-n)){shift_mms_named [i] <- "right shift"}
-  else if (shift_mms_global [i] > n){shift_mms_named [i] <- "left shift"}
+  else if (shift_mms_global [i] < (-n)){shift_mms_named [i] <- "left shift"}
+  else if (shift_mms_global [i] > n){shift_mms_named [i] <- "right shift"}
   else (shift_mms_named [i] <- "no shift")
 }
-
+View(shift_mms_global)
 ```
 
 To be able to use the data whether a protein is clustered or not, we need to put it in a vector
@@ -2269,7 +2269,7 @@ t.test.zt <- lapply(t.test.zt, function(x)
   }) 
 #View(t.test.zt)
 signi.global.pa.zt2 <- liste <- apply(signi.global.pa.zt, 1, function(x) as.numeric(x))
-View(signi.global.pa.zt2)
+
 
 overlap.y.shift_t.test.zt <- numeric(length(t.test.zt))
 for (i in seq_along(t.test.zt)) {
@@ -2349,7 +2349,8 @@ t.test.mvm <- lapply(t.test.mvm, function(x)
 signi.global.pa.mvm2 <- liste <- apply(signi.global.pa.mvm, 1, function(x) as.numeric(x))
 names(signi.global.pa.mvm2) <- 1:length(signi.global.pa.mvm2)
 #print(t.test.mvm)
-#View(signi.global.pa.mvm2)
+
+
 
 overlap.y.shift_t.test.mvm <- numeric(length(t.test.mvm))
 for (i in seq_along(t.test.mvm)) {
@@ -2360,8 +2361,8 @@ for (i in seq_along(t.test.mvm)) {
   }
 }
 
-#sum(overlap.y.shift_t.test.mvm)
-#sum(unlist(t.test.mvm))
+sum(overlap.y.shift_t.test.mvm)
+sum(unlist(t.test.mvm))
 
 ```
 
@@ -2398,7 +2399,7 @@ for (x in 1:3){
 
   col <- c("skyblue2", "darkseagreen3","tomato1", "lightsteelblue4" )
   vjust <- c(-0.5, 1, -0.5, -0.5)
-  labels <- c("left shift", "no shift", "precipitated", "right shift")
+  labels <- c("right shift", "no shift", "precipitated", "left shift")
   
   title <- c("Shifttypes", "Shifttypes z-Transformation", "Shifttypes Min-Max-Scaling")
   
@@ -2820,7 +2821,7 @@ for(i in 1:nrow(predictions_mvm_2)) {
 rownames(predictions_mvm_rdeep) <- rownames(rnase.mvm[2501:3074, ])
 
 print(summary(model_mvm_all_2))
-# View(predictions_mvm_rdeep)
+#View(predictions_mvm_rdeep)
 ```
 
 Last but not least, the regression model is shown graphically.
@@ -2943,7 +2944,7 @@ for(i in 1:nrow(predictions_zt_2)) {
 rownames(predictions_zt_rdeep) <- rownames(rnase.zt[2501:3074, ])
 
 # print(summary(model_zt_all_2))
-# View(predictions_zt_rdeep)
+#View(predictions_zt_rdeep)
 ```
 
 Last but not least, the regression model is shown graphically.
