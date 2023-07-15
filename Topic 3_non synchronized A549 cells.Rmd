@@ -1431,8 +1431,8 @@ shift_mvm_global <- globalpeak.rnase.mvm - globalpeak.ctrl.mvm
 shift_mvm_named <- shift_mvm_global
 for (i in 1:nrow(rnase.mvm)) {
   if (i %in% precipitated.mvm) {shift_mvm_named[i] <- "precipitated"}
-  else if (shift_mvm_global [i] < (-n)){shift_mvm_named [i] <- "right shift"}
-  else if (shift_mvm_global [i] > n){shift_mvm_named [i] <- "left shift"}
+  else if (shift_mvm_global [i] < (-n)){shift_mvm_named [i] <- "left shift"}
+  else if (shift_mvm_global [i] > n){shift_mvm_named [i] <- "right shift"}
   else (shift_mvm_named [i] <- "no shift")
 }
 
@@ -1465,8 +1465,8 @@ shift_zt_global <- globalpeak.rnase.zt - globalpeak.ctrl.zt
 shift_zt_named <- shift_zt_global
 for (i in 1:nrow(ctrl.zt)) {
   if (i %in% precipitated.zt) {shift_zt_named[i] <- "precipitated"}
-  else if (shift_zt_global [i] < (-n)){shift_zt_named [i] <- "right shift"}
-  else if (shift_zt_global [i] > n){shift_zt_named [i] <- "left shift"}
+  else if (shift_zt_global [i] < (-n)){shift_zt_named [i] <- "left shift"}
+  else if (shift_zt_global [i] > n){shift_zt_named [i] <- "right shift"}
   else (shift_zt_named [i] <- "no shift")
 }
 
@@ -1498,8 +1498,8 @@ shift_mms_global <- globalpeak.rnase.mms - globalpeak.ctrl.mms
 shift_mms_named <- shift_mms_global
 for (i in 1:nrow(ctrl.mms)) {
   if (i %in% precipitated.mms) {shift_mms_named[i] <- "precipitated"}
-  else if (shift_mms_global [i] < (-n)){shift_mms_named [i] <- "right shift"}
-  else if (shift_mms_global [i] > n){shift_mms_named [i] <- "left shift"}
+  else if (shift_mms_global [i] < (-n)){shift_mms_named [i] <- "left shift"}
+  else if (shift_mms_global [i] > n){shift_mms_named [i] <- "right shift"}
   else (shift_mms_named [i] <- "no shift")
 }
 
@@ -2398,26 +2398,26 @@ for (x in 1:3){
 
   col <- c("skyblue2", "darkseagreen3","tomato1", "lightsteelblue4" )
   vjust <- c(-0.5, 1, -0.5, -0.5)
-  labels <- c("left shift", "no shift", "precipitated", "right shift")
+  labels <- c("right shift", "no shift", "precipitated", "left shift")
   
-  title <- c("Shifttypes", "Shifttypes z-Transformation", "Shifttypes Min-Max-Scaling")
+  title <- c("Shifttypes MVM", "Shifttypes z-Transformation", "Shifttypes Min-Max-Scaling")
   
   peak.ctrl <- peak.ctrl.all[[x]]
   peak.rnase <- peak.rnase.all[[x]]
   
-  peaks <- data.frame(peak.ctrl, peak.rnase, shift_named[,1])
-  number.of.clusters <- data.frame(value = shift_named[,1])
-  peaks$cluster <- factor(shift_named[,1])
+  peaks <- data.frame(peak.ctrl, peak.rnase, shift_named[,x])
+  number.of.clusters <- data.frame(value = shift_named[,x])
+  peaks$cluster <- factor(shift_named[,x])
   
   
   dot.plot <- ggplot(peaks, aes(peak.ctrl,peak.rnase)) + 
-    geom_point(aes(colour = shift_named[,1]), 
+    geom_point(aes(colour = shift_named[,x]), 
                shape = 19, 
                alpha = 0.5, size = 1.5, 
                position = position_jitter(width = 0.2, height = 0.2))+
     labs(x = "Fraction of Control Peak", 
          y = "Fraction of RNase Peak", 
-         title = title[1])+
+         title = title[x])+
     coord_equal()+
     scale_colour_manual(values = col,labels = labels, name = "shifttypes")+
     theme_light()
@@ -3179,7 +3179,6 @@ for(i in 1:nrow(predictions_zt_plot)) {
 }
 
 rownames(predictions_zt_rdeep_shift) <- rownames(rnase.zt[2501:3074, ])
-predictions_zt_rdeep_shift
 
 predictions_mvm_rdeep_shift <- matrix(0, nrow = nrow(predictions_mvm_plot), ncol = ncol(predictions_mvm_plot))
 
@@ -3218,24 +3217,8 @@ number.observed.nonRBPs.regression <- c(length(names.nrdp.mvm.regression), lengt
 Here we load the Rdeep data we want to compare our results to.
 
 ```{r}
-rdeep <- read.csv('archive/Data for comparison/RBP2GO_Human_database_RBPs.csv', header=TRUE, row.names=1, sep = ";")
-View(rdeep)
-```
-
-Here we convert a table, containing non-RNA dependent proteins to a usefull format.
-
-```{r}
-text <- "archive/Data for comparison/Table_HS_Non_RBP.txt"
-csv <- "archive/Data for comparison/Table_HS_Non_RBP.csv"
-
-# Textdatei einlesen
-non.rdeep.text <- read.table(text, sep = "\t", header = TRUE, quote = "\"")
-
-# CSV-Datei schreiben
-write.csv(non.rdeep.text,csv, row.names = FALSE)
-
-non.rdeep <- read.csv(csv)
-
+rdeep <- read.csv('archive/Data for comparison/Rajagopal_R-DeeP.csv', header=TRUE, sep = ";")
+#View(rdeep)
 ```
 
 
@@ -3254,7 +3237,7 @@ true.positives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.rdp.regression[[z]]) {
-    if (i %in% rownames(rdeep)) {
+    if (i %in% rdeep[,1]) {
       counter <- counter + 1
     }
   }
@@ -3274,7 +3257,7 @@ false.positives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0)
 for(z in 1:3){
   counter <- 0
   for (i in names.rdp.regression[[z]]) {
-    if (i %in% non.rdeep$Entry_Name) {
+    if (!(i %in% rdeep[,1])) {
       counter <- counter + 1
     }
   }
@@ -3298,7 +3281,7 @@ true.negatives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.nrdp.regression[[z]]) {
-    if (i %in% non.rdeep$Entry_Name) {
+    if (!(i %in% rdeep[,1])) {
       counter <- counter + 1
     }
   }
@@ -3317,7 +3300,7 @@ false.negatives.regression.shift <- data.frame(mvm = c(0), zt = c(0), mms = c(0)
 for(z in 1:3){
   counter <- 0
   for (i in names.nrdp.regression[[z]]) {
-    if (i %in% rownames(rdeep)) {
+    if (i %in% rdeep[,1]) {
       counter <- counter + 1
     }
   }
@@ -3464,7 +3447,7 @@ true.positives.parameters <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.rdp.parameters[[z]]) {
-    if (i %in% rownames(rdeep)) {
+    if (i %in% rdeep[,1]) {
       counter <- counter + 1
     }
   }
@@ -3476,7 +3459,7 @@ true.positives.kmeans <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.rdp.kmeans[[z]]) {
-    if (i %in% rownames(rdeep)) {
+    if (i %in% rdeep[,1]) {
       counter <- counter + 1
     }
   }
@@ -3488,7 +3471,7 @@ true.positives.glob <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.rdp.glob[[z]]) {
-    if (i %in% rownames(rdeep)) {
+    if (i %in% rdeep[,1]) {
       counter <- counter + 1
     }
   }
@@ -3508,7 +3491,7 @@ false.positives.parameters <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.rdp.parameters[[z]]) {
-    if (i %in% non.rdeep$Entry_Name) {
+    if (!(i %in% rdeep[,1])) {
       counter <- counter + 1
     }
   }
@@ -3520,7 +3503,7 @@ false.positives.kmeans <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.rdp.kmeans[[z]]) {
-    if (i %in% non.rdeep$Entry_Name) {
+    if (!(i %in% rdeep[,1])) {
       counter <- counter + 1
     }
   }
@@ -3532,7 +3515,7 @@ false.positives.glob <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.rdp.glob[[z]]) {
-    if (i %in% non.rdeep$Entry_Name) {
+    if (!(i %in% rdeep[,1])) {
       counter <- counter + 1
     }
   }
@@ -3552,7 +3535,7 @@ true.negatives.parameters <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.nrdp.parameters[[z]]) {
-    if (i %in% non.rdeep$Entry_Name) {
+    if (!(i %in% rdeep[,1])) {
       counter <- counter + 1
     }
   }
@@ -3564,7 +3547,7 @@ true.negatives.kmeans <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.nrdp.kmeans[[z]]) {
-    if (i %in% non.rdeep$Entry_Name) {
+    if (!(i %in% rdeep[,1])) {
       counter <- counter + 1
     }
   }
@@ -3576,7 +3559,7 @@ true.negatives.glob <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.nrdp.glob[[z]]) {
-    if (i %in% non.rdeep$Entry_Name) {
+    if (!(i %in% rdeep[,1])) {
       counter <- counter + 1
     }
   }
@@ -3595,7 +3578,7 @@ false.negatives.parameters <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.nrdp.parameters[[z]]) {
-    if (i %in% rownames(rdeep)) {
+    if (i %in% rdeep[,1]) {
       counter <- counter + 1
     }
   }
@@ -3607,7 +3590,7 @@ false.negatives.kmeans <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.nrdp.kmeans[[z]]) {
-    if (i %in% rownames(rdeep)) {
+    if (i %in% rdeep[,1]) {
       counter <- counter + 1
     }
   }
@@ -3619,7 +3602,7 @@ false.negatives.glob <- data.frame(mvm = c(0), zt = c(0), mms = c(0))
 for(z in 1:3){
   counter <- 0
   for (i in names.nrdp.glob[[z]]) {
-    if (i %in% rownames(rdeep)) {
+    if (i %in% rdeep[,1]) {
       counter <- counter + 1
     }
   }
@@ -3696,71 +3679,6 @@ for(x in 1:3){
 ```
 
 
-### 11.8. non-comparable Proteins
-
-Here we identify those proteins that are neither in the Rdeep-data base, nor the table. 
-
-```{r}
-non.comparable.mvm.parameters <- rownames(comp.mvm.parameters)[which(!(rownames(comp.mvm.parameters) %in% non.rdeep$Entry_Name) & (!(rownames(comp.mvm.parameters) %in% rownames(rdeep))))]
-non.comparable.zt.parameters <- rownames(comp.zt.parameters)[which(!(rownames(comp.zt.parameters) %in% non.rdeep$Entry_Name) & (!(rownames(comp.zt.parameters) %in% rownames(rdeep))))]
-non.comparable.mms.parameters <- rownames(comp.mms.parameters)[which(!(rownames(comp.mms.parameters) %in% non.rdeep$Entry_Name) & (!(rownames(comp.mms.parameters) %in% rownames(rdeep))))]
-
-non.comparable.mvm.kmeans <- rownames(comp.mvm.kmeans)[which(!(rownames(comp.mvm.kmeans) %in% non.rdeep$Entry_Name) & (!(rownames(comp.mvm.kmeans) %in% rownames(rdeep))))]
-non.comparable.zt.kmeans <- rownames(comp.zt.kmeans)[which(!(rownames(comp.zt.kmeans) %in% non.rdeep$Entry_Name) & (!(rownames(comp.zt.kmeans) %in% rownames(rdeep))))]
-non.comparable.mms.kmeans <- rownames(comp.mms.kmeans)[which(!(rownames(comp.mms.kmeans) %in% non.rdeep$Entry_Name) & (!(rownames(comp.mms.kmeans) %in% rownames(rdeep))))]
-
-#shifting?
-shifting.non.comparable.mvm.parameters <- comp.mvm.parameters[which(!(rownames(comp.mvm.parameters) %in% non.rdeep$Entry_Name) & (!(rownames(comp.mvm.parameters) %in% rownames(rdeep)))),]
-shifting.non.comparable.zt.parameters <- comp.zt.parameters[which(!(rownames(comp.zt.parameters) %in% non.rdeep$Entry_Name) & (!(rownames(comp.zt.parameters) %in% rownames(rdeep)))),]
-shifting.non.comparable.mms.parameters <- comp.mms.parameters[which(!(rownames(comp.mms.parameters) %in% non.rdeep$Entry_Name) & (!(rownames(comp.mms.parameters) %in% rownames(rdeep)))),]
-
-shifting.non.comparable.mvm.kmeans <- comp.mvm.kmeans[which(!(rownames(comp.mvm.kmeans) %in% non.rdeep$Entry_Name) & (!(rownames(comp.mvm.kmeans) %in% rownames(rdeep)))),]
-shifting.non.comparable.zt.kmeans <- comp.zt.kmeans[which(!(rownames(comp.zt.kmeans) %in% non.rdeep$Entry_Name) & (!(rownames(comp.zt.kmeans) %in% rownames(rdeep)))),]
-shifting.non.comparable.mms.kmeans <- comp.mms.kmeans[which(!(rownames(comp.mms.kmeans) %in% non.rdeep$Entry_Name) & (!(rownames(comp.mms.kmeans) %in% rownames(rdeep)))),]
-
-
-non.comparable.parameters <- data.frame(mvm = c(non.comparable.mvm.parameters, length(non.comparable.mvm.parameters)),
-                                        "is shift? mvm" = c(shifting.non.comparable.mvm.parameters,
-                                                            sum(shifting.non.comparable.mvm.parameters)),
-                                        zt = c(non.comparable.zt.parameters, length(non.comparable.zt.parameters)),
-                                        "is shift? zt" = c(shifting.non.comparable.zt.parameters,
-                                                           sum(shifting.non.comparable.zt.parameters)),
-                                        mms = c(non.comparable.mms.parameters,length(non.comparable.mms.parameters)),
-                                        "is shift? mms" = c(shifting.non.comparable.mms.parameters,
-                                                            sum(shifting.non.comparable.mms.parameters)))
-colnames(non.comparable.parameters) = c("mvm", "shift?", "zt", "shift?", "mms", "shift?")
-
-non.comparable.kmeans <- data.frame(mvm = c(non.comparable.mvm.kmeans, length(non.comparable.mvm.kmeans)),
-                                        "is shift? mvm" = c(shifting.non.comparable.mvm.kmeans,
-                                                            sum(shifting.non.comparable.mvm.kmeans)),
-                                        zt = c(non.comparable.zt.kmeans, length(non.comparable.zt.kmeans)),
-                                        "is shift? zt" = c(shifting.non.comparable.zt.kmeans,
-                                                           sum(shifting.non.comparable.zt.kmeans)),
-                                        mms = c(non.comparable.mms.kmeans,length(non.comparable.mms.kmeans)),
-                                        "is shift? mms" = c(shifting.non.comparable.mms.kmeans,
-                                                            sum(shifting.non.comparable.mms.kmeans)))
-
-colnames(non.comparable.kmeans) = c("mvm", "shift?", "zt", "shift?", "mms", "shift?")
-
-number.non.comparable.parameters <- data.frame(mvm = length(non.comparable.mvm.parameters), 
-                                        zt = length(non.comparable.zt.parameters), 
-                                        mms = length(non.comparable.mms.parameters))
-number.non.comparable.kmeans <- data.frame(mvm = length(non.comparable.mvm.kmeans), 
-                                    zt = length(non.comparable.zt.kmeans), 
-                                    mms = length(non.comparable.mms.kmeans))
-
-#View(non.comparable.parameters)
-#View(non.comparable.kmeans)
-
-#a data frame that sums it all up
-non.comparable.all <- cbind(non.comparable.parameters[,c(1, 2, 4, 6)], non.comparable.kmeans[,c(2, 4, 6)])
-colnames(non.comparable.all) <- c("Name", "Shift according to parameters mvm", "Shift according to parameters zt", "Shift according to parameters mms", "Shift according to kmeans mvm", "Shift according to kmeans zt", "Shift according to kmeans mms")
-rownames(non.comparable.all) <- c(1:13,"total")
-#View(non.comparable.all)
-```
-Its always the same 13 proteins that are not in the database
-
-
 ### 11.9. Summary
 
 These data frames show all results of the comparison. 
@@ -3804,8 +3722,8 @@ colnames(summary.numbers.all) <- c("global shift mvm", "global shift zt", "globa
 summary.rates.all <- cbind(summary.rates.glob, summary.rates.parameters, summary.rates.kmeans)
 colnames(summary.rates.all) <- c("global shift mvm", "global shift zt", "global shift mms", "parameters mvm", "parameters zt", "parameters mms", "kmeans mvm", "kmeans zt", "kmeans mms")
 
-#View(summary.numbers.all)
-#View(summary.rates.all)
+View(summary.numbers.all)
+View(summary.rates.all)
 
 ```
 
