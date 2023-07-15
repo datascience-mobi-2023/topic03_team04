@@ -6,7 +6,7 @@ The following files are located in our Repository:
 | Name | Description|
 |-------|-------|
 | README.md| This file contains all the important information about this repository.|
-| Topic 3_non synchronized A549 cells.Rmd| This file contains the code used perform our analysis.|
+| Topic 3_non synchronized A549 cells.Rmd| This file contains the code used to perform our analysis.|
 | Report.pdf |This file contains our Report. |
 | Project proposal.pptx| This file contains the PowerPoint presentation from our Project Proposal.|
 | Final Presentation.pptx| This file contains the first draft of our PowerPoint Presentation for our final Presentation.|
