@@ -3366,33 +3366,6 @@ for(x in 1:3){
 precision.regression.shift
 ```
 
-#### 10.4.9 Comparison of trained data based on parameters amount with RDeep
-
-
-```{r}
-names.rdp.mvm.regression.para <- rownames(rounded_predictions_mvm_all)[which(rounded_predictions_mvm_all == 1)]
-names.rdp.zt.regression.para <- rownames(rounded_predictions_zt_all)[which(rounded_predictions_zt_all == 1)]
-names.rdp.mms.regression.para <- rownames(rounded_predictions_mms_all)[which(rounded_predictions_mms_all == 1)]
-
-names.rdp.regression.para <- list(names.rdp.mvm.regression.para, names.rdp.zt.regression.para, names.rdp.mms.regression.para)
-number.observed.RBPs.regression.para <- c(length(names.rdp.mvm.regression.para), length(names.rdp.zt.regression.para), length(names.rdp.mms.regression.para))
-
-
-names.nrdp.mvm.regression.para <- rownames(rounded_predictions_mvm_all)[which(rounded_predictions_mvm_all == 0)]
-names.nrdp.zt.regression.para <- rownames(rounded_predictions_zt_all)[which(rounded_predictions_zt_all == 0)]
-names.nrdp.mms.regression.para <- rownames(rounded_predictions_mms_all)[which(rounded_predictions_mms_all == 0)]
-
-names.nrdp.regression.para <- list(names.nrdp.mvm.regression.para, names.nrdp.zt.regression.para, names.nrdp.mms.regression.para)
-number.observed.nonRBPs.regression.para <- c(length(names.nrdp.mvm.regression.para), length(names.nrdp.zt.regression.para), length(names.nrdp.mms.regression.para))
-
-```
-
-Check how many of our proteins really are RNA-dependent:
-
-```{r}
-number.observed.RBPs.regression.para
-```
-
 
 ## 11. Comparison with RDeep
 
