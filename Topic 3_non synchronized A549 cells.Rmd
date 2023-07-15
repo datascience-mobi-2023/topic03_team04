@@ -3218,15 +3218,15 @@ number.observed.nonRBPs.regression <- c(length(names.nrdp.mvm.regression), lengt
 Here we load the Rdeep data we want to compare our results to.
 
 ```{r}
-rdeep <- read.csv('RBP2GO_Human_database_RBPs.csv', header=TRUE, row.names=1, sep = ";")
-#View(rdeep)
+rdeep <- read.csv('archive/Data for comparison/RBP2GO_Human_database_RBPs.csv', header=TRUE, row.names=1, sep = ";")
+View(rdeep)
 ```
 
 Here we convert a table, containing non-RNA dependent proteins to a usefull format.
 
 ```{r}
-text <- "Table_HS_Non_RBP.txt"
-csv <- "Table_HS_Non_RBP.csv"
+text <- "archive/Data for comparison/Table_HS_Non_RBP.txt"
+csv <- "archive/Data for comparison/Table_HS_Non_RBP.csv"
 
 # Textdatei einlesen
 non.rdeep.text <- read.table(text, sep = "\t", header = TRUE, quote = "\"")
