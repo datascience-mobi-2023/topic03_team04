@@ -3406,7 +3406,7 @@ names.nrdp.kmeans <- list(names.nrdp.mvm.kmeans, names.nrdp.zt.kmeans, names.nrd
 number.observed.non.RBPs.kmeans <- c(length(names.nrdp.mvm.kmeans), length(names.nrdp.zt.kmeans), length(names.nrdp.mms.kmeans))
 
 
-# the proteins identified as RNA-dependent by the global shift parameter
+# the proteins identified as RNA-dependent by the global shift parameter:
 comp.glob <- shift_named
 for(x in 1:3){
   for(y in 1:dim(comp.glob)[1]){
@@ -3425,7 +3425,7 @@ names.rdp.glob <- list(names.rdp.mvm.glob, names.rdp.zt.glob, names.rdp.mms.glob
 number.observed.RBPs.glob <- c(length(names.rdp.mvm.glob), length(names.rdp.zt.glob), length(names.rdp.mms.glob))
 print(number.observed.RBPs.glob)
 
-# the proteins identified as non-RNA-dependent by our four parameters:
+# the proteins identified as non-RNA-dependent by the global shift parameter:
 names.nrdp.mvm.glob <- rownames(as.data.frame(comp.glob[,1]))[which(as.data.frame(comp.glob[,1]) == 0)]
 names.nrdp.zt.glob <- rownames(as.data.frame(comp.glob[,2]))[which(as.data.frame(comp.glob[,2]) == 0)]
 names.nrdp.mms.glob <- rownames(as.data.frame(comp.glob[,3]))[which(as.data.frame(comp.glob[,3]) == 0)]
