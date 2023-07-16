@@ -3741,7 +3741,7 @@ number.non.comparable.kmeans <- data.frame(mvm = length(non.comparable.mvm.kmean
 #a data frame that sums it all up
 non.comparable.all <- cbind(non.comparable.parameters[,c(1, 2, 4, 6)], non.comparable.kmeans[,c(2, 4, 6)])
 colnames(non.comparable.all) <- c("Name", "RDeep according to parameters mvm", "RDeep according to parameters zt", "RDeep according to parameters mms", "RDeep according to kmeans mvm", "RDeep according to kmeans zt", "RDeep according to kmeans mms")
-rownames(non.comparable.all) <- c(1:21,"total")
+rownames(non.comparable.all) <- c(1:22,"total")
 
 library("kableExtra")
 non.comparable.all0 <- kable(non.comparable.all, align = "c")
