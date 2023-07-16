@@ -10,9 +10,9 @@ The following files are located in our Repository:
 | Report.pdf |This file contains our Report. |
 | Project proposal.pptx| This file contains the PowerPoint presentation from our Project Proposal.|
 | Final Presentation.pptx| This file contains the first draft of our PowerPoint Presentation for our final Presentation.|
-| RBP2GO_Human_database_RBPs.csv | Table that contains data, we compare our results to|
-| Table_HS_Non_RBP.csv | Table that contains data we compare our results to |
-| Table_HS_Non_RBP.txt | File that contains data we need to compare our results |
+| Rajagopal_R-DeeP.csv | Table that contains RDeeps from R-Deep 2.0, we compare our results to|
+| nonRdeep2.0.csv | Table that contains the names of those proteins not present in R-Deep 2.0 |
+
 
 
  They are stored in the following folders:
