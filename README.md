@@ -1,4 +1,4 @@
-# Topic 3 : Proteome-wide Screen for RNA-dependent Proteins
+# Topic 3: Proteome-wide Screen for RNA-dependent Proteins
 ## Sub-project 4: non-synchronized A549 cells (A549_NS)  
  This repository contains the work of Tine Limberg, Anastasia Möller, Johannes Schadt and Sylviane Verschaeve.
  
